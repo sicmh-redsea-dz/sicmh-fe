@@ -1,3 +1,5 @@
+@layer reset, base, tokens, recipes, utilities;
+
 @font-face {
   font-family: Poppins-Regular;
   src: url('./assets/fonts/poppins/Poppins-Regular.ttf');
