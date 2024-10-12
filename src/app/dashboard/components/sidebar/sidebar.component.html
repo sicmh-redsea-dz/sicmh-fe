@@ -1,0 +1,75 @@
+<div 
+  [class]="toggledSidebar ? 'sidebar active' : 'sidebar'"
+  (mouseleave)="handleMouseLeaveSubmenuOnCollapse()"
+>
+  <div 
+    class="menu-btn"
+    (click)="toggleSidebar()"
+  >
+    <i class="ph-bold ph-caret-left"></i>
+  </div>
+  <div class="head">
+    <div class="user-img">
+      <img src="../../../../assets/images/user.jpg" alt="">
+    </div>
+    <div class="user-details">
+      <p class="title">{{user.role}}</p>
+      <p class="name">{{user.name}}</p>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="menu">
+      <p class="title">Main</p>
+      <ul>
+        <li 
+          *ngFor="let item of items; let idx = index" 
+          [class]="toggledStates[idx] ? 'active' : ' '"
+        >
+          <a 
+            [routerLink]="item.routerLink" 
+            (click)="toggleItem(idx)"
+          >
+            <i [class]="'icon ' + item.icon"></i>
+            <span class="text">{{item.label}}</span>
+            <i *ngIf="item.hasSubmenu" [class]="'arrow ' + item.arrowIcon"></i>
+          </a>
+          <ul 
+            *ngIf="item.hasSubmenu" 
+            [class]="toggledStates[idx] ? 'sub-menu show' : 'sub-menu'"
+          >
+            <li 
+              (click)="handleSubmenuOnCollapse(idx)"
+              *ngFor="let subitem of item.subItems"
+            >
+              <a [routerLink]="subitem.routerLink">
+                <span class="text">{{subitem.label}}</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="menu">
+    <p class="title">Account</p>
+    <ul>
+      <li>
+        <a>
+          <i class="icon ph-bold ph-gear"></i>
+          <span class="text">Settings</span>
+        </a>
+      </li>
+      <li>
+        <a>
+          <i class="icon ph-bold ph-sign-out"></i>
+          <span 
+            class="text"
+            (click)="onLogout()"
+          >
+            Logout
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

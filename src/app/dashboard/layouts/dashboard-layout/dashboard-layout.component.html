@@ -1,58 +1,6 @@
-<!-- <h1>Dashboard</h1>
-<hr/>
-<h3>User</h3>
-<pre>{{user() | json}}</pre>
-<br>
-<button (click)="onLogout()">Cerrar sesion</button> -->
-
 <div class="container">
-  <div class="sidebar">
-    <div class="head">
-      <div class="user-img">
-        <img src="../../../../assets/images/user.jpg" alt="">
-      </div>
-      <div class="user-details">
-        <p class="title">web developer</p>
-        <p class="name">John Doe</p>
-      </div>
-    </div>
-    <div class="nav">
-      <div class="menu">
-        <p class="title">Main</p>
-        <ul>
-          <li 
-            *ngFor="let item of items; let idx = index" 
-            [class]="toggledStates[idx] ? 'active' : ' '"
-          >
-            <a (click)="toggleItem(idx)">
-              <i [class]="'icon ' + item.icon"></i>
-              <span class="text">{{item.label}}</span>
-              <i *ngIf="item.hasSubmenu" [class]="'arrow ' + item.arrowIcon"></i>
-            </a>
-            <ul 
-              *ngIf="item.hasSubmenu" 
-              [class]="toggledStates[idx] ? 'sub-menu show' : 'sub-menu'"
-            >
-              <li *ngFor="let subitem of item.subItems">
-                <a >
-                  <span class="text">{{subitem}}</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      <div class="menu">
-        <p class="title">Settings</p>
-        <ul>
-          <li>
-            <a>
-              <i class="icon ph-house-simple"></i>
-              <span class="text">Settings</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <router-outlet></router-outlet>
   </div>
 </div>
