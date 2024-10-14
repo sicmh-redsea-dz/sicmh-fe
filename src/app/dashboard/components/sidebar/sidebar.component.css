@@ -27,7 +27,7 @@
   overflow: hidden;
 }
 
-.user-img .img {
+.user-img img {
   width: 100%;
   object-fit: cover;
 }
