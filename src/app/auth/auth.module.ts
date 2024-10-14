@@ -12,7 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   declarations: [
     LoginPageComponent,
     RegisterPageComponent,
-    AuthLayoutComponent
+    AuthLayoutComponent,
   ],
   imports: [
     CommonModule,

@@ -49,6 +49,7 @@ export class SidebarComponent {
   }
 
   public onLogout() {
+    console.log('log out')
     this.authService.logout()
   }
 }
