@@ -1,1 +1,45 @@
-<p class="the_patients">patients works!</p>
+<div class="search-bar">
+  <input type="text" placeholder="Search users..." />
+</div>
+
+<div class="user-table-container">
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th style=" font-size: 1rem"><i class="ph-bold ph-user"></i></th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Last Visit</th>
+        <th>
+          <button class="plus-circle  table-opts"
+                  [routerLink]="'new-patient'">
+                    <i class="fa-solid fa-plus"></i>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody style="background-color: white;">
+      <tr *ngFor="let patient of listOfPatients()?.patients; let idx = index ">
+        <td><img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar"></td>
+        <td>{{patient | formatFullname }}</td>
+        <td>{{ patient.email }}</td>
+        <td>{{ '+504 '+ patient.phone }}</td>
+        <td><span class="badge active">{{ patient | formatDate }}</span></td>
+        <td>
+          <div  class="ellipsis table-opts"
+                (click)="handleSelectedPatient(patient.id)">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <button class="page-btn">Previous</button>
+  <span>Page 1 of 5</span>
+  <button class="page-btn">Next</button>
+</div>
+

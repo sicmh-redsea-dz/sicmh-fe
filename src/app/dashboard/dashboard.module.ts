@@ -6,6 +6,10 @@ import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-l
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
+import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
+import { FormatDatePipe } from './pipes/format-date.pipe';
+import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -13,11 +17,15 @@ import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.co
     DashboardLayoutComponent,
     SidebarComponent,
     PatientsPageComponent,
-    DashboardPageComponent
+    DashboardPageComponent,
+    FormatFullnamePipe,
+    FormatDatePipe,
+    PatientFormPageComponent
   ],
   imports: [
     CommonModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    ReactiveFormsModule
   ]
 })
 export class DashboardModule { }

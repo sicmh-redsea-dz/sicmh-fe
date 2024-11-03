@@ -3,17 +3,20 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout.component';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
+import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardLayoutComponent,
     children: [
+      { path: 'main', component: DashboardPageComponent },
       { path: 'patients', component: PatientsPageComponent },
-      { path: '', component: DashboardPageComponent },
-      { path: '**', redirectTo: ''}
+      { path: 'patients/:id', component: PatientFormPageComponent },
+      { path: 'patients/new-patient', component: PatientFormPageComponent },
+      { path: '**', redirectTo: 'main'}
     ]
-  }
+  },
 ];
 
 @NgModule({

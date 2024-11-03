@@ -1,3 +1,171 @@
-.the_patients {
-  background-color: white;
+.search-bar {
+  margin: 0 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.search-bar input {
+  padding: 10px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: .5rem;
+  font-size: 14px;
+}
+
+.user-table-container {
+  height: 100%;
+  width: 100%;
+  max-height: 75vh;
+  margin: 10px auto;
+  padding-top: 0;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+  border-radius: 1rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table-opts {
+  cursor: pointer;
+  text-align: center;
+  line-height: 1;
+  font-family: 'Poppins-Bold';
+  font-size: 14px;
+}
+
+.plus-circle {
+  border: 1.5px solid #333333;
+  border-radius: 50%;     
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.ellipsis {
+  color: #333333
+}
+
+.user-table th,
+.user-table td {
+  font-size: 14px;
+  padding: .5rem 1rem;
+  text-align: center;
+  width: 22%;
+}
+
+.user-table th {
+  font-size: .75rem;
+}
+
+.user-table th:nth-child(4),
+.user-table td:nth-child(4) {
+  width: 16%;
+}
+
+.user-table th:first-child,
+.user-table th:last-child,
+.user-table td:last-child, 
+.user-table td:first-child {
+  line-height: 1;
+  width: 5%;
+}
+
+.user-table th {
+  background-color: #f5f9fc;
+  color: #333333;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.user-table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Avatar styling */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Badge styles for status */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+}
+
+.badge.active {
+  background-color: #28a745;
+}
+
+.badge.inactive {
+  background-color: #dc3545;
+}
+
+/* Button styles for actions */
+.btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 5px;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #0056b3;
+}
+
+.pagination span {
+  font-size: 14px;
 }

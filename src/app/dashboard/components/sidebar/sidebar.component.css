@@ -183,6 +183,7 @@
   background-color: #000;
   opacity: 0;
   visibility: hidden;
+  z-index: 2;
   /* transition: all 0.3s; */
 }
 

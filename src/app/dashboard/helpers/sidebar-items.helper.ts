@@ -5,7 +5,7 @@ export const sidebarItmes = [
     label: 'Dashboard',
     icon: 'ph-bold ph-house-simple',
     hasSubmenu: false,
-    routerLink: 'dashboard'
+    routerLink: 'main'
   },
   {
     label: 'Audience',

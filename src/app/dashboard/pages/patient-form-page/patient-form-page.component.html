@@ -1,0 +1,104 @@
+<div class="container">
+  <div class="header-container">
+    <button class="back-arrow"
+            [routerLink]="['/dashboard', 'patients']">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="form-header">
+      <h1>{{title}}</h1>
+      <p>Completa toda la información del paciente a continuación.</p>
+    </div>
+  </div>
+
+  <form class="patient-form"
+        autocomplete="off"
+        [formGroup]="patientForm"
+        (ngSubmit)="onHandleSubmit()">
+    <div class="form-content">
+
+      <div class="form-column">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input  class=""
+                  type="text" 
+                  formControlName="firstName" 
+                  placeholder="Nombre del paciente">
+        </div>
+
+        <div class="form-group">
+          <label>Apellido</label>
+          <input  class=""
+                  type="text" 
+                  formControlName="lastName" 
+                  placeholder="Apellido del paciente">
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Nacimiento</label>
+          <input  class="" 
+                  type="date" 
+                  formControlName="birthdate">
+        </div>
+
+        <div class="form-group">
+          <label>Género</label>
+          <select name="gender" formControlName="gender">
+            <option value="">Seleccionar</option>
+            <option value="male">Masculino</option>
+            <option value="female">Femenino</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-column">
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input  class="" 
+                  type="tel" 
+                  formControlName="phone" 
+                  placeholder="Número de teléfono">
+        </div>
+
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input  class="" 
+                  type="email" 
+                  formControlName="email" 
+                  placeholder="ejemplo@correo.com">
+        </div>
+
+        <div class="form-group">
+          <label>Dirección</label>
+          <input  class=""
+                  type="text"
+                  formControlName="address" 
+                  placeholder="Dirección completa">
+        </div>
+
+        <div class="form-group">
+          <label>Subir Imagen del Paciente</label>
+          <input  class=""
+                  type="file"
+                  formControlName="image" 
+                  accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label>Notas Adicionales</label>
+      <textarea class="" 
+                rows="3" 
+                formControlName="notes" 
+                placeholder="Información adicional sobre el paciente">
+      </textarea>
+    </div>
+
+    <button class="submit-btn"
+            [disabled]="patientForm.invalid"
+            type="submit">
+      {{actionButtonText}}
+    </button>
+  </form>
+</div>
