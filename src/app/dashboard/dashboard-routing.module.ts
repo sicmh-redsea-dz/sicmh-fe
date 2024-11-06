@@ -14,11 +14,22 @@ const routes: Routes = [
     children: [
       { path: 'main', component: DashboardPageComponent },
       { path: 'patients', component: PatientsPageComponent },
-      { path: 'patients/:id', component: PatientFormPageComponent },
-      { path: 'patients/new-patient', component: PatientFormPageComponent },
+      {
+        path: 'patients',
+        children: [
+          { path: ':id', component: PatientFormPageComponent },
+          { path: 'new-patient', component: PatientFormPageComponent },
+
+        ]
+      },
       { path: 'visits', component: VisitsPageComponent },
-      { path: 'visits/new-history', component: VisitsFormPageComponent },
-      { path: '**', redirectTo: 'visits/new-history'}
+      {
+        path: 'visits',
+        children: [
+          { path: 'new-history', component: VisitsFormPageComponent },
+        ]
+      },
+      { path: '**', redirectTo: 'main'}
     ]
   },
 ];

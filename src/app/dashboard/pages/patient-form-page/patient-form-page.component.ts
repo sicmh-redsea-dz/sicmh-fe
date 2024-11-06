@@ -44,9 +44,7 @@ export class PatientFormPageComponent implements OnInit {
       .pipe(
         map((urlSegment) => urlSegment),
       ).subscribe(segments => {
-        console.log('url segment: ', segments)
-        let urlSegment = segments[1].path === 'new-patient' ? true : false
-        console.log('url segment: ', urlSegment)
+        let urlSegment = segments[0].path === 'new-patient' ? true : false
         if(urlSegment) {
           this.caller = 'np'
           this.frameTitle = 'Registro de Paciente'
