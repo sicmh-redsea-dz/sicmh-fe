@@ -1,0 +1,201 @@
+.search-bar {
+  margin: 0 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.search-bar input {
+  padding: 10px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: .5rem;
+  font-size: 14px;
+}
+
+.visit-table-container {
+  height: 100%;
+  width: 100%;
+  max-height: 75vh;
+  margin: 10px auto;
+  padding-top: 0;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+  border-radius: 1rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.visit-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table-opts {
+  cursor: pointer;
+  text-align: center;
+  line-height: 1;
+  font-family: 'Poppins-Bold';
+  font-size: 14px;
+}
+
+.plus-circle {
+  border: 1.5px solid #333333;
+  border-radius: 50%;     
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.ellipsis {
+  color: #333333
+}
+
+.visit-table th,
+.visit-table td {
+  font-size: 14px;
+  padding: .5rem .25rem;
+  text-align: center;
+  width: 19%;
+}
+
+.visit-table th {
+  font-size: .75rem;
+  background-color: #f5f9fc;
+  color: #333333;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.visit-table td:last-child {
+  line-height: 1;
+  width: 5%;
+}
+
+.visit-table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.visit-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+td:nth-child(5) .truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 80%;
+  vertical-align: middle;
+}
+
+.tooltip {
+  white-space: normal;
+  text-align: center;
+  position: relative;
+}
+
+.tooltip .tooltip-text {
+  background-color: #212b46;
+  border-radius: 6px;
+  top: 100%;
+  left: 50%;
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 400;
+  text-align: center;
+  margin-left: -100px;
+  padding: 5px 0;
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  width: 200px;
+  z-index: 1;
+  transition: opacity .8s;
+  height: auto;
+  white-space: normal;
+}
+
+td:nth-child(5):hover .tooltip-text {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Avatar styling */
+.visit-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Badge styles for status */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+}
+
+.badge.active {
+  background-color: #28a745;
+}
+
+.badge.inactive {
+  background-color: #dc3545;
+}
+
+/* Button styles for actions */
+.btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 5px;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #0056b3;
+}
+
+.pagination span {
+  font-size: 14px;
+}

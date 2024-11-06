@@ -78,9 +78,9 @@ textarea {
   border: none;
 }
 
-textarea:focus, input:focus {
+/* textarea:focus{
   border-color: transparent !important;
-}
+} */
 
 /*---------------------------------------------*/
 button {

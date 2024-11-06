@@ -1,0 +1,40 @@
+<div class="visit-table-container">
+  <table class="visit-table">
+    <thead>
+      <tr>
+        <th>Doctor</th>
+        <th>Patient</th>
+        <th>Last Visit</th>
+        <th>Next Visit</th>
+        <th>Diagnosis</th>
+        <th>
+          <button class="plus-circle  table-opts"
+                  [routerLink]="'new-history'">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody style="background-color: white;">
+      <tr>
+        <td>Dr. Melqueche</td>
+        <td>Dereck Zavala</td>
+        <td>2024-10-23</td>
+        <td>2024-11-01</td>
+        <td>
+          <div class="tooltip">
+            <span class="truncate-text">Texto muy largo que debería truncarse...</span>
+            <span class="tooltip-text">
+              Texto completo que aparece en el tooltip al hacer hover.
+            </span>
+          </div>
+        </td>
+        <td>
+          <div class="ellipsis table-opts">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,6 +1,5 @@
-import { Component, computed, inject, Input } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { sidebarItmes } from '../../helpers/sidebar-items.helper';
-import { User } from '../../../auth/interfaces';
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({

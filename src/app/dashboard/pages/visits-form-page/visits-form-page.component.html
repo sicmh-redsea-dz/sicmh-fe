@@ -1,0 +1,162 @@
+<div class="container">
+  <div class="header-container">
+    <button class="back-arrow" 
+            [routerLink]="['/dashboard', 'visits']">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="form-header">
+      <h1>Registro Medico</h1>
+      <p>Ingresa los detalles completos de la visita médica.</p>
+    </div>
+    <p class="subtle-text"># 123456789</p>
+  </div>
+
+  <form class="medical-form" 
+        autocomplete="off">
+
+    <div class="input-row">
+      <div class="input-group date-group">
+        <label>Date</label>
+        <input type="date" />
+      </div>
+
+      <div class="input-group">
+        <label>Doctor</label>
+        <select>
+          <option value="op1">Opción 1</option>
+          <option value="op2">Opción 2</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Patient</label>
+        <select>
+          <option value="op1">Opción 1</option>
+          <option value="op2">Opción 2</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="input-columns">
+      <!-- Columna izquierda (75%) -->
+      <div class="left-column">
+        <div class="number-input-group">
+          <label>Presion</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-1" />
+            <div class="button-group">
+              <button class="increment" (click)="myFunc($event)">+</button>
+              <button class="decrement" (click)="myFunc($event)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Temperatura</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-2" />
+            <div class="button-group">
+              <button class="increment" (click)="myFunc($event)">+</button>
+              <button class="decrement" (click)="myFunc($event)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Altura</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-6"/>
+            <div class="button-group">
+              <select>
+                <option value="mts">mts</option>
+                <option value="pgs">pgs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+  
+        <div class="number-input-group">
+          <label>Glucometria</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-4" />
+            <div class="button-group">
+              <button class="increment" (click)="myFunc($event)">+</button>
+              <button class="decrement" (click)="myFunc($event)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Oxigenacion</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-5" />
+            <div class="button-group">
+              <button class="increment" (click)="myFunc($event)">+</button>
+              <button class="decrement" (click)="myFunc($event)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Peso</label>
+          <div class="number-input">
+            <input type="number" value="0" id="number-input-6"/>
+            <div class="button-group">
+              <select>
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-vertical"></div>
+      <!-- Columna derecha (25%) -->
+      <div class="right-column">
+        <div class="calculated-input-group">
+          <label>IMC</label>
+          <input type="text" />
+        </div>
+
+        <div class="calculated-input-group">
+          <label>% De Grasa</label>
+          <input type="text" />
+        </div>
+
+        <div class="calculated-input-group">
+          <label>Grasa Visceral</label>
+          <input type="text" />
+        </div>
+
+        <div class="calculated-input-group">
+          <label>Edad Segun Peso</label>
+          <input type="text" />
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Diagnostico</label>
+        <textarea id="textarea1"></textarea>
+      </div>
+    
+      <div class="textarea-group">
+        <label>Tratamiento</label>
+        <textarea id="textarea2"></textarea>
+      </div>
+    </div>
+    
+    <div class="textarea-full">
+      <label>Notas</label>
+      <textarea id="textarea3"></textarea>
+    </div>
+
+    <button class="submit-btn" 
+            [disabled]="false" 
+            type="submit">
+      Save
+    </button>
+  </form>
+</div>

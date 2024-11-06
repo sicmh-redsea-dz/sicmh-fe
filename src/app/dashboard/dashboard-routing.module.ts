@@ -4,6 +4,8 @@ import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-l
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
 import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
+import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
+import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
 
 const routes: Routes = [
   {
@@ -14,7 +16,9 @@ const routes: Routes = [
       { path: 'patients', component: PatientsPageComponent },
       { path: 'patients/:id', component: PatientFormPageComponent },
       { path: 'patients/new-patient', component: PatientFormPageComponent },
-      { path: '**', redirectTo: 'main'}
+      { path: 'visits', component: VisitsPageComponent },
+      { path: 'visits/new-history', component: VisitsFormPageComponent },
+      { path: '**', redirectTo: 'visits/new-history'}
     ]
   },
 ];

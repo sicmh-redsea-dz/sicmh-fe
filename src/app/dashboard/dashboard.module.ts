@@ -10,6 +10,8 @@ import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
 import { FormatDatePipe } from './pipes/format-date.pipe';
 import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
+import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     DashboardPageComponent,
     FormatFullnamePipe,
     FormatDatePipe,
-    PatientFormPageComponent
+    PatientFormPageComponent,
+    VisitsPageComponent,
+    VisitsFormPageComponent
   ],
   imports: [
     CommonModule,

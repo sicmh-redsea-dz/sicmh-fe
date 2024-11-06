@@ -1,5 +1,3 @@
-import { RouterLink } from "@angular/router";
-
 export const sidebarItmes = [
   {
     label: 'Dashboard',
@@ -11,7 +9,7 @@ export const sidebarItmes = [
     label: 'Audience',
     icon: 'ph-bold ph-user',
     hasSubmenu: true,
-    subItems: [{label: 'Users', routerLink: 'patients'}, {label:'Subscribers', routerLink:''}],
+    subItems: [{label: 'Patients', routerLink: 'patients'}, {label:'Visits', routerLink:'visits'}],
     arrowIcon: 'ph-bold ph-caret-down'
   },
   {
