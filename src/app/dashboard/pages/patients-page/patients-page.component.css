@@ -53,7 +53,7 @@
 
 .user-table th,
 .user-table td {
-  font-size: 14px;
+  font-size: .75rem;
   padding: .5rem 1rem;
   text-align: center;
   width: 22%;
@@ -107,6 +107,10 @@
   font-size: 12px;
   color: white;
   text-align: center;
+}
+
+.badge.date{
+  background-color: #ca9bf7;
 }
 
 .badge.active {

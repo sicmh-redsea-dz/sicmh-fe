@@ -33,12 +33,10 @@ export class PatientFormPageComponent implements OnInit {
     notes     : ['']
   })
 
-  
   public set frameTitle(v: string) {
     this.title = v;
   }
   
-
   ngOnInit(): void {
     this.activeRoute.url
       .pipe(
@@ -76,7 +74,7 @@ export class PatientFormPageComponent implements OnInit {
       .subscribe({
         next: (editedUser) => {
           if( editedUser ) {
-            const {patient} = editedUser.data
+            const { patient } = editedUser.data
             Swal.fire('Success', `${patient.name} ${patient.lastName} has been edited!`, 'success')
               .then(() => {
                 this.router.navigateByUrl('/dashboard/patients')

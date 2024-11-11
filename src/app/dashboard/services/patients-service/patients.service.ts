@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../../environments/environment'
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs'
+import { catchError, map, Observable, of, throwError } from 'rxjs'
 import { AddedUser, Data, FormPatient, Patient, PatientsResponse } from '../../interface/patients-response.interface'
 import { AuthService } from '../../../auth/services/auth.service'
 
@@ -15,7 +15,6 @@ export class PatientsService {
   private _listOfPatients = signal<Data | null>( null )
   private _selectedPatient = signal<Patient | null>( null )
   public selectedPatient = computed(() => this._selectedPatient() )
-
   public listOfPatients = computed(() => this._listOfPatients())
 
   public getPatients():Observable<boolean> {

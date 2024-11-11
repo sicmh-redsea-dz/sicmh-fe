@@ -1,37 +1,47 @@
+<div class="search-bar">
+  <input type="text" placeholder="Search users..." />
+</div>
+
 <div class="visit-table-container">
   <table class="visit-table">
     <thead>
       <tr>
+        <th>Id</th>
         <th>Doctor</th>
         <th>Patient</th>
         <th>Last Visit</th>
-        <th>Next Visit</th>
         <th>Diagnosis</th>
         <th>
           <button class="plus-circle  table-opts"
-                  [routerLink]="'new-history'">
+                  [routerLink]="'new-visit'">
             <i class="fa-solid fa-plus"></i>
           </button>
         </th>
       </tr>
     </thead>
     <tbody style="background-color: white;">
-      <tr>
-        <td>Dr. Melqueche</td>
-        <td>Dereck Zavala</td>
-        <td>2024-10-23</td>
-        <td>2024-11-01</td>
+      <tr *ngFor="let visit of listOfVisits(); let idx = index">
+        <td>{{visit.id}}</td>
+        <td>{{visit.doctorName}}</td>
+        <td>{{visit.patientName}}</td>
+        <td><span class="badge date">{{visit.lastVisitDate | formatDate}}</span></td>
         <td>
           <div class="tooltip">
-            <span class="truncate-text">Texto muy largo que debería truncarse...</span>
+            <span class="truncate-text">{{visit.diagnosis}}</span>
             <span class="tooltip-text">
-              Texto completo que aparece en el tooltip al hacer hover.
+              {{visit.diagnosis}}
             </span>
           </div>
         </td>
         <td>
-          <div class="ellipsis table-opts">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
+          <div class="opts">
+            <div class="opts-btns edit"
+                (click)="handleSelectedVisit(visit.id)">
+              <i class="ph ph-pencil"></i>
+            </div>
+            <div class="opts-btns delete">
+              <i class="ph ph-trash-simple"></i>
+            </div>
           </div>
         </td>
       </tr>

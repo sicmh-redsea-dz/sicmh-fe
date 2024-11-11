@@ -6,8 +6,8 @@ import { Patient } from '../interface/patients-response.interface';
 })
 export class FormatDatePipe implements PipeTransform {
 
-  transform(value: Patient): string {
-    const formattedDate = value.birthDate.toString().split('T')
+  transform(value: string | Date): string {
+    const formattedDate = value.toString().split('T')
     return formattedDate[0]
   }
 

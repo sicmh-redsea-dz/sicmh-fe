@@ -26,7 +26,8 @@ const routes: Routes = [
       {
         path: 'visits',
         children: [
-          { path: 'new-history', component: VisitsFormPageComponent },
+          { path: 'edit-visit/:id', component: VisitsFormPageComponent },
+          { path: 'new-visit', component: VisitsFormPageComponent },
         ]
       },
       { path: '**', redirectTo: 'main'}

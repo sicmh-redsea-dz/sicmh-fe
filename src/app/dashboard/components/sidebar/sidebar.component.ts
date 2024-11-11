@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { sidebarItmes } from '../../helpers/sidebar-items.helper';
+import { sidebarItmes } from '../../helpers/sidebar-items/sidebar-items.helper';
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
@@ -48,7 +48,6 @@ export class SidebarComponent {
   }
 
   public onLogout() {
-    console.log('log out')
     this.authService.logout()
   }
 }

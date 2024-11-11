@@ -9,9 +9,10 @@ import { PatientsService } from '../../services/patients-service/patients.servic
   styleUrl: './patients-page.component.css'
 })
 export class PatientsPageComponent {
-  public listOfPatients = computed(() => this.patientService.listOfPatients())
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
+  
+  public listOfPatients = computed(() => this.patientService.listOfPatients())
 
   constructor() {
     this.getPatients()

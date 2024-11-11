@@ -5,34 +5,51 @@
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="form-header">
-      <h1>Registro Medico</h1>
-      <p>Ingresa los detalles completos de la visita médica.</p>
+      <h1>{{title}}</h1>
+      <p>Completa los detalles de la visita médica.</p>
     </div>
-    <p class="subtle-text"># 123456789</p>
+    <p class="subtle-text" *ngIf="caller !== 'nv' ">{{idTag}}</p>
   </div>
 
   <form class="medical-form" 
-        autocomplete="off">
+        autocomplete="off"
+        [formGroup]="visitForm"
+        (ngSubmit)="onHandleSubmit()">
 
     <div class="input-row">
       <div class="input-group date-group">
         <label>Date</label>
-        <input type="date" />
+        <input type="date" 
+              formControlName="date"/>
       </div>
 
       <div class="input-group">
         <label>Doctor</label>
-        <select>
-          <option value="op1">Opción 1</option>
-          <option value="op2">Opción 2</option>
+        <select formControlName="doctor">
+          <option disabled 
+                  selected
+                  value="">
+            Seleccione un doctor
+          </option>
+          <option *ngFor="let doctor of listOfDoctors()"
+                  [value]="doctor.id">
+            {{doctor.name}}
+          </option>
         </select>
       </div>
 
       <div class="input-group">
         <label>Patient</label>
-        <select>
-          <option value="op1">Opción 1</option>
-          <option value="op2">Opción 2</option>
+        <select formControlName="patient">
+          <option disabled 
+                  selected
+                  value="">
+            Seleccione un doctor
+          </option>
+          <option *ngFor="let patient of listOfPatients()" 
+                  [value]="patient.id">
+            {{patient.name}}
+          </option>
         </select>
       </div>
     </div>
@@ -45,60 +62,67 @@
         <div class="number-input-group">
           <label>Presion</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-1" />
-            <div class="button-group">
-              <button class="increment" (click)="myFunc($event)">+</button>
-              <button class="decrement" (click)="myFunc($event)">-</button>
-            </div>
+            <input type="text" 
+                  formControlName="pressure" 
+                  placeholder="Ej. 120/80 mmHg"/>
           </div>
         </div>
         <div class="number-input-group">
           <label>Temperatura</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-2" />
+            <input type="number" 
+                  formControlName="temperature"
+                  placeholder="Ej. 36º"/>
             <div class="button-group">
-              <button class="increment" (click)="myFunc($event)">+</button>
-              <button class="decrement" (click)="myFunc($event)">-</button>
+              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
         </div>
         <div class="number-input-group">
           <label>Altura</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-6"/>
+            <input type="number" 
+                  formControlName="height" 
+                  placeholder="Ej. 1.75"/>
             <div class="button-group">
               <select>
-                <option value="mts">mts</option>
+                <option value="mts">cms</option>
                 <option value="pgs">pgs</option>
               </select>
             </div>
           </div>
         </div>
-  
         <div class="number-input-group">
           <label>Glucometria</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-4" />
+            <input type="number"
+                  formControlName="glucometry"
+                  placeholder="Ej. 90 mg/dL"/>
             <div class="button-group">
-              <button class="increment" (click)="myFunc($event)">+</button>
-              <button class="decrement" (click)="myFunc($event)">-</button>
+              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
         </div>
         <div class="number-input-group">
           <label>Oxigenacion</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-5" />
+            <input type="number"
+                  formControlName="oxygenation" 
+                  placeholder="Ej. 100%"/>
             <div class="button-group">
-              <button class="increment" (click)="myFunc($event)">+</button>
-              <button class="decrement" (click)="myFunc($event)">-</button>
+              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
         </div>
         <div class="number-input-group">
           <label>Peso</label>
           <div class="number-input">
-            <input type="number" value="0" id="number-input-6"/>
+            <input type="number" 
+                  formControlName="weight"
+                  placeholder="Ej. 120"/>
             <div class="button-group">
               <select>
                 <option value="kg">kg</option>
@@ -114,22 +138,34 @@
       <div class="right-column">
         <div class="calculated-input-group">
           <label>IMC</label>
-          <input type="text" />
+          <input class="calculated-input"
+                type="text" 
+                formControlName="BMI"
+                placeholder="Ej. 22.86"/>
         </div>
 
         <div class="calculated-input-group">
           <label>% De Grasa</label>
-          <input type="text" />
+          <input class="calculated-input"
+                type="text" 
+                formControlName="fatPercentage"
+                placeholder="Ej. 25.8%"/>
         </div>
 
         <div class="calculated-input-group">
           <label>Grasa Visceral</label>
-          <input type="text" />
+          <input class="calculated-input" 
+                type="text" 
+                formControlName="visceralFat"
+                placeholder="Ej. 1.07"/>
         </div>
 
         <div class="calculated-input-group">
           <label>Edad Segun Peso</label>
-          <input type="text" />
+          <input class="calculated-input" 
+                type="text" 
+                formControlName="ageAccordingToWeight"
+                placeholder="Ej. 32"/>
         </div>
       </div>
     </div>
@@ -139,24 +175,27 @@
     <div class="textareas-row">
       <div class="textarea-group">
         <label>Diagnostico</label>
-        <textarea id="textarea1"></textarea>
+        <textarea formControlName="diagnosis"
+                  placeholder="Escribe aquí el diagnóstico detallado del paciente."></textarea>
       </div>
     
       <div class="textarea-group">
         <label>Tratamiento</label>
-        <textarea id="textarea2"></textarea>
+        <textarea formControlName="treatment"
+                  placeholder="Describe el plan de tratamiento y medicamentos recomendados."></textarea>
       </div>
     </div>
     
     <div class="textarea-full">
       <label>Notas</label>
-      <textarea id="textarea3"></textarea>
+      <textarea formControlName="notes"
+                placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
     </div>
 
     <button class="submit-btn" 
-            [disabled]="false" 
+            [disabled]="visitForm.invalid" 
             type="submit">
-      Save
+      {{actionButtonText}}
     </button>
   </form>
 </div>

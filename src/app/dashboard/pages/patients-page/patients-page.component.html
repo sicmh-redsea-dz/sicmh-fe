@@ -10,7 +10,7 @@
         <th>Name</th>
         <th>Email</th>
         <th>Phone</th>
-        <th>Last Visit</th>
+        <th>Birth Date</th>
         <th>
           <button class="plus-circle  table-opts"
                   [routerLink]="'new-patient'">
@@ -21,11 +21,13 @@
     </thead>
     <tbody style="background-color: white;">
       <tr *ngFor="let patient of listOfPatients()?.patients; let idx = index ">
-        <td><img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar"></td>
+        <td>
+          <img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar">
+        </td>
         <td>{{patient | formatFullname }}</td>
         <td>{{ patient.email }}</td>
         <td>{{ '+504 '+ patient.phone }}</td>
-        <td><span class="badge active">{{ patient | formatDate }}</span></td>
+        <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
         <td>
           <div  class="ellipsis table-opts"
                 (click)="handleSelectedPatient(patient.id)">

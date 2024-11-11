@@ -47,16 +47,24 @@
   transition: background-color 0.3s;
 }
 
-.ellipsis {
-  color: #333333
-}
-
 .visit-table th,
 .visit-table td {
-  font-size: 14px;
+  font-size: .75rem;
   padding: .5rem .25rem;
   text-align: center;
-  width: 19%;
+  width: 21.25%;
+}
+
+.visit-table th:first-child,
+.visit-table td:first-child{
+  line-height: 1;
+  width: 5%;
+}
+
+.visit-table th:last-child
+.visit-table td:last-child{
+  line-height: 1;
+  width: 10%;
 }
 
 .visit-table th {
@@ -67,11 +75,6 @@
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.visit-table td:last-child {
-  line-height: 1;
-  width: 5%;
 }
 
 .visit-table tr {
@@ -123,12 +126,41 @@ td:nth-child(5):hover .tooltip-text {
   visibility: visible;
 }
 
-/* Avatar styling */
-.visit-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+td .opts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem
 }
+
+.opts .opts-btns {
+  cursor: pointer;
+  text-align: center;
+  line-height: 1;
+  font-family: 'Poppins-Bold';
+  font-size: 1rem;
+}
+
+.opts-btns.edit {
+  color: navy
+}
+
+.opts-btns.delete {
+  color: red
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Badge styles for status */
 .badge {
@@ -137,6 +169,10 @@ td:nth-child(5):hover .tooltip-text {
   font-size: 12px;
   color: white;
   text-align: center;
+}
+
+.badge.date{
+  background-color: #ca9bf7;
 }
 
 .badge.active {
