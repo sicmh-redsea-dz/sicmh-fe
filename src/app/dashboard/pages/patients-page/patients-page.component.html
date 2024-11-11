@@ -37,9 +37,11 @@
   </table>
 </div>
 
-<div class="pagination">
-  <button class="page-btn">Previous</button>
-  <span>Page 1 of 5</span>
-  <button class="page-btn">Next</button>
-</div>
-
+<app-pagination
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [offset]="offset"
+  [totalCount]="totalCount"
+  [totalRegistries]="totalRegistries"
+  (pageChange)="onPageChange($event)"
+/>

@@ -9,19 +9,28 @@ import { FormVisit } from '../../interface/visits-response.interface';
   templateUrl: './visits-page.component.html',
   styleUrl: './visits-page.component.css'
 })
-export class VisitsPageComponent {
+export class VisitsPageComponent implements OnInit {
   public searchTerm: string = ''
+  public currentPage: number = 1
+  public totalPages: number = 1
+  public limit: number = 25
+  public offset: number = 0
+  public totalRegistries: number = 1
 
   private router = inject( Router )
   private visitsService: VisitsService = inject(VisitsService)
 
-  constructor() {
+  ngOnInit(): void {
     this.getVisits()
   }
 
   public getVisits() {
-    this.visitsService.getAllVisits()
+    this.visitsService.getAllVisits({limit: this.limit, offset: this.offset})
       .subscribe({
+        next: ( response ) => {
+          this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
+          this.totalRegistries = response?.totalRegistries!
+        },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
         }
@@ -30,6 +39,14 @@ export class VisitsPageComponent {
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
+    this.currentPage = 1
+    this.getVisits()
+  }
+
+  public onPageChange(page: number) {
+    this.currentPage = page
+    this.offset = (this.currentPage - 1) * this.limit;
+    this.getVisits();
   }
 
   public handleSelectedVisit(id: number) {

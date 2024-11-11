@@ -196,28 +196,3 @@ td .opts {
 .btn-delete:hover {
   background-color: #c82333;
 }
-
-/* Pagination styling */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-}
-
-.page-btn {
-  padding: 8px 16px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.page-btn:hover {
-  background-color: #0056b3;
-}
-
-.pagination span {
-  font-size: 14px;
-}

@@ -4,8 +4,12 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
-import { VisitsResponse, Doctor, Visits, Patient, FormVisit, SelectedVisitResponse, Visit } from '../../interface/visits-response.interface';
+import { VisitsResponse, Doctor, Visits, Patient, FormVisit, SelectedVisitResponse, Visit, Data } from '../../interface/visits-response.interface';
 
+interface Pagination {
+  limit: number,
+  offset: number
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -26,7 +30,7 @@ export class VisitsService {
   private _listOfPatients = signal<Patient[] | null>(null)
   public listOfPatients = computed(() => this._listOfPatients() )
 
-  public getAllVisits(): Observable<boolean> {
+  public getAllVisits(pagination: Pagination): Observable<Data | null> {
     const url: string = `${this.baseUrl}/dashboard/visits`
     const token = localStorage.getItem('token')
     if( !token ) this.authStatus.logout()
@@ -34,8 +38,8 @@ export class VisitsService {
       .set('Authorization', `Bearer ${token}`)
 
     const params = new HttpParams()
-      .set('limit', 25)
-      .set('offset', 0)
+      .set('limit', pagination.limit)
+      .set('offset', pagination.offset)
 
     return this.http.get<VisitsResponse>(url, { headers, params })
       .pipe(
@@ -43,11 +47,11 @@ export class VisitsService {
           this._listOfVisits.set(data.visits)
           this._listOfDoctors.set(data.doctors)
           this._listOfPatients.set(data.patients)
-          return true
+          return data
         }),
         catchError(( err ) => {
           throwError(() => err.error.message)
-          return of(false)
+          return of( null )
         })
       )
   }

@@ -9,6 +9,7 @@ export interface Data {
   totalVisitsCount:   number;
   totalPatientsCount: number;
   totalDoctorsCount:  number;
+  totalRegistries:  number;
 }
 
 export interface Doctor {

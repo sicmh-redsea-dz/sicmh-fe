@@ -4,6 +4,7 @@ export interface PatientsResponse {
 
 export interface Data {
   totalCount: number;
+  totalRegistries: number;
   patients:   Patient[];
 }
 

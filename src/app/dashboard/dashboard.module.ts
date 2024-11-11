@@ -13,6 +13,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
 import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { PaginationComponent } from './components/pagination/pagination.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
     PatientFormPageComponent,
     VisitsPageComponent,
     VisitsFormPageComponent,
-    SearchBarComponent
+    SearchBarComponent,
+    PaginationComponent
   ],
   imports: [
     CommonModule,

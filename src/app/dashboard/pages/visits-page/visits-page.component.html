@@ -46,3 +46,11 @@
     </tbody>
   </table>
 </div>
+
+<app-pagination
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [offset]="offset"
+  [totalRegistries]="totalRegistries"
+  (pageChange)="onPageChange($event)"
+/>

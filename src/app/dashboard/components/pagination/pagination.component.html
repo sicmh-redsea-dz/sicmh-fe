@@ -1,0 +1,20 @@
+<div class="pagination">
+  <div class="pagination-info">
+    <span>Displaying <span class="pagination-number">{{displayedCount['min']}}</span> to <span class="pagination-number">{{displayedCount['max']}}</span> Out of <span class="pagination-number">{{totalRegistries}}</span></span>
+  </div>
+  <div class="pagination-controls">
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPreviousPage()">
+      <i class="fa fa-chevron-left"></i>
+    </button>
+    
+    <ng-container *ngFor="let page of displayedPages">
+      <button class="page-number" [class.active]="page === currentPage" (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </ng-container>
+    
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToNextPage()">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+  </div>
+</div>

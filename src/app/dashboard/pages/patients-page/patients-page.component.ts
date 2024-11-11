@@ -10,6 +10,12 @@ import { PatientsService } from '../../services/patients-service/patients.servic
 })
 export class PatientsPageComponent {
   public searchTerm: string = ''
+  public limit: number = 25
+  public offset: number = 0
+  public totalPages: number = 1
+  public currentPage: number = 1
+  public totalCount: number = 1
+  public totalRegistries: number = 1
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
@@ -23,12 +29,23 @@ export class PatientsPageComponent {
   }
 
   public getPatients() {
-    this.patientService.getPatients()
+    this.patientService.getPatients({ limit: this.limit, offset: this.offset })
       .subscribe({
+        next: ( response ) => {
+          this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
+          this.totalRegistries = response?.totalRegistries!
+          this.totalCount = response?.totalCount!
+        },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
         }
       }) 
+  }
+
+  public onPageChange(page: number) {
+    this.currentPage = page
+    this.offset = (this.currentPage - 1) * this.limit;
+    this.getPatients();
   }
 
   public handleSelectedPatient( patientId: number) {
