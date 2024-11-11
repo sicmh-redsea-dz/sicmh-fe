@@ -10,10 +10,10 @@ import { FormVisit } from '../../interface/visits-response.interface';
   styleUrl: './visits-page.component.css'
 })
 export class VisitsPageComponent {
+  public searchTerm: string = ''
+
   private router = inject( Router )
   private visitsService: VisitsService = inject(VisitsService)
-
-  public listOfVisits = computed(() => this.visitsService.listOfVisits())
 
   constructor() {
     this.getVisits()
@@ -28,6 +28,10 @@ export class VisitsPageComponent {
       })
   }
 
+  public onSearchTermChange( term: string ) {
+    this.searchTerm = term
+  }
+
   public handleSelectedVisit(id: number) {
     this.visitsService.getVisit(id)
       .subscribe({
@@ -39,5 +43,12 @@ export class VisitsPageComponent {
           console.error('Error al obtener los datos de la visita:', err);
         }
       })
+  }
+
+  public dataToRender() {
+    return this.visitsService.listOfVisits()?.filter((visit) => {
+      return visit.patientName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        visit.doctorName.toLocaleLowerCase().includes(this.searchTerm.toLocaleLowerCase())
+    })
   }
 }

@@ -9,13 +9,17 @@ import { PatientsService } from '../../services/patients-service/patients.servic
   styleUrl: './patients-page.component.css'
 })
 export class PatientsPageComponent {
+  public searchTerm: string = ''
+  
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
   
-  public listOfPatients = computed(() => this.patientService.listOfPatients())
-
   constructor() {
     this.getPatients()
+  }
+
+  public onSearchTermChange( term: string ) {
+    this.searchTerm = term
   }
 
   public getPatients() {
@@ -38,5 +42,12 @@ export class PatientsPageComponent {
           console.error('Error al obtener los datos del paciente:', err);
         }
       })
+  }
+
+  public dataToRender() {
+    return this.patientService.listOfPatients()?.patients.filter((patient) => {
+      return patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        patient.lastName.toLowerCase().includes(this.searchTerm.toLowerCase())
+    })
   }
 }

@@ -1,6 +1,4 @@
-<div class="search-bar">
-  <input type="text" placeholder="Search users..." />
-</div>
+<app-search-bar (searchTermChange)="onSearchTermChange($event)"></app-search-bar>
 
 <div class="visit-table-container">
   <table class="visit-table">
@@ -20,7 +18,7 @@
       </tr>
     </thead>
     <tbody style="background-color: white;">
-      <tr *ngFor="let visit of listOfVisits(); let idx = index">
+      <tr *ngFor="let visit of dataToRender(); let idx = index">
         <td>{{visit.id}}</td>
         <td>{{visit.doctorName}}</td>
         <td>{{visit.patientName}}</td>

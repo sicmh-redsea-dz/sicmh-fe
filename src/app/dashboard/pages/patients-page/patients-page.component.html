@@ -1,6 +1,4 @@
-<div class="search-bar">
-  <input type="text" placeholder="Search users..." />
-</div>
+<app-search-bar (searchTermChange)="onSearchTermChange($event)"></app-search-bar>
 
 <div class="user-table-container">
   <table class="user-table">
@@ -20,7 +18,7 @@
       </tr>
     </thead>
     <tbody style="background-color: white;">
-      <tr *ngFor="let patient of listOfPatients()?.patients; let idx = index ">
+      <tr *ngFor="let patient of dataToRender(); let idx = index ">
         <td>
           <img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar">
         </td>
