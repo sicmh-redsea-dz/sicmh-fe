@@ -18,6 +18,13 @@
   src: url('./assets/fonts/poppins/Poppins-SemiBold.ttf');
 }
 
+:root {
+  --primary-color: #0e1b23;
+  --secondary-color: #8383de;
+  --gradient-color: linear-gradient(90deg, #a493f5, #7b66d4);
+  --color-white: #fff
+}
+
 * {
   margin: 0px;
   padding: 0px;

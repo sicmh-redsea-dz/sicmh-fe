@@ -61,6 +61,22 @@ export class PatientsPageComponent {
       })
   }
 
+  public deleteSelectedVisit(id: number) {
+    Swal.fire({
+      title: 'Estas seguro?',
+      text: 'Esta acción no se puede revertir.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Si, aceptar',
+      cancelButtonText: 'Cancelar'
+    }).then(( result ) => {
+      if( result.isConfirmed ) 
+        Swal.fire('Acción confirmada', 'Has aceptado la acción', 'success')
+      else if( result.dismiss === Swal.DismissReason.cancel) 
+        Swal.fire('Acción cancelada', 'No se realizo ningun cambio', 'info')
+    })
+  }
+
   public dataToRender() {
     return this.patientService.listOfPatients()?.patients.filter((patient) => {
       return patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||

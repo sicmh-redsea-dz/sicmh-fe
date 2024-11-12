@@ -37,7 +37,8 @@
                 (click)="handleSelectedVisit(visit.id)">
               <i class="ph ph-pencil"></i>
             </div>
-            <div class="opts-btns delete">
+            <div class="opts-btns delete"
+                  (click)="deleteSelectedVisit(visit.id)">
               <i class="ph ph-trash-simple"></i>
             </div>
           </div>

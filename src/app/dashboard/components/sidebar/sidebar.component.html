@@ -21,28 +21,23 @@
     <div class="menu">
       <p class="title">Main</p>
       <ul>
-        <li 
-          *ngFor="let item of items; let idx = index" 
-          [class]="toggledStates[idx] ? 'active' : ' '"
-        >
-          <a 
-            [routerLink]="item.routerLink" 
-            (click)="toggleItem(idx)"
-          >
+        <li *ngFor="let item of items; let idx = index" 
+          [class]="toggledStates[idx] ? 'active' : ' '">
+          <a [routerLink]="item.routerLink" 
+            (click)="toggleItem(idx)">
             <i [class]="'icon ' + item.icon"></i>
             <span class="text">{{item.label}}</span>
             <i *ngIf="item.hasSubmenu" [class]="'arrow ' + item.arrowIcon"></i>
           </a>
-          <ul 
-            *ngIf="item.hasSubmenu" 
-            [class]="toggledStates[idx] ? 'sub-menu show' : 'sub-menu'"
-          >
-            <li 
-              (click)="handleSubmenuOnCollapse(idx)"
-              *ngFor="let subitem of item.subItems"
-            >
+          <ul *ngIf="item.hasSubmenu" 
+              [class]="toggledStates[idx] ? 'sub-menu show' : 'sub-menu'">
+            <li (click)="handleSubmenuOnCollapse(idx)"
+              *ngFor="let subitem of item.subItems; let i = index">
               <a [routerLink]="subitem.routerLink">
-                <span class="text">{{subitem.label}}</span>
+                <span class="text" 
+                    [style.color]="toggledSidebar ? '#000' : '#fff'">
+                  {{subitem.label}}
+                </span>
               </a>
             </li>
           </ul>
