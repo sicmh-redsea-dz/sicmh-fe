@@ -21,6 +21,7 @@
 :root {
   --primary-color: #0e1b23;
   --secondary-color: #8383de;
+  --hover-color: #a8a8e9;
   --gradient-color: linear-gradient(90deg, #a493f5, #7b66d4);
   --color-white: #fff
 }

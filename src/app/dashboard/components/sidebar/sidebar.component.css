@@ -72,8 +72,8 @@
 
 .menu ul li > a:hover,
 .menu ul li.active > a{
+  background-color: var(--hover-color);
   color: #000;
-  background-color: #f6f6f6;
   cursor: pointer;
 }
 
@@ -134,7 +134,7 @@
 }
 
 .menu-btn:hover i {
-  color: var(--primary-color);
+  color: var(--color-white);
 }
 
 .menu-btn i {
