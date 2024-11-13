@@ -106,4 +106,24 @@ export class PatientsService {
         })
       )
   }
+
+  public deletePatient(id: number): Observable<boolean> {
+    const url: string = `${this.baseUrl}/dashboard/patients/${id}`
+    const token: string | null = localStorage.getItem('token')
+    if( !token ) this.authStatus.logout()
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.delete(url, { headers })
+      .pipe(
+        map((data) => {
+          console.log( data )
+          return true
+        }),
+        catchError(( err ) => {
+          throwError(() => err.message )
+          return of( false )
+        })
+      )
+  }
 } 

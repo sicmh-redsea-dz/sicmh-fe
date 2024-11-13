@@ -70,8 +70,10 @@ export class PatientsPageComponent {
       confirmButtonText: 'Si, aceptar',
       cancelButtonText: 'Cancelar'
     }).then(( result ) => {
-      if( result.isConfirmed ) 
+      if( result.isConfirmed ) {
+        this.deletePatient( id )
         Swal.fire('Acción confirmada', 'Has aceptado la acción', 'success')
+      }
       else if( result.dismiss === Swal.DismissReason.cancel) 
         Swal.fire('Acción cancelada', 'No se realizo ningun cambio', 'info')
     })
@@ -82,5 +84,17 @@ export class PatientsPageComponent {
       return patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         patient.lastName.toLowerCase().includes(this.searchTerm.toLowerCase())
     })
+  }
+
+  private deletePatient(id: number) {
+    this.patientService.deletePatient(id)
+      .subscribe({
+        next: ( result ) => {
+          if( result ) this.getPatients()
+        },
+        error:( err ) => {
+          console.error('Error al eliminar el paciente seleccionado:', err);
+        }
+      })
   }
 }
