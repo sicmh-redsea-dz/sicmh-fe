@@ -27,10 +27,6 @@
         <td>{{ '+504 '+ patient.phone }}</td>
         <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
         <td>
-          <!-- <div  class="ellipsis table-opts"
-                (click)="handleSelectedPatient(patient.id)">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-          </div> -->
           <div class="opts">
             <div class="opts-btns edit"
                 (click)="handleSelectedPatient(patient.id)">

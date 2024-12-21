@@ -6,7 +6,6 @@ import { AuthStatus } from './auth/interfaces';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
 })
 export class AppComponent {
   private authService = inject( AuthService );
