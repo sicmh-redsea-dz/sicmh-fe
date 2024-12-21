@@ -6,6 +6,7 @@ import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.co
 import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
 import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
 import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
+import { BillingPageComponent } from './pages/billing-page/billing-page.component';
 
 const routes: Routes = [
   {
@@ -30,7 +31,8 @@ const routes: Routes = [
           { path: 'new-visit', component: VisitsFormPageComponent },
         ]
       },
-      { path: '**', redirectTo: 'main'}
+      { path: 'income/billings', component: BillingPageComponent },
+      { path: '**', redirectTo: 'income/billings'}
     ]
   },
 ];

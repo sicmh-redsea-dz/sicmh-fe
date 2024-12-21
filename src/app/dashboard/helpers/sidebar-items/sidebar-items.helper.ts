@@ -28,7 +28,7 @@ export const sidebarItmes = [
     label: 'Income',
     icon: 'ph-bold ph-chart-bar',
     hasSubmenu: true,
-    subItems: [{label: 'Earnings', routerLink: ''}, {label:'Funds', routerLink:''}],
+    subItems: [{label: 'Billings', routerLink: 'income/billings'}, {label:'Funds', routerLink:''}],
     arrowIcon: 'ph-bold ph-caret-down'
   }
 ]
