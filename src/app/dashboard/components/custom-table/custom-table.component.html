@@ -1,0 +1,29 @@
+<div class="bill-table-container">
+  <table class="bill-table">
+    <thead>
+      <tr>
+        <th *ngFor="let h of headers">{{ h }}</th>
+        <th>
+          <button class="plus-circle">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let items of bodyContent">
+        <td *ngFor="let item of items">{{ item }}</td>
+        <td>
+          <div class="opts">
+            <div class="opts-btns action"><i class="ph ph-eye"></i></div>
+            <div class="opts-btns delete"
+                (click)="execItemDeletion()">
+              <i class="ph ph-trash-simple"></i>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

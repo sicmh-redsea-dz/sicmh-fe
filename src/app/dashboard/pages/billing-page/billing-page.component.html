@@ -1,35 +1,4 @@
-<div class="bill-table-container">
-  <table class="bill-table">
-    <thead>
-      <tr>
-        <th>Invoice number</th>
-        <th>Doctor</th>
-        <th>Pacient</th>
-        <th>Date</th>
-        <th>State</th>
-        <th>Amount</th>
-        <th>
-          <button class="plus-circle">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>01924</td>
-        <td>Hugo Strange</td>
-        <td>Nolan Grayson</td>
-        <td>2024-11-10</td>
-        <td>Pending</td>
-        <td>L 850.00</td>
-        <td>
-          <div class="opts">
-            <div class="opts-btns action"><i class="ph ph-eye"></i></div>
-            <div class="opts-btns delete"><i class="ph ph-trash-simple"></i></div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<app-custom-table 
+  [headers]="headers"
+  [bodyContent]="bodyContent"
+  (deleteSelectedItem)="deleteSelectedInvoice()"/>
