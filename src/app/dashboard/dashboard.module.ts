@@ -16,6 +16,7 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
 import { CustomTableComponent } from './components/custom-table/custom-table.component';
+import { DrawerComponent } from './components/drawer/drawer.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { CustomTableComponent } from './components/custom-table/custom-table.com
     SearchBarComponent,
     PaginationComponent,
     BillingPageComponent,
-    CustomTableComponent
+    CustomTableComponent,
+    DrawerComponent
   ],
   imports: [
     CommonModule,

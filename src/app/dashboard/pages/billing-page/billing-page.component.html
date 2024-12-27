@@ -1,4 +1,7 @@
 <app-custom-table 
   [headers]="headers"
   [bodyContent]="bodyContent"
+  (insertItem)="bootstrapInvoiceDrawer()"
   (deleteSelectedItem)="deleteSelectedInvoice()"/>
+
+<app-drawer />
