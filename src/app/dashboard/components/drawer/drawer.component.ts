@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
+import { DrawerContents } from '../../interface/drawer-content.enum';
 
 @Component({
   selector: 'app-drawer',
@@ -7,11 +8,17 @@ import { DrawerService } from '../../services/drawer-service/drawer.service';
   styleUrl: './drawer.component.css'
 })
 export class DrawerComponent {
-  private isDrawerOpen = inject( DrawerService )
-  public isDrawerVisible = computed(() => this.isDrawerOpen.isDrawerOpen())
+  private drawerParams = inject( DrawerService )
+
+  public dcInvoice = DrawerContents.INVOICE;
+  public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
+  public bodyToDisplay = computed(() => this.drawerParams.contentToDisplay())
 
   public setDrawerVisibility() {
-    if( this.isDrawerVisible() ) this.isDrawerOpen.isDrawerOpen.set( false )
+    if( this.isDrawerVisible() ) {
+      this.drawerParams.isDrawerOpen.set( false )
+      this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
+    }
   }
   
 }

@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
+import { DrawerContents } from '../../interface/drawer-content.enum';
 
 @Component({
   selector: 'app-billing-page',
@@ -36,10 +37,11 @@ export class BillingPageComponent {
     ],
   ]
 
-  public isDrawerOpen = inject( DrawerService )
+  public drawerParams = inject( DrawerService )
 
   public bootstrapInvoiceDrawer() {
-    this.isDrawerOpen.isDrawerOpen.set( true )
+    this.drawerParams.isDrawerOpen.set( true )
+    this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
   }
 
   public deleteSelectedInvoice() {

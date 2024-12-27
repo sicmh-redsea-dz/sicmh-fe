@@ -17,6 +17,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
 import { CustomTableComponent } from './components/custom-table/custom-table.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
+import { InvoiceComponent } from './components/drawer-body-components/invoice/invoice.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { DrawerComponent } from './components/drawer/drawer.component';
     PaginationComponent,
     BillingPageComponent,
     CustomTableComponent,
-    DrawerComponent
+    DrawerComponent,
+    InvoiceComponent
   ],
   imports: [
     CommonModule,

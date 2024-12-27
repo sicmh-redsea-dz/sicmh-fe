@@ -1,10 +1,18 @@
 <div [ngClass]="{'drawer-overlay': true, 'show': isDrawerVisible()}">
   <div [ngClass]="{'drawer': true, 'open': isDrawerVisible()}">
     <div class="drawer-header">
-      <h2>Invoice details</h2>
+      <h2>generate invoice</h2>
       <button (click)="setDrawerVisibility()">
         <i class="icon fa-solid fa-x"></i>
       </button>
+    </div>
+    <div class="drawer-body">
+      @if ( bodyToDisplay() === dcInvoice ) {
+        <app-drawer-invoice />
+      }
+      @else {
+        <p>There is no available content for this drawer.</p>
+      }
     </div>
   </div>
 </div>
