@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
+import { InvoicesService } from '../../services/invoices-services/invoices.service';
 
 @Component({
   selector: 'app-billing-page',
@@ -18,30 +19,39 @@ export class BillingPageComponent {
     'Amount'
   ]
 
-  public bodyContent: string[][] = [
-    [
-      '01924',
-      'Hugo Strange',
-      'Nolan Grayson',
-      '2024-11-10',
-      'Pending',
-      'L 850.00'
-    ],
-    [
-      '90123',
-      'Tommy Elliot',
-      'Hela Odinsdottir',
-      '2024-11-10',
-      'Pending',
-      'L 850.00'
-    ],
-  ]
-
   public drawerParams = inject( DrawerService )
+  private invoiceService = inject( InvoicesService )
+  public bodyContent: string[][] = []
+
+  constructor() {
+    this.getInvoices()
+  }
 
   public bootstrapInvoiceDrawer() {
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
+  }
+
+  public getInvoices() {
+    this.invoiceService.getInvoices()
+      .subscribe({
+        next: (response) => {
+          response?.map( item => {
+            let arr = [
+              item.InvoiceNumber,
+              item.Doctor,
+              item.Paciente,
+              item.FechaFactura.split('T')[0],
+              item.Estado,
+              item.Monto,
+            ]
+            this.bodyContent.push( arr )
+          })
+        },
+        error: ( message ) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
   }
 
   public deleteSelectedInvoice() {

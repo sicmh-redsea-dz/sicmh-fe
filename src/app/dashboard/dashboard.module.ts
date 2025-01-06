@@ -18,6 +18,7 @@ import { BillingPageComponent } from './pages/billing-page/billing-page.componen
 import { CustomTableComponent } from './components/custom-table/custom-table.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { InvoiceComponent } from './components/drawer-body-components/invoice/invoice.component';
+import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { InvoiceComponent } from './components/drawer-body-components/invoice/in
     BillingPageComponent,
     CustomTableComponent,
     DrawerComponent,
-    InvoiceComponent
+    InvoiceComponent,
+    SettingsPageComponent
   ],
   imports: [
     CommonModule,

@@ -7,6 +7,7 @@ import { PatientFormPageComponent } from './pages/patient-form-page/patient-form
 import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
 import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
+import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
 
 const routes: Routes = [
   {
@@ -32,7 +33,8 @@ const routes: Routes = [
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },
-      { path: '**', redirectTo: 'income/billings'}
+      { path: 'settings', component: SettingsPageComponent },
+      { path: '**', redirectTo: 'main'}
     ]
   },
 ];
