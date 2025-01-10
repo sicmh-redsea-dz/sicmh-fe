@@ -1,51 +1,98 @@
-<div class="toggle-container">
-  <p>SAR</p>
-  <input 
-    class="input-toggle" 
-    type="checkbox"
-    id="toggle-switch"
-    defaultChecked>
-  <label for="toggle-switch" class="toggle-switch"></label>
-</div>
+<form class="invoice-form"
+      autocomplete="off"
+      [formGroup]="invoiceForm"
+      (ngSubmit)="onHandleSubmit()">
+  <div 
+    class="form-group" 
+    [ngStyle]="{
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }"
+  >
+    <div class="toggle-container">
+      <p>SAR</p>
+      <input 
+        class="input-toggle" 
+        type="checkbox"
+        id="toggle-switch"
+        defaultChecked
+      >
+      <label for="toggle-switch" class="toggle-switch"></label>
+    </div>
+    <input type="date" formControlName="date">
+  </div>
 
-<div class="invoice-form">
   <div class="form-group">
-    <label for="customer">Cliente</label>
-    <select id="customer" name="customer">
+    <label>Cliente</label>
+    <select formControlName="patient">
       <option value="">Selecciona un cliente</option>
-      <option value="1">Cliente 1</option>
-      <option value="2">Cliente 2</option>
-      <option value="3">Cliente 3</option>
+      @for(p of options.patients; track $index) {
+        <option [value]="p.id">{{p.name}}</option>
+      }
     </select>
   </div>
 
   <div class="form-group">
-    <label for="customer">Doctor</label>
-    <select id="customer" name="customer">
-      <option value="">Selecciona un cliente</option>
-      <option value="1">Cliente 1</option>
-      <option value="2">Cliente 2</option>
-      <option value="3">Cliente 3</option>
+    <label>Doctor</label>
+    <select formControlName="doctor">
+      <option value="">Selecciona un doctor</option>
+      @for (d of options.doctors; track $index) {
+        <option [value]="d.id">{{d.name}}</option>
+      }
     </select>
   </div>
 
   <div class="form-group">
-    <label for="date">Fecha</label>
-    <input type="date" id="date" name="date">
+    <label for="customer">Servicio</label>
+    <select name="services" (change)="handleChange($event)">
+      <option value="">Selecciona un servicio</option>
+      @for(s of options.services; track $index) {
+        <option [value]="s.id">{{s.serviceName}}</option>
+      }
+    </select>
+    @if(selectedServices.length > 0) {
+      <ul class="list">
+        @for(ss of selectedServices; track $index) {
+          <li>
+            <span>{{ss.description}}</span>
+            <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
+          </li>
+        }
+      </ul>
+    }
   </div>
 
   <div class="form-group">
-    <label for="amount">Monto</label>
-    <input type="number" id="amount" name="amount" placeholder="0.00">
+    <label for="customer">Tipo de pago</label>
+    <select formControlName="pMethod" name="pMethod">
+      <option value="">Selecciona un metodo de pago</option>
+      @for(p of options.pMethods; track $index) {
+        <option [value]="p.id">{{p.paymentDescription}}</option>
+      }
+    </select>
   </div>
 
   <div class="form-group">
-    <label for="description">Descripción</label>
-    <textarea id="description" name="description" rows="3" placeholder="Detalles de la factura"></textarea>
+    <label>Monto</label>
+    <input type="number" formControlName="amount" placeholder="0.00">
+  </div>
+
+  <div class="form-group">
+    <label>Descripción</label>
+    <textarea formControlName="description" rows="3" placeholder="Detalles de la factura"></textarea>
   </div>
 
   <div class="form-actions">
-    <button type="reset" class="btn cancel">Cancelar</button>
-    <button type="submit" class="btn submit">Generar</button>
+    <button class="btn cancel"
+            (click)="onHandleCancel()">
+      Cancelar
+    </button>
+    <button class="btn submit"
+          type="submit" 
+          [disabled]="invoiceForm.invalid">
+      Generar
+    </button>
   </div>
-</div>
+</form>

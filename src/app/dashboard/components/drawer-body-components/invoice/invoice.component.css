@@ -1,9 +1,9 @@
 .invoice-form {
-  padding: .5rem;
+  padding: 0 .5rem;
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  gap: 15px;
+  gap: .25rem;
 }
 
 .form-group {
@@ -37,17 +37,47 @@
   background-color: #fff;
 }
 
+.list {
+  margin-bottom: .5rem;
+}
+
+.list li {
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.list li::marker {
+  color: var(--color-gray)
+}
+
+.list li span {
+  font-size: 12px;
+  color: var(--secondary-color);
+}
+
+.list li .icon {
+  margin-left: .5rem;
+  font-size: 10px;
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.list li .icon:hover {
+  color: #c82333;
+}
+
 .form-actions {
   display: flex;
   justify-content: end;
   gap: 10px;
+  margin-top: .5rem;
 }
 
 .btn {
   color: #fff;
   padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 1rem;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.3s ease;
@@ -55,6 +85,15 @@
 
 .btn.submit {
   background: #28a745;
+}
+
+.btn.submit:disabled {
+  background: var(--color-light-gray);
+}
+
+.btn.submit:disabled:hover {
+  background: var(--color-light-gray);
+  cursor: default;
 }
 
 .btn.cancel {
@@ -79,7 +118,7 @@
 }
 
 .toggle-container p {
-  margin: 0 .5rem;
+  margin-right: .5rem;
   font-size: 1rem;
   text-transform: uppercase;
   color: var(--color-gray);

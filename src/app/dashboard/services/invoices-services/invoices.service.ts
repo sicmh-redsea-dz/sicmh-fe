@@ -3,7 +3,7 @@ import { environment } from '../../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { AuthService } from '../../../auth/services/auth.service';
-import { InvoiceResponse, Invoice } from '../../interface/invoice-response.interface';
+import { InvoiceResponse, Invoice, InvoiceForm } from '../../interface/invoice-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -19,8 +19,7 @@ export class InvoicesService {
   public getInvoices(): Observable<Invoice[] | null> {
     const url: string = `${this.baseUrl}/dashboard/invoices`
 
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
+    const token = this.validateToken()
 
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
@@ -36,5 +35,53 @@ export class InvoicesService {
           return of( null )
         })
       )
+  }
+
+  public getDataForInvoice(): Observable<any | null> {
+    const url: string = `${this.baseUrl}/dashboard/invoices/new-invoice`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.get( url, { headers })
+      .pipe(
+        map(( resp ) => {
+          return resp
+        }),
+        catchError(( err ) => {
+          throwError(() => err.message)
+          return of( null )
+        })
+      )
+  }
+
+  public createInvoice(invoiceForm: InvoiceForm): Observable<boolean> {
+    const url: string = `${this.baseUrl}/dashboard/invoices/new-invoice`
+    const body = {...invoiceForm}
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.post(url, body, { headers })
+      .pipe(
+        map((resp) => {
+          console.log( resp )
+          return true
+        }),
+        catchError(( err ) => {
+          throwError(() => err.message)
+          return of( false )
+        })
+      )
+  }
+
+  private validateToken(): string | null {
+    const token = localStorage.getItem('token')
+    if( !token ) this.authStatus.logout()
+    return token
   }
 }
