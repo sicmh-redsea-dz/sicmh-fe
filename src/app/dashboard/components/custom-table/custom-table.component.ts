@@ -7,7 +7,7 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 })
 export class CustomTableComponent {
   @Input() headers: string[] = []
-  @Input() bodyContent: string[][] = []
+  @Input() bodyContent: any[] = []
   @Output() deleteSelectedItem = new EventEmitter()
   @Output() insertItem = new EventEmitter()
 
@@ -17,7 +17,7 @@ export class CustomTableComponent {
     this.insertItem.emit()
   }
   
-  public execItemDeletion() {
-    this.deleteSelectedItem.emit()
+  public execItemDeletion(invoiceId: string) {
+    this.deleteSelectedItem.emit(invoiceId)
   }
 }

@@ -69,10 +69,27 @@ export class InvoicesService {
     return this.http.post(url, body, { headers })
       .pipe(
         map((resp) => {
-          console.log( resp )
           return true
         }),
         catchError(( err ) => {
+          throwError(() => err.message)
+          return of( false )
+        })
+      )
+  }
+
+  public deleteInvoice(id: string): Observable<boolean> {
+    const url: string = `${this.baseUrl}/dashboard/invoices/${id}`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.delete(url, { headers })
+      .pipe(
+        map(() => true),
+        catchError((err) => {
           throwError(() => err.message)
           return of( false )
         })

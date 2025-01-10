@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { afterNextRender, Component, computed, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
@@ -21,7 +21,7 @@ export class BillingPageComponent {
 
   public drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
-  public bodyContent: string[][] = []
+  public bodyContent: any[] = []
 
   constructor() {
     this.getInvoices()
@@ -37,15 +37,14 @@ export class BillingPageComponent {
       .subscribe({
         next: (response) => {
           response?.map( item => {
-            let arr = [
-              item.InvoiceNumber,
-              item.Doctor,
-              item.Paciente,
-              item.FechaFactura.split('T')[0],
-              item.Estado,
-              item.Monto,
-            ]
-            this.bodyContent.push( arr )
+            this.bodyContent.push({
+              'InvoiceNumber': item.InvoiceNumber,
+              'Doctor': item.Doctor,
+              'Paciente': item.Paciente,
+              'FechaFactura': item.FechaFactura.split('T')[0],
+              'Estado': item.Estado,
+              'Monto': item.Monto,
+            })
           })
         },
         error: ( message ) => {
@@ -54,25 +53,41 @@ export class BillingPageComponent {
       })
   }
 
-  public deleteSelectedInvoice() {
+  public deleteSelectedInvoice(invoiceId: string) {
     Swal.fire({
-      title: 'Are you sure you want to delete this element?',
+      title: `Are you sure you want to delete this element [${invoiceId}]?`,
       text: 'This action is irreversible. Proceed with caution.',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, proceed',
       cancelButtonText: 'Cancel'
     }).then(( result ) => {
-      if ( result.isConfirmed ) Swal.fire({
-        title: 'Action Confirmed',
-        text: 'You have successfully accepted the action.',
-        icon: 'success'
-      })
+      if ( result.isConfirmed ) {
+        this.deleteInvoice( invoiceId )
+        Swal.fire({
+          title: 'Action Confirmed',
+          text: 'You have successfully accepted the action.',
+          icon: 'success'
+        })
+      }
       else if ( result.dismiss === Swal.DismissReason.cancel ) Swal.fire({
         title: 'Action Canceled',
         text: 'No changes were made.',
         icon: 'info'
       })
     })
+  }
+
+  private deleteInvoice(id: string) {
+    this.invoiceService.deleteInvoice(id)
+      .subscribe({
+        next: ( result ) => {
+          console.log('res: ', result)
+          if( result ) this.getInvoices()
+        },
+        error: ( err ) => {
+          console.error('Error al eliminar la factura seleccionado:', err);
+        }
+      })
   }
 }

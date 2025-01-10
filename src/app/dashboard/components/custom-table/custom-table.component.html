@@ -11,18 +11,25 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let items of bodyContent">
-        <td *ngFor="let item of items">{{ item }}</td>
-        <td>
-          <div class="opts">
-            <div class="opts-btns action"><i class="ph ph-eye"></i></div>
-            <div class="opts-btns delete"
-                (click)="execItemDeletion()">
-              <i class="ph ph-trash-simple"></i>
+      @for(item of bodyContent; track $index) {
+        <tr>
+          <td>{{ item.InvoiceNumber }}</td>
+          <td>{{ item.Doctor }}</td>
+          <td>{{ item.Paciente }}</td>
+          <td>{{ item.FechaFactura.split('T')[0] }}</td>
+          <td>{{ item.Estado }}</td>
+          <td>{{ item.Monto }}</td>
+          <td>
+            <div class="opts">
+              <div class="opts-btns action"><i class="ph ph-eye"></i></div>
+              <div class="opts-btns delete"
+                  (click)="execItemDeletion(item.InvoiceNumber )">
+                <i class="ph ph-trash-simple"></i>
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>
