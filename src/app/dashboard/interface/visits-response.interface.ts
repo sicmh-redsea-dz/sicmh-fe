@@ -3,10 +3,11 @@ export interface VisitsResponse {
 }
 
 export interface Data {
-  visits:             Visits[];
-  patients:           Patient[];
-  doctors:            Doctor[];
-  totalVisitsCount:   number;
+  visits: Visits[];
+  patients: Patient[];
+  doctors:  Doctor[];
+  stock:  Stock[];
+  totalVisitsCount: number;
   totalPatientsCount: number;
   totalDoctorsCount:  number;
   totalRegistries:  number;
@@ -20,6 +21,13 @@ export interface Doctor {
 export interface Patient {
   id:   number;
   name: string;
+}
+
+export interface Stock {
+  id: string,
+  productName: string,
+  productDescription: string,
+  quantity: number,
 }
 
 export interface Visits {

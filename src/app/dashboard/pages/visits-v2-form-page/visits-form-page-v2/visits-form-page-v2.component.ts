@@ -1,18 +1,17 @@
-import Swal from 'sweetalert2';
+import { Component, computed, inject } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { VisitsService } from '../../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import { FormVisit, Stock } from '../../../interface/visits-response.interface';
+import Swal from 'sweetalert2';
 import { map } from 'rxjs';
-import { FormVisit } from '../../interface/visits-response.interface';
-import { VisitsService } from '../../services/visits-service/visits.service';
 
 @Component({
-  selector: 'app-visits-form-page',
-  templateUrl: './visits-form-page.component.html',
-  styleUrl: './visits-form-page.component.css'
+  selector: 'app-visits-form-page-v2',
+  templateUrl: './visits-form-page-v2.component.html',
+  styleUrl: './visits-form-page-v2.component.css'
 })
-export class VisitsFormPageComponent implements OnInit {
+export class VisitsFormPageV2Component {
   public title = ''
   public caller = ''
   public actionButtonText = ''
@@ -22,31 +21,27 @@ export class VisitsFormPageComponent implements OnInit {
   private activateRoute = inject( ActivatedRoute )
 
   public bmiDisabled = true;
+  public selectedStockItems: Stock[] = []
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
   public listOfDoctors = computed(() => this.visitsService.listOfDoctors())
   public listOfPatients = computed(() => this.visitsService.listOfPatients())
+  public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
 
   public visitForm: FormGroup = this.fb.group({
     patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patient: '', [Validators.required]],
     doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.doctor: '', [Validators.required]],
     date          : [this.caller !== 'nv' ? this.selectedVisit()?.date: '', [Validators.required]],
-    diagnosis     : [this.caller !== 'nv' ? this.selectedVisit()?.diagnosis: '', [Validators.required]],
-    treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
-    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', [Validators.required]],
+    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', []],
     pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.pressure: '', [Validators.required]],
     oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenation: '', [Validators.required]],
     temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
     glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucometry: '', [Validators.required]],
     weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
     height        : [this.caller !== 'nv' ? this.selectedVisit()?.height: '', [Validators.required]],
-    BMI           : [this.caller !== 'nv' ? this.selectedVisit()?.BMI: '', [Validators.required]],
-    fatPercentage : [this.caller !== 'nv' ? this.selectedVisit()?.fatPercentage: '', [Validators.required]],
-    visceralFat   : [this.caller !== 'nv' ? this.selectedVisit()?.visceralFat: '', [Validators.required]],
-    ageAccordingToWeight: [this.caller !== 'nv' ? this.selectedVisit()?.ageAccordingToWeight: '', [Validators.required]],
+    stockItems    : this.fb.array([],[Validators.required])
   })
 
   ngOnInit(): void {
-    // this.visitForm.get('weight')?.valueChanges.subscribe(() => this.calculateBMI())
     this.activateRoute.url
       .pipe(
         map((urlSegment) => urlSegment),
@@ -64,6 +59,10 @@ export class VisitsFormPageComponent implements OnInit {
       })
   }
 
+  get stockItemsArray(): FormArray {
+    return this.visitForm.get('stockItems') as FormArray
+  }
+
   public get idTag() : string {
     return `# ${this.selectedVisit()?.id}`
   }
@@ -76,6 +75,7 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisit) {
+    console.log('the visit: ', visit )
     this.visitsService.createVisit( visit )
       .subscribe({
         next: ( visit ) => {
@@ -121,6 +121,33 @@ export class VisitsFormPageComponent implements OnInit {
     }
   }
 
+  public handleChange(event: any) {
+    const { target } = event
+    const value = target.value
+    if (this.selectedStockItems.length === 0){
+      const existingItem = this.listOfStockItems()!.find((item: any) => item.id === parseInt(value));
+      if( existingItem ) this.selectedStockItems.push(existingItem);
+    } 
+    else {
+      const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
+      if (!existingItem) this.selectedStockItems.push(this.listOfStockItems()!.find((item: any) => item.id === parseInt(value))!)
+    }
+    this.loadDataOfStockArray()
+  }
+
+  public removeListItem(id: string, idx: number) {
+    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== id)
+    this.stockItemsArray.removeAt(idx)
+    this.loadDataOfStockArray()
+  }
+
+  private loadDataOfStockArray() {
+    this.stockItemsArray.clear()
+    this.selectedStockItems.forEach((item, idx) => {
+      this.stockItemsArray.push(this.fb.control(item.id, [Validators.required]))
+    })
+  }
+
   private calculateBMI(): void {
     const weight = this.visitForm.get('weight')?.value
     const height = this.visitForm.get('height')?.value
@@ -134,5 +161,4 @@ export class VisitsFormPageComponent implements OnInit {
       this.bmiDisabled = true
     }
   }
-
 }

@@ -8,6 +8,7 @@ import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
 import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
 import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
+import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 
 const routes: Routes = [
   {
@@ -30,11 +31,12 @@ const routes: Routes = [
         children: [
           { path: 'edit-visit/:id', component: VisitsFormPageComponent },
           { path: 'new-visit', component: VisitsFormPageComponent },
+          { path: 'new-visit/v2', component: VisitsFormPageV2Component },
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },
       { path: 'settings', component: SettingsPageComponent },
-      { path: '**', redirectTo: 'income/billings'}
+      { path: '**', redirectTo: 'main'}
     ]
   },
 ];

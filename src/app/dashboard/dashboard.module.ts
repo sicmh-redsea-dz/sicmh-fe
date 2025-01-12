@@ -19,6 +19,7 @@ import { CustomTableComponent } from './components/custom-table/custom-table.com
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { InvoiceComponent } from './components/drawer-body-components/invoice/invoice.component';
 import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
+import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { SettingsPageComponent } from './pages/settings-page/settings-page.compo
     CustomTableComponent,
     DrawerComponent,
     InvoiceComponent,
-    SettingsPageComponent
+    SettingsPageComponent,
+    VisitsFormPageV2Component
   ],
   imports: [
     CommonModule,

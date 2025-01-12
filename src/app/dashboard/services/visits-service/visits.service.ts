@@ -4,7 +4,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
-import { VisitsResponse, Doctor, Visits, Patient, FormVisit, SelectedVisitResponse, Visit, Data } from '../../interface/visits-response.interface';
+import { VisitsResponse, Doctor, Visits, Patient, FormVisit, SelectedVisitResponse, Visit, Data, Stock } from '../../interface/visits-response.interface';
 
 interface Pagination {
   limit: number,
@@ -30,6 +30,9 @@ export class VisitsService {
   private _listOfPatients = signal<Patient[] | null>(null)
   public listOfPatients = computed(() => this._listOfPatients() )
 
+  private _listOfStockItems = signal<Stock[] | null>(null)
+  public listOfStockItems = computed(() => this._listOfStockItems() )
+
   public getAllVisits(pagination: Pagination): Observable<Data | null> {
     const url: string = `${this.baseUrl}/dashboard/visits`
     const token = localStorage.getItem('token')
@@ -47,6 +50,7 @@ export class VisitsService {
           this._listOfVisits.set(data.visits)
           this._listOfDoctors.set(data.doctors)
           this._listOfPatients.set(data.patients)
+          this._listOfStockItems.set(data.stock)
           return data
         }),
         catchError(( err ) => {
