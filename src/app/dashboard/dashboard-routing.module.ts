@@ -25,13 +25,19 @@ const routes: Routes = [
 
         ]
       },
+      { path: 'emergency', component: VisitsPageComponent },
+      {
+        path: 'emergency',
+        children: [
+          { path: 'new-visit', component: VisitsFormPageV2Component },
+        ]
+      },
       { path: 'visits', component: VisitsPageComponent },
       {
         path: 'visits',
         children: [
           { path: 'edit-visit/:id', component: VisitsFormPageComponent },
           { path: 'new-visit', component: VisitsFormPageComponent },
-          { path: 'new-visit/v2', component: VisitsFormPageV2Component },
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },

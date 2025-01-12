@@ -11,7 +11,7 @@
         <th>Diagnosis</th>
         <th>
           <button class="plus-circle  table-opts"
-                  [routerLink]="'new-visit/v2'">
+                [routerLink]="urlSegment !== 'emergency' ? ['new-visit'] : ['new-visit']">
             <i class="fa-solid fa-plus"></i>
           </button>
         </th>

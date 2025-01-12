@@ -1,34 +1,56 @@
 export const sidebarItmes = [
   {
-    label: 'Dashboard',
+    label: 'Panel',
     icon: 'ph-bold ph-house-simple',
     hasSubmenu: false,
     routerLink: 'main'
   },
   {
-    label: 'Audience',
+    label: 'Audiencia',
     icon: 'ph-bold ph-user',
     hasSubmenu: true,
-    subItems: [{label: 'Patients', routerLink: 'patients'}, {label:'Visits', routerLink:'visits'}],
+    subItems: [
+      {
+        label: 'Pacientes', 
+        routerLink: 'patients'
+      }, 
+      {
+        label:'Visitas', 
+        routerLink:'visits'
+      },
+      {
+        label:'Emergencias', 
+        routerLink:'emergency'
+      }
+    ],
     arrowIcon: 'ph-bold ph-caret-down'
   },
   {
-    label: 'Posts',
+    label: 'Publicaciones',
     icon: 'ph-bold ph-file-text',
     hasSubmenu: false,
     routerLink: ''
   },
   {
-    label: 'Schedules',
+    label: 'Horarios',
     icon: 'ph-bold ph-calendar-blank',
     hasSubmenu: false,
     routerLink: ''
   },
   {
-    label: 'Income',
+    label: 'Ingreso',
     icon: 'ph-bold ph-chart-bar',
     hasSubmenu: true,
-    subItems: [{label: 'Billings', routerLink: 'income/billings'}, {label:'Funds', routerLink:''}],
+    subItems: [
+      {
+        label: 'Facturaciones', 
+        routerLink: 'income/billings'
+      }, 
+      {
+        label:'Fondos', 
+        routerLink:''
+      }
+    ],
     arrowIcon: 'ph-bold ph-caret-down'
   }
 ]

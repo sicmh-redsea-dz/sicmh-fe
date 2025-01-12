@@ -18,10 +18,12 @@ export class VisitsPageComponent implements OnInit {
   public totalRegistries: number = 1
 
   private router = inject( Router )
+  public urlSegment: string = ''
   private visitsService: VisitsService = inject(VisitsService)
 
   ngOnInit(): void {
     this.getVisits()
+    this.urlSegment = (this.router.url).split('/')[2]
   }
 
   public getVisits() {
