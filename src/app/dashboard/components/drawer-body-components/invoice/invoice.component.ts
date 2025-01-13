@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DrawerService } from '../../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../../interface/drawer-content.enum';
-import { formatNewDate } from '../../../helpers/dateFormatters';
+import { formatIncomingData, formatNewDate } from '../../../helpers/dateFormatters';
 
 interface Options {
   patients: any[]
@@ -23,9 +23,9 @@ export class InvoiceComponent implements OnInit {
   private drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
 
+  public invoiceIdToUpd = computed(() => this.drawerParams.setInvoiceId())
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
 
-  public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
   public selectedServices: any[] = []
   public invoiceForm: FormGroup = this.fb.group({
     patient      : ['', [Validators.required]],
@@ -36,11 +36,15 @@ export class InvoiceComponent implements OnInit {
     amount       : [{value: '', disabled: true}],
     description  : [{value: '', disabled: true}],
   })
+  public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
 
   ngOnInit(): void {
-    console.log('is set to upd: ', this.isDrawerSetToUpd())
     this.getInvoiceData()
-    this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
+    if( !this.isDrawerSetToUpd() ) {
+      this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
+    } else {
+      this.getPendingInvoice(this.invoiceIdToUpd())
+    }
   }
 
   get serviceArray(): FormArray {
@@ -60,6 +64,31 @@ export class InvoiceComponent implements OnInit {
           Swal.fire('Error', message, 'error')
         }
       })
+  }
+
+  public getPendingInvoice(invoiceId: string) {
+    this.invoiceService.getOneInvoice(invoiceId)
+      .subscribe({
+        next: ( data ) => {
+          this.setDataInForm( data )
+        },
+        error: ( message ) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
+  }
+
+  private setDataInForm(data: Record<string, any>) {
+    const { invoice, details } = data['data']
+    this.invoiceForm.get('patient')!.setValue( invoice.patientId )
+    this.invoiceForm.get('doctor')!.setValue( invoice.doctorId )
+    this.invoiceForm.get('date')!.setValue( formatIncomingData( invoice.date ) )
+    // this.invoiceForm.get('amount')!.setValue( formatIncomingData( invoice.amount ) )
+    if( details.length > 0 ) {
+      this.selectedServices.push({price: invoice.amount, desc: 'Material Medico'})
+      this.loadMutableData()
+      // this.invoiceForm.get('description')!.setValue( formatIncomingData( 'Material Medico' ) )
+    }
   }
 
   public handleChange(event: any) {
@@ -83,6 +112,7 @@ export class InvoiceComponent implements OnInit {
     this.drawerParams.isDrawerOpen.set( false )
     this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
     this.drawerParams.setToUpdate.set( false )
+    this.drawerParams.setInvoiceId.set( '' )
   }
 
   public onHandleSubmit() {

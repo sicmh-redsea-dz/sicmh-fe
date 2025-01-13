@@ -123,16 +123,32 @@ export class VisitsFormPageV2Component {
     }
   }
 
+  public incrementQuantity(index: number) {
+    const item = this.selectedStockItems[index];
+    if (item.currentQuantity < item.quantity) {
+      item.currentQuantity += 1
+      this.loadDataOfStockArray()
+    }
+  }
+
+  public decrementQuantity(index: number) {
+    const item = this.selectedStockItems[index];
+    if (item.currentQuantity > 1) {
+      item.currentQuantity -= 1
+      this.loadDataOfStockArray()
+    } 
+  }
+
   public handleChange(event: any) {
     const { target } = event
     const value = target.value
     if (this.selectedStockItems.length === 0){
       const existingItem = this.listOfStockItems()!.find((item: any) => item.id === parseInt(value));
-      if( existingItem ) this.selectedStockItems.push(existingItem);
+      if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
     } 
     else {
       const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
-      if (!existingItem) this.selectedStockItems.push(this.listOfStockItems()!.find((item: any) => item.id === parseInt(value))!)
+      if (!existingItem) this.selectedStockItems.push({...this.listOfStockItems()!.find((item: any) => item.id === parseInt(value))!, currentQuantity: 1})
     }
     this.loadDataOfStockArray()
   }
@@ -145,8 +161,13 @@ export class VisitsFormPageV2Component {
 
   private loadDataOfStockArray() {
     this.stockItemsArray.clear()
-    this.selectedStockItems.forEach((item, idx) => {
-      this.stockItemsArray.push(this.fb.control(item.id, [Validators.required]))
+    this.selectedStockItems.forEach((item) => {
+      this.stockItemsArray.push(
+        this.fb.control(
+          {id: item.id, qty: item.currentQuantity}, 
+          [Validators.required]
+        )
+      )
     })
   }
 

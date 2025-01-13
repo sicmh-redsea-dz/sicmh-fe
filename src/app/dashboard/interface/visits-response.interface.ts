@@ -28,6 +28,7 @@ export interface Stock {
   productName: string,
   productDescription: string,
   quantity: number,
+  currentQuantity: number
 }
 
 export interface Visits {

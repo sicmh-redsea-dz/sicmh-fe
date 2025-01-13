@@ -150,11 +150,11 @@
                  <li>
                    <span [style]="{width: '50%'}">{{$index+1 +'. '+ ss.productName}}</span>
                    <div>
-                     <i class="icon arrow fa-solid fa-chevron-left"></i>
-                     <span [style]="{marginRight: '.5rem'}">1</span>
+                     <i class="icon arrow fa-solid fa-chevron-left" (click)="decrementQuantity($index)"></i>
+                     <span [style]="{marginRight: '.5rem'}">{{ss.currentQuantity}}</span>
                      <span [style]="{fontWeight: 'bold'}">/</span>
                      <span [style]="{marginLeft: '.5rem'}">{{ss.quantity}}</span>
-                      <i class="icon arrow fa-solid fa-chevron-right"></i>
+                      <i class="icon arrow fa-solid fa-chevron-right" (click)="incrementQuantity($index)"></i>
                    </div>
                    <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
                  </li>

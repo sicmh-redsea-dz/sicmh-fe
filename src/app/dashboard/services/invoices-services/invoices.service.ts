@@ -37,6 +37,26 @@ export class InvoicesService {
       )
   }
 
+  public getOneInvoice(invoiceId: string): Observable<any | null> {
+    const url: string = `${this.baseUrl}/dashboard/invoices/invoice/${invoiceId}`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.get(url, { headers })
+      .pipe(
+        map(( resp ) => {
+          return resp
+        }),
+        catchError(( err ) => {
+          throwError(() => err.message )
+          return of( null )
+        })
+      )
+  }
+
   public getDataForInvoice(): Observable<any | null> {
     const url: string = `${this.baseUrl}/dashboard/invoices/new-invoice`
 

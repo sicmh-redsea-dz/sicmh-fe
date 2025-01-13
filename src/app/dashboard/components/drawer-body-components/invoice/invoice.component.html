@@ -55,10 +55,12 @@
     @if(selectedServices.length > 0) {
       <ul class="list">
         @for(ss of selectedServices; track $index) {
-          <li>
-            <span>{{ss.description}}</span>
-            <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
-          </li>
+          @if(ss.id) {
+            <li>
+              <span>{{ss.description}}</span>
+              <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
+            </li>
+          }
         }
       </ul>
     }

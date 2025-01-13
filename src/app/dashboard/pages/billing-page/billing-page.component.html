@@ -2,6 +2,6 @@
   [headers]="headers"
   [bodyContent]="bodyContent"
   (insertItem)="bootstrapInvoiceDrawer()"
-  (finishUpdatingItem)="bootstrapInvoiceDrawerToUpd()"
+  (finishUpdatingItem)="bootstrapInvoiceDrawerToUpd($event)"
   (deleteSelectedItem)="deleteSelectedInvoice($event)"/>
 <app-drawer />

@@ -27,10 +27,11 @@ export class BillingPageComponent {
     this.getInvoices()
   }
 
-  public bootstrapInvoiceDrawerToUpd() {
+  public bootstrapInvoiceDrawerToUpd(invoiceId: string) {
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
     this.drawerParams.setToUpdate.set( true )
+    this.drawerParams.setInvoiceId.set( invoiceId )
   }
 
   public bootstrapInvoiceDrawer() {

@@ -20,6 +20,7 @@ export class DrawerComponent {
       this.drawerParams.isDrawerOpen.set( false )
       this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
       this.drawerParams.setToUpdate.set( false )
+      this.drawerParams.setInvoiceId.set( '' )
     }
   }
   

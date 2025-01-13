@@ -18,8 +18,8 @@ export class CustomTableComponent {
     this.insertItem.emit()
   }
 
-  public execItemUpdate() {
-    this.finishUpdatingItem.emit()
+  public execItemUpdate(id: string) {
+    this.finishUpdatingItem.emit(id)
   }
   
   public execItemDeletion(invoiceId: string) {
