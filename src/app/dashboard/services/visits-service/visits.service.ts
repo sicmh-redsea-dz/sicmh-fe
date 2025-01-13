@@ -103,8 +103,8 @@ export class VisitsService {
 
   }
 
-  public createVisit(visit: FormVisit): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/visits/create`
+  public createVisit(visit: FormVisit, origin='er'): Observable<boolean> {
+    const url: string = `${this.baseUrl}/dashboard/visits/create/${origin}`
     const body = {...visit}
     const token = localStorage.getItem('token')
     if( !token ) this.authStatus.logout()

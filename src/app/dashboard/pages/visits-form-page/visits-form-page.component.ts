@@ -76,7 +76,7 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisit) {
-    this.visitsService.createVisit( visit )
+    this.visitsService.createVisit( visit, 'sp' )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
