@@ -1,7 +1,7 @@
 <div class="container">
   <div class="header-container">
     <button class="back-arrow" 
-            [routerLink]="['/dashboard', 'visits']">
+            [routerLink]="['/dashboard', 'emergency']">
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="form-header">
@@ -148,7 +148,14 @@
              <ul class="list">
                @for(ss of selectedStockItems; track $index) {
                  <li>
-                   <span>{{ss.productName}}</span>
+                   <span [style]="{width: '50%'}">{{$index+1 +'. '+ ss.productName}}</span>
+                   <div>
+                     <i class="icon arrow fa-solid fa-chevron-left"></i>
+                     <span [style]="{marginRight: '.5rem'}">1</span>
+                     <span [style]="{fontWeight: 'bold'}">/</span>
+                     <span [style]="{marginLeft: '.5rem'}">{{ss.quantity}}</span>
+                      <i class="icon arrow fa-solid fa-chevron-right"></i>
+                   </div>
                    <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
                  </li>
                }

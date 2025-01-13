@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { InvoicesService } from '../../../services/invoices-services/invoices.service';
 import Swal from 'sweetalert2';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DrawerService } from '../../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../../interface/drawer-content.enum';
+import { formatNewDate } from '../../../helpers/dateFormatters';
 
 interface Options {
   patients: any[]
@@ -17,10 +18,12 @@ interface Options {
   templateUrl: './invoice.component.html',
   styleUrl: './invoice.component.css'
 })
-export class InvoiceComponent {
+export class InvoiceComponent implements OnInit {
   private fb = inject( FormBuilder )
   private drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
+
+  public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
 
   public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
   public selectedServices: any[] = []
@@ -34,8 +37,10 @@ export class InvoiceComponent {
     description  : [{value: '', disabled: true}],
   })
 
-  constructor() {
+  ngOnInit(): void {
+    console.log('is set to upd: ', this.isDrawerSetToUpd())
     this.getInvoiceData()
+    this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
   }
 
   get serviceArray(): FormArray {
@@ -77,6 +82,7 @@ export class InvoiceComponent {
     this.invoiceForm.reset()
     this.drawerParams.isDrawerOpen.set( false )
     this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
+    this.drawerParams.setToUpdate.set( false )
   }
 
   public onHandleSubmit() {

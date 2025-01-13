@@ -29,6 +29,7 @@ const routes: Routes = [
       {
         path: 'emergency',
         children: [
+          { path: 'edit-visit/:id', component: VisitsFormPageV2Component },
           { path: 'new-visit', component: VisitsFormPageV2Component },
         ]
       },
@@ -42,7 +43,7 @@ const routes: Routes = [
       },
       { path: 'income/billings', component: BillingPageComponent },
       { path: 'settings', component: SettingsPageComponent },
-      { path: '**', redirectTo: 'main'}
+      { path: '**', redirectTo: 'emergency'}
     ]
   },
 ];

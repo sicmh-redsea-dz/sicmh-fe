@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { map } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
+import { formatIncomingData, formatNewDate } from '../../helpers/dateFormatters';
 
 @Component({
   selector: 'app-visits-form-page',
@@ -29,7 +30,7 @@ export class VisitsFormPageComponent implements OnInit {
   public visitForm: FormGroup = this.fb.group({
     patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patient: '', [Validators.required]],
     doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.doctor: '', [Validators.required]],
-    date          : [this.caller !== 'nv' ? this.selectedVisit()?.date: '', [Validators.required]],
+    date          : [this.caller !== 'nv' ? '': '', [Validators.required]],
     diagnosis     : [this.caller !== 'nv' ? this.selectedVisit()?.diagnosis: '', [Validators.required]],
     treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
     notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', [Validators.required]],
@@ -57,9 +58,12 @@ export class VisitsFormPageComponent implements OnInit {
           this.title = 'Registro de visitas'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset();
+          this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
           this.title = 'Editar visita'
           this.actionButtonText = 'Editar'
+          console.log(this.selectedVisit()?.date!)
+          this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.date!))
         }
       })
   }

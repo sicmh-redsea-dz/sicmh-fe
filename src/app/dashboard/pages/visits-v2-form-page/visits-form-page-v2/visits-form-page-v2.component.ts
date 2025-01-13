@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormVisit, Stock } from '../../../interface/visits-response.interface';
 import Swal from 'sweetalert2';
 import { map } from 'rxjs';
+import { formatNewDate, formatIncomingData } from '../../../helpers/dateFormatters';
 
 @Component({
   selector: 'app-visits-form-page-v2',
@@ -28,17 +29,17 @@ export class VisitsFormPageV2Component {
   public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
 
   public visitForm: FormGroup = this.fb.group({
-    patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patient: '', [Validators.required]],
-    doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.doctor: '', [Validators.required]],
-    date          : [this.caller !== 'nv' ? this.selectedVisit()?.date: '', [Validators.required]],
-    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', []],
-    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.pressure: '', [Validators.required]],
-    oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenation: '', [Validators.required]],
-    temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
-    glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucometry: '', [Validators.required]],
-    weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
-    height        : [this.caller !== 'nv' ? this.selectedVisit()?.height: '', [Validators.required]],
-    stockItems    : this.fb.array([],[Validators.required])
+    patient     : [this.caller !== 'nv' ? this.selectedVisit()?.patient : '', [Validators.required]],
+    doctor      : [this.caller !== 'nv' ? this.selectedVisit()?.doctor : '', [Validators.required]],
+    date        : [this.caller !== 'nv' ? '' : '', [Validators.required]],
+    notes       : [this.caller !== 'nv' ? this.selectedVisit()?.notes : '', []],
+    pressure    : [this.caller !== 'nv' ? this.selectedVisit()?.pressure : '', [Validators.required]],
+    oxygenation : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenation : '', [Validators.required]],
+    temperature : [this.caller !== 'nv' ? this.selectedVisit()?.temperature : '', [Validators.required]],
+    glucometry  : [this.caller !== 'nv' ? this.selectedVisit()?.glucometry : '', [Validators.required]],
+    weight      : [this.caller !== 'nv' ? this.selectedVisit()?.weight : '', [Validators.required]],
+    height      : [this.caller !== 'nv' ? this.selectedVisit()?.height : '', [Validators.required]],
+    stockItems  : this.fb.array([],[Validators.required])
   })
 
   ngOnInit(): void {
@@ -52,9 +53,11 @@ export class VisitsFormPageV2Component {
           this.title = 'Registro de visitas'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset();
+          this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
           this.title = 'Editar visita'
           this.actionButtonText = 'Editar'
+          this.visitForm.get('date')!.setValue(formatIncomingData(this.selectedVisit()?.date!))
         }
       })
   }
@@ -75,7 +78,6 @@ export class VisitsFormPageV2Component {
   }
 
   public handleCreateVisit(visit: FormVisit) {
-    console.log('the visit: ', visit )
     this.visitsService.createVisit( visit )
       .subscribe({
         next: ( visit ) => {

@@ -9,12 +9,17 @@ export class CustomTableComponent {
   @Input() headers: string[] = []
   @Input() bodyContent: any[] = []
   @Output() deleteSelectedItem = new EventEmitter()
+  @Output() finishUpdatingItem = new EventEmitter()
   @Output() insertItem = new EventEmitter()
 
 
 
   public execItemInsertion() {
     this.insertItem.emit()
+  }
+
+  public execItemUpdate() {
+    this.finishUpdatingItem.emit()
   }
   
   public execItemDeletion(invoiceId: string) {

@@ -13,11 +13,13 @@ export class DrawerComponent {
   public dcInvoice = DrawerContents.INVOICE;
   public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
   public bodyToDisplay = computed(() => this.drawerParams.contentToDisplay())
+  public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
 
   public setDrawerVisibility() {
     if( this.isDrawerVisible() ) {
       this.drawerParams.isDrawerOpen.set( false )
       this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
+      this.drawerParams.setToUpdate.set( false )
     }
   }
   

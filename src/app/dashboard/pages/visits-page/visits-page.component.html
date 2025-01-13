@@ -11,7 +11,7 @@
         <th>Diagnosis</th>
         <th>
           <button class="plus-circle  table-opts"
-                [routerLink]="urlSegment !== 'emergency' ? ['new-visit'] : ['new-visit']">
+                [routerLink]="'new-visit'">
             <i class="fa-solid fa-plus"></i>
           </button>
         </th>
@@ -26,9 +26,9 @@
         <td>
           <div class="tooltip">
             <span class="truncate-text">{{visit.diagnosis}}</span>
-            <span class="tooltip-text">
-              {{visit.diagnosis}}
-            </span>
+              <span class="tooltip-text" [style]="{visibility: visit.diagnosis ? 'visible' : 'hidden'}">
+                {{visit.diagnosis}}
+              </span>
           </div>
         </td>
         <td>

@@ -381,8 +381,11 @@ select {
 }
 
 .list li {
-  margin-left: 1.5rem;
-  list-style-type: disc;
+  margin: 0 .5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .list li::marker {
@@ -399,6 +402,20 @@ select {
   font-size: 10px;
   color: #dc3545;
   cursor: pointer;
+}
+
+.list li .icon.arrow {
+  margin: 0 .5rem;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.list li .icon.arrow:hover {
+  transform: scale(1.2);
+  color: var(--hover-color);
 }
 
 .list li .icon:hover {

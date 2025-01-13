@@ -56,7 +56,8 @@ export class VisitsPageComponent implements OnInit {
       .subscribe({
         next: ( visit ) => {
           const { id } = visit?.data.visit!
-          return this.router.navigateByUrl(`dashboard/visits/edit-visit/${id?.toString()}`)
+          let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
+          return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
         },
         error: ( err ) => {
           console.error('Error al obtener los datos de la visita:', err);
@@ -80,6 +81,13 @@ export class VisitsPageComponent implements OnInit {
       else if( result.dismiss === Swal.DismissReason.cancel) 
         Swal.fire('Acción cancelada', 'No se realizo ningun cambio', 'info')
     })
+  }
+
+  public handleNewRegister() {
+    let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
+    console.log('url: ', urlFragment)
+    this.router.navigateByUrl(`/dashboard/${urlFragment}/new-visit`)
+
   }
 
   public dataToRender() {

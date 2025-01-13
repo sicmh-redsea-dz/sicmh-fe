@@ -16,14 +16,17 @@
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
-          <td>{{ item.FechaFactura.split('T')[0] }}</td>
-          <td>{{ item.Estado }}</td>
+          <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
+          <td><span class="badge warning">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>
           <td>
             <div class="opts">
-              <div class="opts-btns action"><i class="ph ph-eye"></i></div>
+              <div class="opts-btns action"
+                  (click)="execItemUpdate()">
+                <i class="ph ph-clock"></i>
+              </div>
               <div class="opts-btns delete"
-                  (click)="execItemDeletion(item.InvoiceNumber )">
+                  (click)="execItemDeletion(item.InvoiceNumber)">
                 <i class="ph ph-trash-simple"></i>
               </div>
             </div>
