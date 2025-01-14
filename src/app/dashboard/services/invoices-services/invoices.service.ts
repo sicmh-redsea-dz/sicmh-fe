@@ -98,6 +98,28 @@ export class InvoicesService {
       )
   }
 
+  public updateInvoice(id: string, invoiceForm: InvoiceForm): Observable<boolean> {
+    const url = `${this.baseUrl}/dashboard/invoices/invoice/${id}`
+    const body = {...invoiceForm}
+
+    const token = this.validateToken()
+    
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      
+    return this.http.put(url, body, { headers })
+      .pipe(
+        map((item) => {
+          console.log('updated item: ', item)
+          return true
+        }),
+        catchError(( err ) => {
+          throwError(() => err.message)
+          return of( false )
+        })
+      )
+  }
+
   public deleteInvoice(id: string): Observable<boolean> {
     const url: string = `${this.baseUrl}/dashboard/invoices/${id}`
 

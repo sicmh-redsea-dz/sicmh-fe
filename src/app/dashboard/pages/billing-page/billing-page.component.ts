@@ -32,11 +32,21 @@ export class BillingPageComponent {
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
     this.drawerParams.setToUpdate.set( true )
     this.drawerParams.setInvoiceId.set( invoiceId )
+    this.drawerParams.drawerTexts.update( state => ({
+      ...state,
+      header: 'completar factura',
+      btnText: 'Actualizar'
+    }))
   }
 
   public bootstrapInvoiceDrawer() {
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
+    this.drawerParams.drawerTexts.update( state => ({
+        ...state,
+        header: 'generar factura',
+        btnText: 'Generar'
+    }))
   }
 
   public getInvoices() {

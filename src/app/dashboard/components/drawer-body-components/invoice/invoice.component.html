@@ -88,13 +88,14 @@
 
   <div class="form-actions">
     <button class="btn cancel"
+            type="button"
             (click)="onHandleCancel()">
       Cancelar
     </button>
     <button class="btn submit"
           type="submit" 
           [disabled]="invoiceForm.invalid">
-      Generar
+      {{drawerTexts().btnText}}
     </button>
   </div>
 </form>

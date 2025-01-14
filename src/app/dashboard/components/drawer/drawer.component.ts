@@ -14,6 +14,7 @@ export class DrawerComponent {
   public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
   public bodyToDisplay = computed(() => this.drawerParams.contentToDisplay())
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
+  public drawerHeader = computed(() => this.drawerParams.drawerTexts())
 
   public setDrawerVisibility() {
     if( this.isDrawerVisible() ) {

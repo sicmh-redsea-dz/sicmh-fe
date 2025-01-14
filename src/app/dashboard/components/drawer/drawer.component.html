@@ -1,7 +1,7 @@
 <div [ngClass]="{'drawer-overlay': true, 'show': isDrawerVisible()}">
   <div [ngClass]="{'drawer': true, 'open': isDrawerVisible()}">
     <div class="drawer-header">
-      <h2>generar factura</h2>
+      <h2>{{drawerHeader().header}}</h2>
       <button (click)="setDrawerVisibility()">
         <i class="icon fa-solid fa-x"></i>
       </button>

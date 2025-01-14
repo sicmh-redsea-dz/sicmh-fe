@@ -25,16 +25,17 @@ export class InvoiceComponent implements OnInit {
 
   public invoiceIdToUpd = computed(() => this.drawerParams.setInvoiceId())
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
+  public drawerTexts = computed(() => this.drawerParams.drawerTexts())
 
   public selectedServices: any[] = []
   public invoiceForm: FormGroup = this.fb.group({
-    patient      : ['', [Validators.required]],
-    doctor       : ['', [Validators.required]],
-    service      : this.fb.array([], [Validators.required]),
-    date         : ['', [Validators.required]],
-    pMethod      : ['', [Validators.required]],
-    amount       : [{value: '', disabled: true}],
-    description  : [{value: '', disabled: true}],
+    patient     : ['', [Validators.required]],
+    doctor      : ['', [Validators.required]],
+    service     : this.fb.array([], []),
+    date        : ['', [Validators.required]],
+    pMethod     : ['', [Validators.required]],
+    amount      : [{value: '', disabled: true}],
+    description : [{value: '', disabled: true}],
   })
   public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
 
@@ -83,11 +84,9 @@ export class InvoiceComponent implements OnInit {
     this.invoiceForm.get('patient')!.setValue( invoice.patientId )
     this.invoiceForm.get('doctor')!.setValue( invoice.doctorId )
     this.invoiceForm.get('date')!.setValue( formatIncomingData( invoice.date ) )
-    // this.invoiceForm.get('amount')!.setValue( formatIncomingData( invoice.amount ) )
     if( details.length > 0 ) {
       this.selectedServices.push({price: invoice.amount, desc: 'Material Medico'})
       this.loadMutableData()
-      // this.invoiceForm.get('description')!.setValue( formatIncomingData( 'Material Medico' ) )
     }
   }
 
@@ -108,6 +107,7 @@ export class InvoiceComponent implements OnInit {
   }
 
   public onHandleCancel() {
+    this.completeExistingInvoice()
     this.invoiceForm.reset()
     this.drawerParams.isDrawerOpen.set( false )
     this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
@@ -116,6 +116,13 @@ export class InvoiceComponent implements OnInit {
   }
 
   public onHandleSubmit() {
+    if( this.isDrawerSetToUpd() ) 
+      this.completeExistingInvoice()
+    else 
+      this.saveNewInvoice()
+  }
+  
+  private saveNewInvoice() {
     if(!this.invoiceForm.valid) return
     this.invoiceService.createInvoice({
       ...this.invoiceForm.value,
@@ -134,6 +141,20 @@ export class InvoiceComponent implements OnInit {
           Swal.fire('Error', message, 'error')
         }
       })
+
+  }
+
+  private completeExistingInvoice() {
+    if(!this.invoiceForm.valid) return
+    this.invoiceService.updateInvoice( this.invoiceIdToUpd(), this.invoiceForm.value)
+      .subscribe({
+        next: ( resp ) => {
+          return resp
+        },
+        error: ( message ) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
   }
 
   private loadMutableData() {
@@ -143,7 +164,8 @@ export class InvoiceComponent implements OnInit {
     this.selectedServices.forEach((item, idx) => {
       totalAmount += parseFloat(item.price)
       concatDescriptions += `${idx+1}. ${item.desc}.\n`
-      this.serviceArray.push(this.fb.control(item.id, [Validators.required]))
+      if( item.id ) 
+        this.serviceArray.push(this.fb.control(item.id, []))
     })
     this.invoiceForm.get('amount')?.setValue(totalAmount.toFixed(2))
     this.invoiceForm.get('description')?.setValue(concatDescriptions)

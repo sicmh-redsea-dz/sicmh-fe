@@ -17,14 +17,20 @@
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
           <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
-          <td><span class="badge warning">{{ item.Estado }}</span></td>
+          <td><span [className]="'badge ' + (item.Estado === 'Pagado' ? 'active' : 'warning')">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>
           <td>
             <div class="opts">
-              <div class="opts-btns action"
-                  (click)="execItemUpdate(item.InvoiceNumber)">
-                <i class="ph ph-clock"></i>
-              </div>
+              @if( item.Estado === 'Pagado') {
+                <div class="opts-btns action">
+                  <i class="ph ph-eye"></i>
+                </div>
+              } @else {
+                <div class="opts-btns action"
+                    (click)="execItemUpdate(item.InvoiceNumber)">
+                  <i class="ph ph-clock"></i>
+                </div>
+              } 
               <div class="opts-btns delete"
                   (click)="execItemDeletion(item.InvoiceNumber)">
                 <i class="ph ph-trash-simple"></i>
