@@ -43,7 +43,7 @@ const routes: Routes = [
       },
       { path: 'income/billings', component: BillingPageComponent },
       { path: 'settings', component: SettingsPageComponent },
-      { path: '**', redirectTo: 'income/billings'}
+      { path: '**', redirectTo: 'main'}
     ]
   },
 ];
