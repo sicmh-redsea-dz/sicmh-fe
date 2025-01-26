@@ -17,6 +17,7 @@ export interface Patient {
   address   : string;
   lastName  : string;
   birthDate : string;
+  idNumber: string;
 }
 
 export interface AddedUser {
