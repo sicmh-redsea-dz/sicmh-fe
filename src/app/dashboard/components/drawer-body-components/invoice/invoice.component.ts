@@ -146,9 +146,13 @@ export class InvoiceComponent implements OnInit {
 
   private completeExistingInvoice() {
     if(!this.invoiceForm.valid) return
-    this.invoiceService.updateInvoice( this.invoiceIdToUpd(), this.invoiceForm.value)
+    this.invoiceService.updateInvoice(this.invoiceIdToUpd(), {...this.invoiceForm.value, amount: this.invoiceForm.get('amount')?.value})
       .subscribe({
         next: ( resp ) => {
+          Swal.fire('Success', 'Invoice updated!', 'success')
+            .then(() => {
+              this.onHandleCancel()
+            })
           return resp
         },
         error: ( message ) => {

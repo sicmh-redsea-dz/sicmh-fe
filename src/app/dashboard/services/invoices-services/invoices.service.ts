@@ -107,7 +107,7 @@ export class InvoicesService {
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
       
-    return this.http.put(url, body, { headers })
+    return this.http.patch(url, body, { headers })
       .pipe(
         map((item) => {
           console.log('updated item: ', item)

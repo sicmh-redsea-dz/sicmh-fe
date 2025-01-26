@@ -1,4 +1,4 @@
-import { afterNextRender, Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
