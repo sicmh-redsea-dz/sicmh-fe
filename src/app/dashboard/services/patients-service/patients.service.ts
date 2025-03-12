@@ -22,7 +22,7 @@ export class PatientsService {
   public listOfPatients = computed(() => this._listOfPatients())
 
   public getPatients( pagination: Pagination):Observable<Data | null> {
-    const url: string = `${this.baseUrl}/dashboard/patients`
+    const url: string = `${this.baseUrl}/app/patients`
     const token = localStorage.getItem('token')
     if ( !token ) this.authStatus.logout()
     const headers = new HttpHeaders()
@@ -46,7 +46,7 @@ export class PatientsService {
   }
 
   public getPatient( patientId:number ): Observable<Patient | null> {
-      const url: string = `${this.baseUrl}/dashboard/patients/${patientId}`
+      const url: string = `${this.baseUrl}/app/patients/${patientId}`
       const token = localStorage.getItem('token')
       if( !token ) {
         this.authStatus.logout()
@@ -69,7 +69,7 @@ export class PatientsService {
   }
 
   public savePatient(patient: FormPatient): Observable<AddedUser | null > {
-    const url: string = `${this.baseUrl}/dashboard/patients/new-patient`
+    const url: string = `${this.baseUrl}/app/patients/new-patient`
     const body = {...patient}
     const token = localStorage.getItem('token')
     if( !token ) {
@@ -88,7 +88,7 @@ export class PatientsService {
   }
 
   public editPatient(patient: FormPatient, patientId: number): Observable<AddedUser | null> {
-    const url: string = `${this.baseUrl}/dashboard/patients/${patientId}`
+    const url: string = `${this.baseUrl}/app/patients/${patientId}`
     const body = {...patient}
     const token = localStorage.getItem('token')
     if( !token ) {
@@ -108,7 +108,7 @@ export class PatientsService {
   }
 
   public deletePatient(id: number): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/patients/${id}`
+    const url: string = `${this.baseUrl}/app/patients/${id}`
     const token: string | null = localStorage.getItem('token')
     if( !token ) this.authStatus.logout()
     const headers = new HttpHeaders()
