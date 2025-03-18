@@ -19,15 +19,28 @@ export class LoginPageComponent {
     password: ['', [ Validators.required, Validators.minLength(6)]]
   })
 
-  login() {
+  private login(idToken:string) {
     const { email, password } = this.loginForm.value;
-    this.authService.login( email, password )
+    this.authService.login( email, password, idToken )
       .subscribe({
         next: () => this.router.navigateByUrl('/dashboard'),
         error: ( message ) => {
           Swal.fire( 'Error', message, 'error')
         }
       })
-
   }
+
+  async submit() {
+    const { email, password } = this.loginForm.value
+    console.log({ email, password })
+    try {
+      const authenticatedUser = await this.authService.signIn(email, password)
+      const idToken = await authenticatedUser.user.getIdToken()
+      console.log('usuario ingreso correctamente con G')
+      this.login(idToken)
+    } catch ( err ) {
+      console.log('error al ingresar el usuario con G: ', err)
+    }
+  }
+
 }

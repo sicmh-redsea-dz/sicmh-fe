@@ -2,10 +2,13 @@
   class="login-form"
   autocomplete="off"
   [formGroup]="myForm"
-  (ngSubmit)="register()"
+  (ngSubmit)="submit()"
 >
 
+
     <span class="form-title">Register</span>
+
+    <app-google-button (onClick)="submitWithGoogle($event)"/>
 
     <div class="wrap-input">
         <span class="label-input">Nombre</span>
@@ -34,7 +37,6 @@
         <span class="focus-input"></span>
     </div>
 
-    <div style="text-align: center; padding-top: .5rem; padding-bottom: 2rem;"></div>
 
     <div class="container=btn">
         <div class="wrapper-btn">
