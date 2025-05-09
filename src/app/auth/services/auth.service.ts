@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs'
+import { catchError, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
 import { User, AuthStatus, LoginResponse, CheckTokenResponse } from '../interfaces'
 import { RegisterResponse } from '../interfaces/register-response.interface'
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth'
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onIdTokenChanged } from '@angular/fire/auth'
 
 
 @Injectable({
@@ -25,6 +25,16 @@ export class AuthService {
 
   constructor() { 
     this.checkAuthStatus().subscribe()
+    onIdTokenChanged(this._auth, async ( user ) => {
+      try {
+        if ( user ) {
+          const newToken = await user.getIdToken()
+          localStorage.setItem('token', newToken)
+        }
+      } catch ( err ) {
+        this.logout()
+      }
+    })
   }
 
   signUp(email: string, password: string) {
@@ -33,12 +43,6 @@ export class AuthService {
 
   signIn(email: string, password: string) {
     return signInWithEmailAndPassword(this._auth, email, password)
-  }
-
-  signInWithGoogle() {
-    const provider = new GoogleAuthProvider()
-    provider.addScope('https://www.googleapis.com/auth/calendar.events')
-    return signInWithPopup(this._auth, provider)
   }
 
   private setAuthentication(user: User, token: string): boolean {
@@ -70,13 +74,43 @@ export class AuthService {
       )
   }
 
-  registerWithGoogle(name:string, email:string, uid:string, idToken:string, accessToken:string): Observable<boolean> {
-    const url = `${this.baseUrl}/auth/google-login`
-    const body = { name, email, uid, accessToken }
+  signInWithG(): Observable<any> {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.events');
+    
+    return from(signInWithPopup(this._auth, provider)).pipe(
+      switchMap((authenticatedUser) => {
+        const user = authenticatedUser.user;
+        const { displayName, email, uid } = user;
+  
+        return from(user.getIdToken()).pipe(
+          switchMap((idToken) => {
+            const accessToken = GoogleAuthProvider.credentialFromResult(authenticatedUser)?.accessToken;
+            
+            return this.http.post<any>(`${this.baseUrl}/auth/check-user`, { uid }).pipe(
+              tap(({ existingUser, exists }) => console.log(existingUser, exists)),
+              switchMap(({ existingUser, exists }) => {
+                if (exists) {
+                  return of(this.setAuthentication(existingUser!, idToken))
+                } else {
+                  return this.registerWithGoogle(displayName!, email!, uid, idToken, accessToken!);
+                }
+              })
+            );
+          })
+        );
+      })
+    );
+  }
 
-    return this.http.post<any>( url, body )
+  private registerWithGoogle(name:string, email:string, uid:string, idToken:string, accessToken:string): Observable<boolean> {
+    console.log('register with google')
+    console.log(name, email, uid, idToken, accessToken)
+    const url = `${this.baseUrl}/auth/gregister`
+    const body = { name, email, uid, idToken, accessToken }
+    return this.http.post<RegisterResponse>(url, body)
       .pipe(
-        map(({ user }) => this.setAuthentication( user, idToken )),
+        map(({user}) => this.setAuthentication(user, idToken)),
         catchError( err => throwError(() => err.error.message))
       )
   }
@@ -93,9 +127,17 @@ export class AuthService {
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${ token }`)
 
-    return this.http.get(url, { headers })
+    return this.http.get<CheckTokenResponse>(url, { headers })
       .pipe(
-        map(() => true ),
+        switchMap(({ user }) => {
+          return this.refreshFirebaseToken().pipe(
+            map(( newToken ) => {
+              const finalToken = newToken || token
+              localStorage.setItem('token', finalToken)
+              return this.setAuthentication(user, finalToken)
+            })
+          )
+        }),
         catchError(() => {
           this._authStatus.set(AuthStatus.notAuthenticated)
           return of(false)
@@ -103,9 +145,24 @@ export class AuthService {
       )
   }
 
+  private refreshFirebaseToken(): Observable<string | null> {
+    const user = this._auth.currentUser;
+    if (!user) return of(null);
+
+    return from(user.getIdToken(true)).pipe(
+        catchError(() => of(null))
+    );
+  }
+
   logout() {
-    localStorage.removeItem('token')
-    this._currentUser.set(null)
-    this._authStatus.set(AuthStatus.notAuthenticated)
+    this._auth.signOut()
+      .then(() => {
+        localStorage.removeItem('token')
+        this._currentUser.set(null)
+        this._authStatus.set(AuthStatus.notAuthenticated)
+      })
+      .catch( error => {
+        console.error('Error al cerrar sesión: ', error)
+      })
   }
 }

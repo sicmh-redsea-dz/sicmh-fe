@@ -1,12 +1,13 @@
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { map } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../helpers/dateFormatters';
+import { Staff } from '../../interface/visits-service.interface';
 
 @Component({
   selector: 'app-visits-form-page',
@@ -28,22 +29,22 @@ export class VisitsFormPageComponent implements OnInit {
   public listOfPatients = computed(() => this.visitsService.listOfPatients())
 
   public visitForm: FormGroup = this.fb.group({
-    patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patient: '', [Validators.required]],
-    doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.doctor: '', [Validators.required]],
+    ageAccordingToWeight: [this.caller !== 'nv' ? this.selectedVisit()?.ageBasedOnWeight: '', [Validators.required]],
+    BMI           : [this.caller !== 'nv' ? this.selectedVisit()?.BMI: '', [Validators.required]],
     date          : [this.caller !== 'nv' ? '': '', [Validators.required]],
     diagnosis     : [this.caller !== 'nv' ? this.selectedVisit()?.diagnosis: '', [Validators.required]],
-    treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
-    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', [Validators.required]],
-    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.pressure: '', [Validators.required]],
-    oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenation: '', [Validators.required]],
-    temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
-    glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucometry: '', [Validators.required]],
-    weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
+    doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.staffId : '', [Validators.required]],
+    fatPercentage : [this.caller !== 'nv' ? this.selectedVisit()?.bodyFatPercentage: '', [Validators.required]],
+    glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel: '', [Validators.required]],
     height        : [this.caller !== 'nv' ? this.selectedVisit()?.height: '', [Validators.required]],
-    BMI           : [this.caller !== 'nv' ? this.selectedVisit()?.BMI: '', [Validators.required]],
-    fatPercentage : [this.caller !== 'nv' ? this.selectedVisit()?.fatPercentage: '', [Validators.required]],
+    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', [Validators.required]],
+    oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation: '', [Validators.required]],
+    patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patientId: '', [Validators.required]],
+    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure: '', [Validators.required]],
+    temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
+    treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
     visceralFat   : [this.caller !== 'nv' ? this.selectedVisit()?.visceralFat: '', [Validators.required]],
-    ageAccordingToWeight: [this.caller !== 'nv' ? this.selectedVisit()?.ageAccordingToWeight: '', [Validators.required]],
+    weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
   })
 
   ngOnInit(): void {
@@ -60,10 +61,10 @@ export class VisitsFormPageComponent implements OnInit {
           this.visitForm.reset();
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
+          console.log('hello')
           this.title = 'Editar visita'
           this.actionButtonText = 'Editar'
-          console.log(this.selectedVisit()?.date!)
-          this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.date!))
+          this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
         }
       })
   }
@@ -124,6 +125,10 @@ export class VisitsFormPageComponent implements OnInit {
       if(valueToSet > 0 && valueToSet < 100) this.visitForm.get(caller)?.setValue(valueToSet.toString())
     }
   }
+
+  compareDoctors = (a: Staff, b: Staff): boolean => {
+    return a && b ? a.id === b.id : a === b;
+  };
 
   private calculateBMI(): void {
     const weight = this.visitForm.get('weight')?.value

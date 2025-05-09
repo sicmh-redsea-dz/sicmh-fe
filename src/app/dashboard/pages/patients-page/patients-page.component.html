@@ -20,7 +20,7 @@
     <tbody style="background-color: white;">
       <tr *ngFor="let patient of dataToRender(); let idx = index ">
         <td>
-          <img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar">
+          <i class="ph-bold ph-user"></i>
         </td>
         <td>{{patient | formatFullname }}</td>
         <td>{{ patient.email }}</td>

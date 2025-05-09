@@ -4,7 +4,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
-import { VisitsResponse, Doctor, Visits, Patient, FormVisit, SelectedVisitResponse, Visit, Data, Stock } from '../../interface/visits-response.interface';
+import { FormVisit } from '../../interface/visits-response.interface';
+import { Histories, SimpleVisit, Staff, Patients, History, Visit, Stock } from '../../interface/visits-service.interface'
 
 interface Pagination {
   limit: number,
@@ -18,37 +19,45 @@ export class VisitsService {
   private http = inject( HttpClient )
   private authStatus = inject( AuthService )
 
+  // usando computed() sin derivar ningun valor nuevo
+  // private _listOfVisits = signal<SimpleVisit[]>([])
+  // public listOfVisits = computed(() => this._listOfVisits())
+
   private _selectedVisit = signal<Visit | null>(null)
-  public selectedVisit = computed(() => this._selectedVisit())
+  readonly selectedVisit = this._selectedVisit.asReadonly()
 
-  private _listOfVisits = signal<Visits[] | null>( null )
-  public listOfVisits = computed(() => this._listOfVisits())
+  private _listOfVisits = signal<SimpleVisit[]>([])
+  readonly listOfVisits = this._listOfVisits.asReadonly()
 
-  private _listOfDoctors = signal<Doctor[] | null>( null )
-  public listOfDoctors = computed(() => this._listOfDoctors())
+  private _listOfDoctors = signal<Staff[] | null>( null )
+  readonly listOfDoctors = this._listOfDoctors.asReadonly()
 
-  private _listOfPatients = signal<Patient[] | null>(null)
-  public listOfPatients = computed(() => this._listOfPatients() )
+  private _listOfPatients = signal<Patients[] | null>(null)
+  readonly listOfPatients = this._listOfPatients.asReadonly()
 
   private _listOfStockItems = signal<Stock[] | null>(null)
-  public listOfStockItems = computed(() => this._listOfStockItems() )
+  readonly listOfStockItems = this._listOfStockItems.asReadonly()
 
-  public getAllVisits(pagination: Pagination): Observable<Data | null> {
-    const url: string = `${this.baseUrl}/dashboard/visits`
+  private authHeaders(): HttpHeaders {
     const token = localStorage.getItem('token')
     if( !token ) this.authStatus.logout()
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`)
+  }
+
+  public getAllVisits(pagination: Pagination): Observable<any> {
+    const url: string = `${this.baseUrl}/app/visits`
+
+    const headers = this.authHeaders()
 
     const params = new HttpParams()
       .set('limit', pagination.limit)
       .set('offset', pagination.offset)
 
-    return this.http.get<VisitsResponse>(url, { headers, params })
+    return this.http.get<Histories>(url, { headers, params })
       .pipe(
         map(({data}) => {
           this._listOfVisits.set(data.visits)
-          this._listOfDoctors.set(data.doctors)
+          this._listOfDoctors.set(data.staff)
           this._listOfPatients.set(data.patients)
           this._listOfStockItems.set(data.stock)
           return data
@@ -60,19 +69,17 @@ export class VisitsService {
       )
   }
 
-  public getVisit(id: number): Observable<SelectedVisitResponse | null> {
-    const url: string = `${this.baseUrl}/dashboard/visits/${id}`
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
+  public getVisit(id: number): Observable<Visit | null> {
+    const url: string = `${this.baseUrl}/app/visits/${id}`
 
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)   
+    const headers = this.authHeaders()   
       
-    return this.http.get<SelectedVisitResponse>(url, { headers })
+    return this.http.get<History>(url, { headers })
       .pipe(
-        map((data) => {
-          this._selectedVisit.set( data.data.visit )
-          return data
+        map(( data ) => {
+          console.log('data', data)
+          this._selectedVisit.set( data.data )
+          return data.data
         }),
         catchError((err) => {
           throwError (() => err.message)
@@ -82,17 +89,15 @@ export class VisitsService {
   }
 
   public editVisit(id: number, visit: FormVisit): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/visits/edit-visit/${id}`
+    const url: string = `${this.baseUrl}/app/visits/edit/${id}`
     const body = {...visit}
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
 
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders()
 
     return this.http.patch(url, body, { headers })
       .pipe(
-        map(() => {
+        map((something) => {
+          console.log('something: ', something)
           return true
         }),
         catchError((err) => {
@@ -100,17 +105,13 @@ export class VisitsService {
           return of(false)
         })
       )
-
   }
 
   public createVisit(visit: FormVisit, origin='er'): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/visits/create/${origin}`
+    const url: string = `${this.baseUrl}/app/visits/create`
     const body = {...visit}
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
 
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders()
 
     return this.http.post(url, body, { headers })
       .pipe(
@@ -125,11 +126,9 @@ export class VisitsService {
   }
 
   public deleteVisit(id: number): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/visits/${id}`
-    const token: string | null = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const url: string = `${this.baseUrl}/app/visits/${id}`
+
+    const headers = this.authHeaders()
 
     return this.http.delete(url, { headers })
       .pipe(

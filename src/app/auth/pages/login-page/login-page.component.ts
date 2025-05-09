@@ -15,8 +15,8 @@ export class LoginPageComponent {
   private router = inject( Router )
 
   public loginForm: FormGroup = this.fb.group({
-    email   : ['', [Validators.required, Validators.email]],
-    password: ['', [ Validators.required, Validators.minLength(6)]]
+    email   : ['hamato.raph@gmail.com', [Validators.required, Validators.email]],
+    password: ['k@w@bung@', [ Validators.required, Validators.minLength(6)]]
   })
 
   private login(idToken:string) {
@@ -32,7 +32,7 @@ export class LoginPageComponent {
 
   async submit() {
     const { email, password } = this.loginForm.value
-    console.log({ email, password })
+    
     try {
       const authenticatedUser = await this.authService.signIn(email, password)
       const idToken = await authenticatedUser.user.getIdToken()

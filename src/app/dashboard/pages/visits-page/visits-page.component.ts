@@ -55,7 +55,7 @@ export class VisitsPageComponent implements OnInit {
     this.visitsService.getVisit(id)
       .subscribe({
         next: ( visit ) => {
-          const { id } = visit?.data.visit!
+          const { id } = visit!
           let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
           return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
         },
@@ -83,6 +83,19 @@ export class VisitsPageComponent implements OnInit {
     })
   }
 
+  private deleteVisit(id: number) {
+    this.visitsService.deleteVisit( id )
+      .subscribe({
+        next: ( result ) => {
+          if( result ) 
+            this.getVisits()
+        },
+        error:( err ) => {
+          console.error('Error al eliminar el paciente seleccionado:', err);
+        }
+      })
+  }
+
   public handleNewRegister() {
     let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
     console.log('url: ', urlFragment)
@@ -97,15 +110,4 @@ export class VisitsPageComponent implements OnInit {
     })
   }
 
-  private deleteVisit(id: number) {
-    this.visitsService.deleteVisit( id )
-      .subscribe({
-        next: ( result ) => {
-          if( result ) this.getVisits()
-        },
-        error:( err ) => {
-          console.error('Error al eliminar el paciente seleccionado:', err);
-        }
-      })
-  }
 }

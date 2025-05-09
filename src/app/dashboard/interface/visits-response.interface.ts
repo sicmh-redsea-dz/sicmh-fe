@@ -1,3 +1,25 @@
+export interface VisitsN {
+  data: DataN;
+}
+
+export interface DataN {
+  visits:       VisitN[];
+  totalCount:   number;
+  totalRecords: number;
+}
+
+export interface VisitN {
+  id:            number;
+  doctorName:    string;
+  patientName:    string;
+  lastVisitDate: string;
+  diagnosis:     Date;
+}
+
+
+
+
+
 export interface VisitsResponse {
   data: Data;
 }

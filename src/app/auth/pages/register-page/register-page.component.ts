@@ -32,16 +32,6 @@ export class RegisterPageComponent {
       })
   }
 
-  private registerWithGoogle(displayName:string, email:string, uid:string, idToken:string, accessToken:string) {
-    this.authService.registerWithGoogle(displayName, email, uid, idToken, accessToken)
-      .subscribe({
-        next: () => this.router.navigateByUrl('/dashboard'),
-        error: ( message ) => {
-          Swal.fire('Error', message, 'error')
-        }
-      })
-  }
-
   async submit() {
     const { email, password } = this.myForm.value
     try {
@@ -53,18 +43,17 @@ export class RegisterPageComponent {
       console.log('error al crear el usuario con G: ', err)
     }
   }
-
+  
   async submitWithGoogle(e: Event) {
     e.preventDefault()
-    try {
-      const authenticatedUser = await this.authService.signInWithGoogle()
-      const { displayName, uid, email } = authenticatedUser.user
-      const idToken = await authenticatedUser.user.getIdToken()
-      const accessToken = GoogleAuthProvider.credentialFromResult(authenticatedUser)?.accessToken
-      console.log('usuario creado correctamente con G pop-up: ', accessToken)
-      this.registerWithGoogle( displayName!, email!, uid, idToken, accessToken! )
-    } catch ( err ) {
-      console.log('error al crear el usuario con G pop-up: ', err)
-    }
+    this.authService.signInWithG()
+      .subscribe({
+        next: () => {
+          this.router.navigateByUrl('/dashboard')
+        },
+        error: ( message ) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
   }
 }

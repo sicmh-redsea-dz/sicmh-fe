@@ -2,7 +2,8 @@ import { Component, computed, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormVisit, Stock } from '../../../interface/visits-response.interface';
+import { FormVisit } from '../../../interface/visits-response.interface';
+import { Stock } from '../../../interface/visits-service.interface'
 import Swal from 'sweetalert2';
 import { map } from 'rxjs';
 import { formatNewDate, formatIncomingData } from '../../../helpers/dateFormatters';
@@ -29,14 +30,14 @@ export class VisitsFormPageV2Component {
   public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
 
   public visitForm: FormGroup = this.fb.group({
-    patient     : [this.caller !== 'nv' ? this.selectedVisit()?.patient : '', [Validators.required]],
-    doctor      : [this.caller !== 'nv' ? this.selectedVisit()?.doctor : '', [Validators.required]],
+    patient     : [this.caller !== 'nv' ? this.selectedVisit()?.patientId : '', [Validators.required]],
+    doctor      : [this.caller !== 'nv' ? this.selectedVisit()?.staffId : '', [Validators.required]],
     date        : [this.caller !== 'nv' ? '' : '', [Validators.required]],
     notes       : [this.caller !== 'nv' ? this.selectedVisit()?.notes : '', []],
-    pressure    : [this.caller !== 'nv' ? this.selectedVisit()?.pressure : '', [Validators.required]],
-    oxygenation : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenation : '', [Validators.required]],
+    pressure    : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure : '', [Validators.required]],
+    oxygenation : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation : '', [Validators.required]],
     temperature : [this.caller !== 'nv' ? this.selectedVisit()?.temperature : '', [Validators.required]],
-    glucometry  : [this.caller !== 'nv' ? this.selectedVisit()?.glucometry : '', [Validators.required]],
+    glucometry  : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel : '', [Validators.required]],
     weight      : [this.caller !== 'nv' ? this.selectedVisit()?.weight : '', [Validators.required]],
     height      : [this.caller !== 'nv' ? this.selectedVisit()?.height : '', [Validators.required]],
     stockItems  : this.fb.array([],[Validators.required])
@@ -57,7 +58,7 @@ export class VisitsFormPageV2Component {
         } else {
           this.title = 'Editar visita'
           this.actionButtonText = 'Editar'
-          this.visitForm.get('date')!.setValue(formatIncomingData(this.selectedVisit()?.date!))
+          this.visitForm.get('date')!.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
         }
       })
   }
@@ -125,7 +126,7 @@ export class VisitsFormPageV2Component {
 
   public incrementQuantity(index: number) {
     const item = this.selectedStockItems[index];
-    if (item.currentQuantity < item.quantity) {
+    if (item.currentQuantity < item.productQuantity) {
       item.currentQuantity += 1
       this.loadDataOfStockArray()
     }
@@ -153,8 +154,8 @@ export class VisitsFormPageV2Component {
     this.loadDataOfStockArray()
   }
 
-  public removeListItem(id: string, idx: number) {
-    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== id)
+  public removeListItem(id: number, idx: number) {
+    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== +id)
     this.stockItemsArray.removeAt(idx)
     this.loadDataOfStockArray()
   }

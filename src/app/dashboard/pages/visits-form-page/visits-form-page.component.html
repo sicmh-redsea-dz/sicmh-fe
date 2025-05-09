@@ -25,10 +25,9 @@
 
       <div class="input-group">
         <label>Doctor</label>
-        <select formControlName="doctor">
-          <option disabled 
-                  selected
-                  value="">
+        <select formControlName="doctor" [compareWith]="compareDoctors">
+          <option disabled
+                  [value]="">
             Seleccione un doctor
           </option>
           <option *ngFor="let doctor of listOfDoctors()"
@@ -193,7 +192,7 @@
     </div>
 
     <button class="submit-btn" 
-            [disabled]="visitForm.invalid" 
+            
             type="submit">
       {{actionButtonText}}
     </button>
