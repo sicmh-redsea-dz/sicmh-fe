@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FullCalendarModule }  from '@fullcalendar/angular';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout.component';
@@ -45,7 +46,8 @@ import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-fo
   imports: [
     CommonModule,
     DashboardRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FullCalendarModule
   ]
 })
 export class DashboardModule { }

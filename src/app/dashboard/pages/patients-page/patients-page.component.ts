@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { Component, computed, inject, Signal, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { PatientsService } from '../../services/patients-service/patients.service';
 
 @Component({

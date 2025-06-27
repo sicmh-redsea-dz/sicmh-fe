@@ -40,6 +40,7 @@ export class InvoiceComponent implements OnInit {
   public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
 
   ngOnInit(): void {
+    console.log('asumo que pasa primero por aca')
     this.getInvoiceData()
     if( !this.isDrawerSetToUpd() ) {
       this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))

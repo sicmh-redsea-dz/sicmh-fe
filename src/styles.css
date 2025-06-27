@@ -1,3 +1,5 @@
+@import "tippy.js/dist/tippy.css";
+
 @font-face {
   font-family: Poppins-Regular;
   src: url('./assets/fonts/poppins/Poppins-Regular.ttf');

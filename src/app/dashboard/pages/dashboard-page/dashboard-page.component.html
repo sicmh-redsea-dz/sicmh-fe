@@ -1,1 +1,116 @@
-<p>dashboard-page works!</p>
+<div class="dashboard">
+    <div class="card">
+        <div class="card-icon">
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="status-value">{{ patientsCurrent }}</div>
+        <div class="status-header">Pacientes</div>
+        <div 
+            class="card-trend"
+            [ngClass]="{
+                'card-trend--up': patientsPct! >= 0,
+                'card-trend--down': patientsPct! < 0
+            }"
+        >
+            <div class="card-trend__arrow">
+                {{ patientsPct! >= 0 ? '▲' : '▼' }}
+            </div>
+            <span class="card-trend__text">
+                {{ 
+                    patientsPct !== null
+                        ? (patientsPct! >= 0 ? '+' : '') + patientsPct + '%'
+                        : '-' 
+                }}
+            </span>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="status-value">{{ invoicesCurrent }}</div>
+        <div class="status-header">Facturas</div>
+        <div 
+            class="card-trend"
+            [ngClass]="{
+                'card-trend--up': invoicesPct! >= 0,
+                'card-trend--down': invoicesPct! < 0
+            }"
+        >
+            <div class="card-trend__arrow">
+                {{ invoicesPct! >= 0 ? '▲' : '▼' }}
+            </div>
+            <span class="card-trend__text">
+                {{ 
+                    invoicesPct !== null
+                        ? (invoicesPct! >= 0 ? '+' : '') + invoicesPct + '%'
+                        : '-' 
+                }}
+            </span>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="status-value">{{ visitsCurrent }}</div>
+        <div class="status-header">Citas</div>
+        <div 
+            class="card-trend"
+            [ngClass]="{
+            'card-trend--up':  visitsPct! >= 0,
+            'card-trend--down': visitsPct! <  0
+            }"
+        >
+            <div class="card-trend__arrow">
+                {{ visitsPct! >= 0 ? '▲' : '▼' }}
+            </div>
+            <span class="card-trend__text">
+                {{ 
+                    visitsPct !== null
+                        ? (visitsPct! >= 0 ? '+' : '') + visitsPct + '%'
+                        : '-' 
+                }}
+            </span>
+        </div>
+    </div>
+    <div class="calendar">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+
+    <div class="patients-table">
+        <div class="table-header">
+            <h3>Programación de hoy</h3>
+            <div 
+                class="sort-control" 
+                (click)="toggleSort()"
+            >
+                {{ sortAsc ? 'Ord: A - Z' : 'Ord: Z - A' }}
+                <i 
+                    class="fa-solid"
+                    [ngClass]="sortAsc ? 'fa-chevron-up' : 'fa-chevron-down'"
+                ></i>
+            </div>
+        </div>
+        <div class="dash-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Paciente</th>
+                        <th>Ultima Visita</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let visit of visits; let idx = index">
+                        <td>{{visit.HistoriaID}}</td>
+                        <td>{{visit.NombreDoctor}}</td>
+                        <td>{{visit.NombrePaciente}}</td>
+                        <td>{{visit.FechaUltimaVisita | formatDate}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

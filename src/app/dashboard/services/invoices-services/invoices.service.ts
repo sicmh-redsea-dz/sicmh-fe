@@ -64,7 +64,7 @@ export class InvoicesService {
 
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
-
+    console.log('antes de irse')
     return this.http.get( url, { headers })
       .pipe(
         map(( resp ) => {

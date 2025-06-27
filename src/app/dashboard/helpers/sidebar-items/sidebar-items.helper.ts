@@ -25,18 +25,18 @@ export const sidebarItmes = [
     ],
     arrowIcon: 'ph-bold ph-caret-down'
   },
-  {
-    label: 'Publicaciones',
-    icon: 'ph-bold ph-file-text',
-    hasSubmenu: false,
-    routerLink: ''
-  },
-  {
-    label: 'Horarios',
-    icon: 'ph-bold ph-calendar-blank',
-    hasSubmenu: false,
-    routerLink: ''
-  },
+  // {
+  //   label: 'Publicaciones',
+  //   icon: 'ph-bold ph-file-text',
+  //   hasSubmenu: false,
+  //   routerLink: ''
+  // },
+  // {
+  //   label: 'Horarios',
+  //   icon: 'ph-bold ph-calendar-blank',
+  //   hasSubmenu: false,
+  //   routerLink: ''
+  // },
   {
     label: 'Ingreso',
     icon: 'ph-bold ph-chart-bar',
@@ -46,10 +46,10 @@ export const sidebarItmes = [
         label: 'Facturaciones', 
         routerLink: 'income/billings'
       }, 
-      {
-        label:'Fondos', 
-        routerLink:''
-      }
+      // {
+      //   label:'Fondos', 
+      //   routerLink:''
+      // }
     ],
     arrowIcon: 'ph-bold ph-caret-down'
   }

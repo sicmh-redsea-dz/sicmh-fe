@@ -6,10 +6,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
+import { LoaderComponent } from './shared/loader/loader.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    LoaderComponent,
   ],
   imports: [
     BrowserModule,
