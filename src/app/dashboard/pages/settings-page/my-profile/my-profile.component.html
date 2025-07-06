@@ -1,0 +1,60 @@
+<div class="tiles-container">
+    <!-- Tile: Perfil -->
+    <section class="tile">
+      <div class="tile-header">
+        <i class="fas fa-user"></i>
+        <h3>Perfil</h3>
+      </div>
+      <div class="profile-tile">
+        <div class="avatar-section">
+            <label class="avatar-hover-wrapper" for="avatarUpload">
+              <div class="avatar" *ngIf="!userImageUrl">
+                <i class="fas fa-user"></i>
+              </div>
+              <img *ngIf="userImageUrl" [src]="userImageUrl" alt="avatar" class="avatar-img">
+              <div class="avatar-overlay"></div>
+            </label>
+            <input type="file" id="avatarUpload" (change)="onAvatarChange($event)" hidden />
+        </div>
+        <div class="form-section">
+          <label>Nombre</label>
+          <input type="text" formControlName="username" />
+  
+          <label>Correo</label>
+          <input type="email" formControlName="email" />
+  
+          <button class="save-btn" (click)="saveProfile()">Guardar cambios</button>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Tile: Idioma -->
+    <!-- <section class="tile">
+      <div class="tile-header">
+        <i class="fas fa-language"></i>
+        <h3>Idioma</h3>
+      </div>
+      <div class="language-row">
+          <p>Selecciona el idioma para la interfaz</p>
+          <select formControlName="language">
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+          </select>
+      </div>
+    </section> -->
+  
+    <!-- Tile: Tema -->
+    <section class="tile">
+        <div class="tile-header theme-header">
+          <div class="theme-title">
+            <i class="fas fa-adjust"></i>
+            <h3>Tema</h3>
+          </div>
+          <div class="theme-icon-toggle" (click)="toggleTheme()">
+            <i [ngClass]="profileForm.get('theme')?.value === 'dark' ? 'fas fa-moon' : 'fas fa-sun'"></i>
+          </div>
+        </div>
+    </section>
+      
+</div>
+  

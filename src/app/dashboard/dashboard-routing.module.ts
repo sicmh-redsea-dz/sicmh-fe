@@ -9,6 +9,8 @@ import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-pa
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
 import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
+import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
+import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 
 const routes: Routes = [
   {
@@ -42,8 +44,16 @@ const routes: Routes = [
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },
-      { path: 'settings', component: SettingsPageComponent },
-      { path: '**', redirectTo: 'main'}
+      { 
+        path: 'settings', 
+        component: SettingsPageComponent,
+        children: [
+          { path: '', redirectTo: 'my-profile', pathMatch: 'full' },
+          { path: 'my-profile', component: MyProfileComponent },
+          { path: 'permissions', component: PermissionsComponent },
+        ]
+      },
+      { path: '**', redirectTo: 'settings'}
     ]
   },
 ];

@@ -1,0 +1,80 @@
+h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  
+  .info-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .info-table th,
+  .info-table td {
+    font-size: .75rem;
+    padding: .5rem .25rem;
+    width: 16%;
+    color: #333;
+  }
+  
+  .info-table th {
+    font-weight: bold;
+  }
+  
+  .info-table td:first-child {
+    text-align: center;
+  }
+  
+  .info-table tr {
+    border-bottom: 1px solid #ddd;
+  }
+  
+  
+  
+  
+  
+  .toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .toggle-container p {
+    margin: 0 .5rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+  
+  .input-toggle {
+    display: none;
+  }
+  
+  .toggle-switch {
+    position: relative;
+    background-color: #d2d2d2;
+    height: 1.5rem;
+    width: 3rem;
+    border-radius: 200px;
+    cursor: pointer;
+    transition: .2s;
+  }
+  
+  .toggle-switch::before {
+    content: '';
+    position: absolute;
+    background-color: #fff;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 200px;
+    margin: 4px;
+    transition: .2s;
+  }
+  
+  .input-toggle:checked + .toggle-switch {
+    background-color: var(--secondary-color);
+  }
+  
+  .input-toggle:checked + .toggle-switch::before {
+    transform: translateX(24px);
+  }
