@@ -86,7 +86,7 @@ td .opts {
 }
 
 .badge.date{
-  background-color: #ca9bf7;
+  background-color: var(--tag-color);
 }
 
 .badge.active {

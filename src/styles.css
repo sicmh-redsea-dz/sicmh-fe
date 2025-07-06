@@ -21,10 +21,16 @@
 }
 
 :root {
-  --primary-color: #0e1b23;
-  --secondary-color: #8383de;
-  --hover-color: #a8a8e9;
-  --gradient-color: linear-gradient(90deg, #a493f5, #7b66d4);
+  --primary-color: #2E4172;
+  --secondary-color: #2EBB9F;
+  --hover-color: #36D2B0;
+  --tag-color: #6280b9;
+  --gradient-color: linear-gradient(
+    90deg,
+    #2EBB9F 0%,
+    #6280b9 50%,
+    #2E4172 100%
+  );
   --container-background: #f9f9f9;
   --color-white: #fff;
   --color-gray: #555;
