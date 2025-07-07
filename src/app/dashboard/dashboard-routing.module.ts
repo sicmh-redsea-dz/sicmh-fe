@@ -53,7 +53,7 @@ const routes: Routes = [
           { path: 'permissions', component: PermissionsComponent },
         ]
       },
-      { path: '**', redirectTo: 'settings'}
+      { path: '**', redirectTo: 'main'}
     ]
   },
 ];
