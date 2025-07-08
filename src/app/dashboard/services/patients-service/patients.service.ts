@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../../environments/environment'
-import { catchError, map, Observable, of, throwError } from 'rxjs'
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs'
 import { AddedUser, Data, FormPatient, Patient, PatientsResponse } from '../../interface/patients-response.interface'
 import { AuthService } from '../../../auth/services/auth.service'
 
@@ -68,22 +68,22 @@ export class PatientsService {
         )
   }
 
-  public savePatient(patient: FormPatient): Observable<AddedUser | null > {
+  public savePatient(patient: FormPatient): Observable<AddedUser | null> {
     const url: string = `${this.baseUrl}/app/patients/new-patient`
     const body = {...patient}
     const token = localStorage.getItem('token')
+
     if( !token ) {
       this.authStatus.logout()
       return of( null )
     }
+
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
+
     return this.http.post<AddedUser>( url, body, { headers } )
       .pipe(
-        catchError(( err ) => {
-          throwError(() => err.message )
-          return of( null )
-        })
+        catchError(( err ) => throwError(() => err ))
       )
   }
 

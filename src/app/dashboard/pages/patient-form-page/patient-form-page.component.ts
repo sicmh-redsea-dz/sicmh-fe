@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { map } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { FormPatient } from '../../interface/patients-response.interface';
+import { createSingleton } from 'tippy.js';
 
 @Component({
   selector: 'app-patient-form-page',
@@ -22,6 +23,7 @@ export class PatientFormPageComponent implements OnInit {
   public selectedUser = computed(() => this.patientService.selectedPatient() )
   
   public patientForm: FormGroup = this.fb.group({
+    id        : [this.caller !== 'np' ?this.selectedUser()?.id : '', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
     firstName : [this.caller !== 'np' ? this.selectedUser()?.name : '', [Validators.required, Validators.minLength(2)]],
     lastName  : [this.caller !== 'np' ? this.selectedUser()?.lastName : '', [Validators.required, Validators.minLength(2)]],
     birthdate : [this.caller !== 'np' ? this.formatDate(this.selectedUser()?.birthDate) : '', [Validators.required]],
@@ -81,8 +83,8 @@ export class PatientFormPageComponent implements OnInit {
               })
           }
         },
-        error: (message) => {
-          Swal.fire('Error', message, 'error')
+        error: ( error ) => {
+          Swal.fire('Error', error.message, 'error')
         },
       })
   }
