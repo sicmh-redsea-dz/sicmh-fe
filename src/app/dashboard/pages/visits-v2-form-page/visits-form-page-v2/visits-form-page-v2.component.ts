@@ -89,8 +89,11 @@ export class VisitsFormPageV2Component {
               })
           }
         },
-        error: ( message ) => {
-          Swal.fire('Error', message, 'error')
+        error: ( hasError ) => {
+          if ( !hasError ) {
+
+            Swal.fire('Error', 'Error al generar visita nueva', 'error')
+          }
         }
       })
   }
