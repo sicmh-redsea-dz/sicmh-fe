@@ -38,7 +38,7 @@ export class InvoicesService {
   }
 
   public getOneInvoice(invoiceId: string): Observable<any | null> {
-    const url: string = `${this.baseUrl}/dashboard/invoices/invoice/${invoiceId}`
+    const url: string = `${this.baseUrl}/app/invoice/${invoiceId}`
 
     const token = this.validateToken()
 
@@ -58,13 +58,13 @@ export class InvoicesService {
   }
 
   public getDataForInvoice(): Observable<any | null> {
-    const url: string = `${this.baseUrl}/dashboard/invoices/new-invoice`
+    const url: string = `${this.baseUrl}/app/invoice/raw`
 
     const token = this.validateToken()
 
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
-    console.log('antes de irse')
+    
     return this.http.get( url, { headers })
       .pipe(
         map(( resp ) => {

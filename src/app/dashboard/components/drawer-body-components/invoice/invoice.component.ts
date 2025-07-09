@@ -71,7 +71,7 @@ export class InvoiceComponent implements OnInit {
   public getPendingInvoice(invoiceId: string) {
     this.invoiceService.getOneInvoice(invoiceId)
       .subscribe({
-        next: ( data ) => {
+        next: ({ data }) => {
           this.setDataInForm( data )
         },
         error: ( message ) => {
@@ -81,12 +81,12 @@ export class InvoiceComponent implements OnInit {
   }
 
   private setDataInForm(data: Record<string, any>) {
-    const { invoice, details } = data['data']
-    this.invoiceForm.get('patient')!.setValue( invoice.patientId )
-    this.invoiceForm.get('doctor')!.setValue( invoice.doctorId )
-    this.invoiceForm.get('date')!.setValue( formatIncomingData( invoice.date ) )
-    if( details.length > 0 ) {
-      this.selectedServices.push({price: invoice.amount, desc: 'Material Medico'})
+    const { details, patientId, doctorId, date, amount } = data
+    this.invoiceForm.get('patient')!.setValue( patientId )
+    this.invoiceForm.get('doctor')!.setValue( doctorId )
+    this.invoiceForm.get('date')!.setValue( formatIncomingData( date ) )
+    if( amount > 0 ) {
+      this.selectedServices.push({price: amount, desc: 'Material Medico'})
       this.loadMutableData()
     }
   }
