@@ -78,8 +78,8 @@ export class InvoicesService {
   }
 
   public createInvoice(invoiceForm: InvoiceForm): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/invoices/new-invoice`
-    const body = {...invoiceForm}
+    const url: string = `${this.baseUrl}/app/invoice/create`
+    const body = {...invoiceForm, origin: true}
 
     const token = this.validateToken()
 
@@ -121,7 +121,7 @@ export class InvoicesService {
   }
 
   public deleteInvoice(id: string): Observable<boolean> {
-    const url: string = `${this.baseUrl}/dashboard/invoices/${id}`
+    const url: string = `${this.baseUrl}/app/invoice/${id}`
 
     const token = this.validateToken()
 

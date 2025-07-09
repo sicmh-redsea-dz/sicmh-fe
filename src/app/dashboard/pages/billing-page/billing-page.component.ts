@@ -108,7 +108,7 @@ export class BillingPageComponent {
       .subscribe({
         next: ( result ) => {
           console.log('res: ', result)
-          if( result ) this.getInvoices()
+          if( result ) this.drawerParams.triggerInvoiceRefresh()
         },
         error: ( err ) => {
           console.error('Error al eliminar la factura seleccionado:', err);
