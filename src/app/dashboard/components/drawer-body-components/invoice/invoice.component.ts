@@ -40,32 +40,36 @@ export class InvoiceComponent implements OnInit {
   public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
 
   ngOnInit(): void {
-    console.log('asumo que pasa primero por aca')
     this.getInvoiceData()
-    if( !this.isDrawerSetToUpd() ) {
-      this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
-    } else {
-      this.getPendingInvoice(this.invoiceIdToUpd())
-    }
+      .then(() => {
+        if (!this.isDrawerSetToUpd()) {
+          this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
+        } else {
+          this.getPendingInvoice(this.invoiceIdToUpd())
+        }
+      })
   }
 
   get serviceArray(): FormArray {
     return this.invoiceForm.get('service') as FormArray;
   }
 
-  public getInvoiceData() {
-    this.invoiceService.getDataForInvoice()
-      .subscribe({
-        next: ( resp ) => {
+  public getInvoiceData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.invoiceService.getDataForInvoice().subscribe({
+        next: (resp) => {
           this.options.doctors = resp.data.doctors
           this.options.patients = resp.data.patients
           this.options.services = resp.data.services
           this.options.pMethods = resp.data.paymentMethods
+          resolve()
         },
-        error: ( message ) => {
+        error: (message) => {
           Swal.fire('Error', message, 'error')
+          reject(message)
         }
       })
+    })
   }
 
   public getPendingInvoice(invoiceId: string) {
@@ -81,12 +85,20 @@ export class InvoiceComponent implements OnInit {
   }
 
   private setDataInForm(data: Record<string, any>) {
-    const { details, patientId, doctorId, date, amount } = data
+    const { visitType, patientId, doctorId, date, amount } = data
     this.invoiceForm.get('patient')!.setValue( patientId )
     this.invoiceForm.get('doctor')!.setValue( doctorId )
     this.invoiceForm.get('date')!.setValue( formatIncomingData( date ) )
     if( amount > 0 ) {
       this.selectedServices.push({price: amount, desc: 'Material Medico'})
+      this.loadMutableData()
+    }
+    
+    if ( visitType ) {
+      const updId = visitType === 'Emergencia' ? 2 : 1
+      const selectedItem = this.options.services.find( item => item.id === updId )
+      
+      this.selectedServices.push({description: selectedItem.serviceName, id: selectedItem.id, price: selectedItem.servicePrice, desc: selectedItem.serviceDescription})
       this.loadMutableData()
     }
   }
@@ -108,7 +120,6 @@ export class InvoiceComponent implements OnInit {
   }
 
   public onHandleCancel() {
-    this.completeExistingInvoice()
     this.invoiceForm.reset()
     this.drawerParams.isDrawerOpen.set( false )
     this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
@@ -134,6 +145,7 @@ export class InvoiceComponent implements OnInit {
           if( invoice ) {
             Swal.fire('Success', 'New invoice added!', 'success')
               .then(() => {
+                this.drawerParams.triggerInvoiceRefresh()
                 this.onHandleCancel()
               })
           }
@@ -152,6 +164,7 @@ export class InvoiceComponent implements OnInit {
         next: ( resp ) => {
           Swal.fire('Success', 'Invoice updated!', 'success')
             .then(() => {
+              this.drawerParams.triggerInvoiceRefresh()
               this.onHandleCancel()
             })
           return resp

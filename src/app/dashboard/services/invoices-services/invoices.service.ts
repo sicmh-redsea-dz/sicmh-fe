@@ -99,7 +99,7 @@ export class InvoicesService {
   }
 
   public updateInvoice(id: string, invoiceForm: InvoiceForm): Observable<boolean> {
-    const url = `${this.baseUrl}/dashboard/invoices/invoice/${id}`
+    const url = `${this.baseUrl}/app/invoice/${id}`
     const body = {...invoiceForm}
 
     const token = this.validateToken()

@@ -16,4 +16,12 @@ export class DrawerService {
     btnText: ''
   })
 
+  public shouldRefreshInvoices = signal<boolean>(false)
+
+  // método opcional para resetear
+  public triggerInvoiceRefresh() {
+    this.shouldRefreshInvoices.set(true)
+    setTimeout(() => this.shouldRefreshInvoices.set(false), 0)
+  }
+
 }

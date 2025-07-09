@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
@@ -25,7 +25,15 @@ export class BillingPageComponent {
 
   constructor() {
     this.getInvoices()
+    
+    effect(() => {
+      if (this.drawerParams.shouldRefreshInvoices()) {
+        this.bodyContent = []
+        this.getInvoices()
+      }
+    })
   }
+
 
   public bootstrapInvoiceDrawerToUpd(invoiceId: string) {
     this.drawerParams.isDrawerOpen.set( true )
