@@ -15,6 +15,7 @@ export interface Patient {
   email     : string;
   gender    : 'male' | 'female' | 'other';
   address   : string;
+  idNumber  : string;
   lastName  : string;
   birthDate : string;
 }

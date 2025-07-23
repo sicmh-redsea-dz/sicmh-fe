@@ -9,15 +9,21 @@ export class PaginationComponent implements OnChanges {
   @Input() currentPage: number = 1
   @Input() totalPages: number = 10
   @Input() offset: number = 0
-  @Input() totalCount: number = 1
   @Input() totalRegistries: number = 1
+  @Input() pageSize: number = 25;
   @Output() pageChange = new EventEmitter<number>()
 
   public displayedPages: number[] = []
   public displayedCount: Record<string, number> = { min: 0, max: 25}
   
   ngOnChanges(changes: SimpleChanges): void {
-    if( changes['currentPage'] || changes['totalPages'] ) {
+    if( 
+      changes['currentPage'] ||
+      changes['totalPages'] ||
+      changes['offset'] ||
+      changes['totalRegistries'] ||
+      changes['pageSize']
+    ) {
       this.updateDisplayedPages()
       this.updateDataCount()
     }
@@ -49,13 +55,12 @@ export class PaginationComponent implements OnChanges {
   }
 
   public updateDataCount() {
-    if (this.offset === 0) {
-      this.displayedCount = { min: this.offset + 1, max: this.offset + 25 };
-    } else {
-      const maxCount = Math.min(this.offset + 25, this.totalPages * 25);
-      this.displayedCount = { min: this.offset + 1, max: maxCount };
-    }
+    const min = this.offset + 1;
+    const max = Math.min(this.offset + this.pageSize, this.totalRegistries);
+
+    this.displayedCount = { min, max };
   }
+
   
   public updateDisplayedPages() {
     const pagesToShow = 4;

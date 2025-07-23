@@ -41,7 +41,7 @@
     content: "";
     position: absolute;
     top: 50%; left: 50%;
-    width: 220px; height: 220px;
+    width: 320px; height: 320px;
     border-radius: 50%;
     box-shadow: 0 0 30px #2596be;
     transform: translate(-50%, -50%);

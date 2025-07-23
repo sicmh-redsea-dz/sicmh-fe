@@ -5,6 +5,8 @@
   padding: 10px 0;
   font-size: 14px;
   color: #666;
+  margin: .25rem;
+  padding: .25rem;
 }
 
 .pagination-info .pagination-number {

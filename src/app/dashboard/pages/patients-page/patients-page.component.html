@@ -1,39 +1,44 @@
-<app-search-bar (searchTermChange)="onSearchTermChange($event)"></app-search-bar>
+<div class="header-container">
+  <div class="header-detail">
+    <h2>Pacientes</h2>
+    <span class="badge info">{{ totalRegistries }}</span>
+  </div>
+  <div class="table-actions">
+    <app-search-bar (searchTermChange)="onSearchTermChange($event)"></app-search-bar>
+    <button class="create-button" [routerLink]="'new-patient'">
+      <i class="ph-bold ph-plus"></i>
+      <span class="btn-txt">Crear Nuevo</span>
+    </button>
+  </div>
+</div>
 
 <div class="user-table-container">
   <table class="user-table">
     <thead>
       <tr>
         <th style=" font-size: 1rem"><i class="ph-bold ph-user"></i></th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Birth Date</th>
-        <th>
-          <button class="plus-circle  table-opts"
-                  [routerLink]="'new-patient'">
-                    <i class="fa-solid fa-plus"></i>
-          </button>
-        </th>
+        <th>Identidad</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Telefono</th>
+        <th>Fecha de nacimiento</th>
+        <th></th>
       </tr>
     </thead>
     <tbody style="background-color: white;">
-      <tr *ngFor="let patient of dataToRender(); let idx = index ">
+      <tr (click)="handleSelectedPatient(patient.id)" *ngFor="let patient of dataToRender(); let idx = index ">
         <td>
           <i class="ph-bold ph-user"></i>
         </td>
+        <td>{{ patient.idNumber }}</td>
         <td>{{patient | formatFullname }}</td>
         <td>{{ patient.email }}</td>
         <td>{{ '+504 '+ patient.phone }}</td>
         <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
         <td>
           <div class="opts">
-            <div class="opts-btns edit"
-                (click)="handleSelectedPatient(patient.id)">
-              <i class="ph ph-pencil"></i>
-            </div>
             <div class="opts-btns delete"
-                  (click)="deleteSelectedVisit(patient.id)">
+                  (click)="deleteSelectedVisit(patient.id); $event.stopPropagation()">
               <i class="ph ph-trash-simple"></i>
             </div>
           </div>
@@ -47,7 +52,7 @@
   [totalPages]="totalPages"
   [currentPage]="currentPage"
   [offset]="offset"
-  [totalCount]="totalCount"
   [totalRegistries]="totalRegistries"
+  [pageSize]="limit"
   (pageChange)="onPageChange($event)"
 />

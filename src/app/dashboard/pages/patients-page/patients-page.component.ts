@@ -2,6 +2,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
 import { PatientsService } from '../../services/patients-service/patients.service';
+import { Patient } from '../../interface/patients-response.interface';
 
 @Component({
   selector: 'app-patients',
@@ -14,8 +15,8 @@ export class PatientsPageComponent {
   public offset: number = 0
   public totalPages: number = 1
   public currentPage: number = 1
-  public totalCount: number = 1
   public totalRegistries: number = 1
+  public patients: Patient[] = []
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
@@ -32,9 +33,10 @@ export class PatientsPageComponent {
     this.patientService.getPatients({ limit: this.limit, offset: this.offset })
       .subscribe({
         next: ( response ) => {
+          console.log('patients ::: ', response)
+          this.patients = response?.patients || []
           this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
           this.totalRegistries = response?.totalRegistries!
-          this.totalCount = response?.totalCount!
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
@@ -80,9 +82,10 @@ export class PatientsPageComponent {
   }
 
   public dataToRender() {
-    return this.patientService.listOfPatients()?.patients.filter((patient) => {
+    return this.patients.filter((patient) => {
       return patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        patient.lastName.toLowerCase().includes(this.searchTerm.toLowerCase())
+        patient.lastName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        patient.idNumber.includes(this.searchTerm) 
     })
   }
 

@@ -122,3 +122,18 @@
     flex-direction: column;
   }
 }
+
+input.ng-touched.ng-invalid,
+select.ng-touched.ng-invalid,
+textarea.ng-touched.ng-invalid {
+  border: 1px solid #dc3545;
+  background-color: #fff0f0;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+

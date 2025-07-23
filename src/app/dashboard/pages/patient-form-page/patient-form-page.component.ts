@@ -23,7 +23,7 @@ export class PatientFormPageComponent implements OnInit {
   public selectedUser = computed(() => this.patientService.selectedPatient() )
   
   public patientForm: FormGroup = this.fb.group({
-    id        : [this.caller !== 'np' ?this.selectedUser()?.id : '', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
+    id        : [this.caller !== 'np' ?this.selectedUser()?.id : '', [Validators.required, Validators.maxLength(20)]],
     firstName : [this.caller !== 'np' ? this.selectedUser()?.name : '', [Validators.required, Validators.minLength(2)]],
     lastName  : [this.caller !== 'np' ? this.selectedUser()?.lastName : '', [Validators.required, Validators.minLength(2)]],
     birthdate : [this.caller !== 'np' ? this.formatDate(this.selectedUser()?.birthDate) : '', [Validators.required]],
