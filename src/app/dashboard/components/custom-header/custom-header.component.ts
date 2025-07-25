@@ -11,8 +11,13 @@ export class CustomHeaderComponent {
   @Input() btnRouterLink: string = ''
 
   @Output() searchTerm = new EventEmitter()
+  @Output() btnDrawerTrigger = new EventEmitter()
 
   public execSearchTerm(term: string) {
     this.searchTerm.emit( term )
+  }
+
+  public execDrawerTrigger() {
+    this.btnDrawerTrigger.emit()
   }
 }

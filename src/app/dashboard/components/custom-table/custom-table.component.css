@@ -1,7 +1,8 @@
 .bill-table-container {
   height: 100%;
   width: 100%;
-  max-height: 75vh;
+  max-height: 78vh;
+  min-height: 78vh;
   margin: 10px auto;
   padding-top: 0;
   background-color: #f9f9f9;
@@ -74,31 +75,4 @@ td .opts {
 
 .opts-btns.delete {
   color: red;
-}
-
-/* Badge styles for status */
-.badge {
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  color: white;
-  text-align: center;
-}
-
-.badge.date{
-  background-color: var(--tag-color);
-}
-
-.badge.active {
-  background-color: #28a745;
-}
-
-.badge.warning {
-  background-color: #ffc107;
-  color: #000;
-  font-weight: bold;
-}
-
-.badge.inactive {
-  background-color: #dc3545;
 }

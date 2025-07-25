@@ -4,7 +4,7 @@
   [btnRouterLink]="'new-patient'"
   (searchTerm)="onSearchTermChange( $event )"
 />
-<section>
+<section *ngIf="patients.length > 0; else nodata">
   <div class="user-table-container">
     <table class="user-table">
       <thead>
@@ -50,3 +50,7 @@
     (pageChange)="onPageChange($event)"
   />
 </section>
+
+<ng-template #nodata>
+  <no-data />
+</ng-template>

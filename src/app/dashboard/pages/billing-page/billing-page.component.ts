@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
 import { InvoicesService } from '../../services/invoices-services/invoices.service';
+import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-billing-page',
@@ -18,13 +19,27 @@ export class BillingPageComponent {
     'State',
     'Amount'
   ]
+  public searchTerm: string = ''
+  public currentPage: number = 1
+  public totalPages: number = 1
+  public limit: number = 25
+  public offset: number = 0
+  public totalRegistries: number = 0
 
   public drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
   public bodyContent: any[] = []
+  private searchTermSubject = new Subject<string>()
 
   constructor() {
     this.getInvoices()
+
+    this.searchTermSubject.pipe(
+      debounceTime( 700 ),
+      distinctUntilChanged()
+    ).subscribe(( term: string) => {
+      this.getInvoices( term )
+    })
     
     effect(() => {
       if (this.drawerParams.shouldRefreshInvoices()) {
@@ -32,6 +47,17 @@ export class BillingPageComponent {
         this.getInvoices()
       }
     })
+  }
+
+  public onSearchTermChange( term: string ) {
+    this.searchTerm = term
+    this.searchTermSubject.next( term )
+  }
+
+  public onPageChange( page: number ) {
+    this.currentPage = page
+    this.offset = ( this.currentPage - 1 ) * this.limit
+    this.getInvoices()
   }
 
 
@@ -57,20 +83,20 @@ export class BillingPageComponent {
     }))
   }
 
-  public getInvoices() {
-    this.invoiceService.getInvoices()
+  public getInvoices( term?: string ) {
+    this.invoiceService.getInvoices({
+      limit: this.limit, 
+      offset: this.offset, 
+      term: term ? term.trim() : ''
+    })
       .subscribe({
         next: (response) => {
-          response?.map( item => {
-            this.bodyContent.push({
-              'InvoiceNumber': item.InvoiceNumber,
-              'Doctor': item.Doctor,
-              'Paciente': item.Paciente,
-              'FechaFactura': item.FechaFactura.split('T')[0],
-              'Estado': item.Estado,
-              'Monto': item.Monto,
-            })
-          })
+          console.log('the response :::: ', response)
+          const { data } = response!
+          const {invoiceResp, totalRegistries} = data
+          this.bodyContent = invoiceResp
+          this.totalPages = Math.ceil((totalRegistries) / this.limit )
+          this.totalRegistries = totalRegistries
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')

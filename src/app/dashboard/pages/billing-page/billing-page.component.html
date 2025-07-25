@@ -1,7 +1,29 @@
-<app-custom-table 
-  [headers]="headers"
-  [bodyContent]="bodyContent"
-  (insertItem)="bootstrapInvoiceDrawer()"
-  (finishUpdatingItem)="bootstrapInvoiceDrawerToUpd($event)"
-  (deleteSelectedItem)="deleteSelectedInvoice($event)"/>
-<app-drawer />
+<custom-header 
+  [headerText]="'Facturación'"
+  [itemCounter]="12"
+  (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
+  (searchTerm)="onSearchTermChange( $event )"
+/>
+
+<section *ngIf="bodyContent.length > 0; else nodata">
+  <app-custom-table 
+    [headers]="headers"
+    [bodyContent]="bodyContent"
+    (insertItem)="bootstrapInvoiceDrawer()"
+    (finishUpdatingItem)="bootstrapInvoiceDrawerToUpd($event)"
+    (deleteSelectedItem)="deleteSelectedInvoice($event)"/>
+  <app-drawer />
+
+  <app-pagination 
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [offset]="offset"
+    [totalRegistries]="totalRegistries"
+    [pageSize]="limit"
+    (pageChange)="onPageChange($event)"
+  />
+</section>
+
+<ng-template #nodata>
+  <no-data />
+</ng-template>

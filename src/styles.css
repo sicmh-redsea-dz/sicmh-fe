@@ -165,3 +165,8 @@ button:hover {
 .badge.inactive {
   background-color: #dc3545;
 }
+
+.badge.warning {
+  background-color: #ffc107;
+  color: #000;
+}

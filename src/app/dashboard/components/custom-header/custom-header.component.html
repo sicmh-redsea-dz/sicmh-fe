@@ -5,9 +5,19 @@
   </div>
   <div class="table-actions">
     <app-search-bar (searchTermChange)="execSearchTerm($event)"></app-search-bar>
-    <button class="create-button" [routerLink]="btnRouterLink">
+
+    <button *ngIf="btnRouterLink; else drawerTrigger" class="create-button" [routerLink]="btnRouterLink">
       <i class="ph-bold ph-plus"></i>
       <span class="btn-txt">Crear Nuevo</span>
     </button>
+
+    <ng-template #drawerTrigger>
+      <button class="create-button" (click)="execDrawerTrigger()">
+        <i class="ph-bold ph-plus"></i>
+        <span class="btn-txt">Crear Nuevo</span>
+      </button>
+    </ng-template>
+
+
   </div>
 </div>

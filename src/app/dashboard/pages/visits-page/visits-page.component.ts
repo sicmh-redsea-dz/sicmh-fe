@@ -2,7 +2,6 @@ import { Component, computed, inject, OnInit } from '@angular/core';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { FormVisit } from '../../interface/visits-response.interface';
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 
 @Component({
@@ -28,7 +27,7 @@ export class VisitsPageComponent implements OnInit {
 
   constructor() {
     this.searchTermSubject.pipe(
-      debounceTime( 1000 ),
+      debounceTime( 700 ),
       distinctUntilChanged()
     ).subscribe(( term: string) => {
       this.getVisits( term )

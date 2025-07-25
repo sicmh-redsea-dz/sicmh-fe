@@ -43,7 +43,7 @@ export const sidebarItmes = [
     hasSubmenu: true,
     subItems: [
       {
-        label: 'Facturaciones', 
+        label: 'Facturación', 
         routerLink: 'income/billings'
       }, 
       // {
