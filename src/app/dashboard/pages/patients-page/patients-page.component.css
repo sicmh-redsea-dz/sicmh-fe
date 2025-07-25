@@ -1,58 +1,8 @@
-.header-container {
-  margin: .25rem;
-  padding: .25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.header-container .header-detail {
-  display: flex;
-  align-items: center;
-  gap: .25rem;
-}
-
-.header-container h2 {
-  text-transform: uppercase;
-  font-weight: normal;
-  margin: 0 .5rem;
-}
-
-.header-container .table-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.create-button {
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--primary-color);
-  border-radius: .5rem;
-  padding: 10px;
-  margin: 0 .5rem;
-  color: var(--primary-color);
-  font-size: 14px;
-  transition: background-color .3s ease, color .3s ease;
-}
-
-.create-button:hover {
-  background-color: #D5DBEA;
-  color: var(--primary-color);
-}
-
-.btn-txt {
-  margin-left: 4px;
-}
-
-.create-button:hover .btn-txt {
-  text-decoration: underline;
-}
-
 .user-table-container {
   height: 100%;
   width: 100%;
   max-height: 78vh;
+  min-height: 78vh;
   margin: 10px auto;
   padding-top: 0;
   background-color: #f9f9f9;
@@ -93,16 +43,7 @@
   font-size: .75rem;
   padding: .5rem 1rem;
   text-align: center;
-  width: 22%;
-}
-
-.user-table th {
-  font-size: .75rem;
-}
-
-.user-table th:nth-child(4),
-.user-table td:nth-child(4) {
-  width: 16%;
+  width: 17%;
 }
 
 .user-table th:first-child,
@@ -114,6 +55,7 @@
 }
 
 .user-table th {
+  font-size: .75rem;
   background-color: #f5f9fc;
   color: #333333;
   text-transform: uppercase;
@@ -159,46 +101,6 @@ td .opts {
 
 .opts-btns.delete {
   color: red
-}
-
-
-
-
-
-
-
-
-/* Badge styles for status */
-.badge {
-  width: 5.25rem;
-  display: inline-block;
-  padding: 5px 0;
-  border-radius: 12px;
-  font-size: 12px;
-  color: white;
-  text-align: center;
-}
-
-.badge.info{
-  width: auto;
-  padding: .25rem .75rem;
-  font-size: 10px;
-  font-weight: bolder;
-  color: var(--color-gray);
-  border: .5px solid var(--color-gray);
-  border-radius: 2rem;
-}
-
-.badge.date{
-  background-color: var(--tag-color);
-}
-
-.badge.active {
-  background-color: #28a745;
-}
-
-.badge.inactive {
-  background-color: #dc3545;
 }
 
 /* Button styles for actions */

@@ -16,6 +16,7 @@ export interface SimpleVisit {
     id:            number
     doctorName:    string
     patientName:   string
+    patientId:     string
     lastVisitDate: Date
     diagnosis:     null | string
 }

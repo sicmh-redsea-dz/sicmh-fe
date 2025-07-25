@@ -7,9 +7,11 @@ import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
 import { Histories, SimpleVisit, Staff, Patients, History, Visit, Stock } from '../../interface/visits-service.interface'
 
-interface Pagination {
+interface Delimiters {
   limit: number,
-  offset: number
+  offset: number,
+  term: string,
+  default: boolean
 }
 @Injectable({
   providedIn: 'root'
@@ -44,14 +46,16 @@ export class VisitsService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`)
   }
 
-  public getAllVisits(pagination: Pagination): Observable<any> {
+  public getAllVisits(args: Delimiters): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits`
 
     const headers = this.authHeaders()
 
     const params = new HttpParams()
-      .set('limit', pagination.limit)
-      .set('offset', pagination.offset)
+    .set('offset', args.offset)
+    .set('limit', args.limit)
+    .set('term', args.term)
+    .set('default', args.default)
 
     return this.http.get<Histories>(url, { headers, params })
       .pipe(

@@ -23,6 +23,8 @@ import { SettingsPageComponent } from './pages/settings-page/settings-page.compo
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
+import { CustomHeaderComponent } from './components/custom-header/custom-header.component';
+import { NoDataComponent } from './components/no-data/no-data.component';
 
 
 @NgModule({
@@ -45,7 +47,9 @@ import { PermissionsComponent } from './pages/settings-page/permissions/permissi
     SettingsPageComponent,
     VisitsFormPageV2Component,
     MyProfileComponent,
-    PermissionsComponent
+    PermissionsComponent,
+    CustomHeaderComponent,
+    NoDataComponent
   ],
   imports: [
     CommonModule,

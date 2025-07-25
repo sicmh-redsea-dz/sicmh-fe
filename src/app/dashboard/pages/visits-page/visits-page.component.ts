@@ -3,6 +3,7 @@ import { VisitsService } from '../../services/visits-service/visits.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { FormVisit } from '../../interface/visits-response.interface';
+import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-visits-page',
@@ -15,23 +16,70 @@ export class VisitsPageComponent implements OnInit {
   public totalPages: number = 1
   public limit: number = 25
   public offset: number = 0
-  public totalRegistries: number = 1
+  public totalRegistries: number = 0
+  public visits: any[] = []
+  public isDefaultER: boolean = false
+  public header: string = 'visitas'
 
   private router = inject( Router )
   public urlSegment: string = ''
   private visitsService: VisitsService = inject(VisitsService)
+  private searchTermSubject = new Subject<string>()
 
-  ngOnInit(): void {
-    this.getVisits()
-    this.urlSegment = (this.router.url).split('/')[2]
+  constructor() {
+    this.searchTermSubject.pipe(
+      debounceTime( 1000 ),
+      distinctUntilChanged()
+    ).subscribe(( term: string) => {
+      this.getVisits( term )
+    })
   }
 
-  public getVisits() {
-    this.visitsService.getAllVisits({limit: this.limit, offset: this.offset})
+  ngOnInit(): void {
+
+    this.urlSegment = (this.router.url).split('/')[2]
+    
+    if ( this.urlSegment === 'emergency' )
+      this.header = 'emergencias'
+      this.isDefaultER = true
+      this.getVisits()
+  }
+
+  public getVisits(searchTerm?: string) {
+
+    if ( 
+      !searchTerm && 
+      this.urlSegment === 'visits'
+    ) {
+      this.visits = []
+      this.totalRegistries = 0
+      return
+    }
+
+    if (
+      !searchTerm && 
+      this.urlSegment === 'emergency' &&
+      !this.isDefaultER
+    ) {
+      this.isDefaultER = true
+    }
+    
+    this.visitsService.getAllVisits({
+      limit: this.limit, 
+      offset: this.offset, 
+      term: searchTerm ? searchTerm.trim() : '',
+      default: this.isDefaultER  
+    })
+      .pipe(
+        finalize(() => {
+          this.isDefaultER = false
+        })
+      )
       .subscribe({
-        next: ( response ) => {
-          this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
-          this.totalRegistries = response?.totalRegistries!
+        next: ( response ) => { 
+          this.visits = response.visits || []
+          this.totalPages = Math.ceil((response?.totalRecords!) / this.limit )
+          this.totalRegistries = response?.totalRecords!
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
@@ -41,14 +89,13 @@ export class VisitsPageComponent implements OnInit {
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
-    this.currentPage = 1
-    this.getVisits()
+    this.searchTermSubject.next( term )
   }
 
   public onPageChange(page: number) {
     this.currentPage = page
-    this.offset = (this.currentPage - 1) * this.limit;
-    this.getVisits();
+    this.offset = (this.currentPage - 1) * this.limit
+    this.getVisits()
   }
 
   public handleSelectedVisit(id: number) {
@@ -104,10 +151,12 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public dataToRender() {
-    return this.visitsService.listOfVisits()?.filter((visit) => {
-      return visit.patientName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        visit.doctorName.toLocaleLowerCase().includes(this.searchTerm.toLocaleLowerCase())
-    })
+    return this.visits
+    // return this.visits.filter((visit) => {
+    //   return visit.patientName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    //     visit.doctorName.toLocaleLowerCase().includes(this.searchTerm.toLocaleLowerCase()) ||
+    //     visit.patientId.includes(this.searchTerm)
+    // })
   }
 
 }

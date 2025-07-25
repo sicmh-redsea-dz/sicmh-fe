@@ -132,3 +132,36 @@ button:hover {
 .bg1 {background-color: #3b5998}
 .bg2 {background-color: #1da1f2}
 .bg3 {background-color: #ea4335}
+
+
+/* Badge styles for status */
+.badge {
+  width: 5.25rem;
+  display: inline-block;
+  padding: 5px 0;
+  border-radius: 10px;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+}
+
+.badge.info{
+  width: auto;
+  padding: .25rem .75rem;
+  font-size: 10px;
+  font-weight: bolder;
+  color: var(--color-gray);
+  border: .5px solid var(--color-gray);
+}
+
+.badge.date{
+  background-color: var(--tag-color);
+}
+
+.badge.active {
+  background-color: #28a745;
+}
+
+.badge.inactive {
+  background-color: #dc3545;
+}

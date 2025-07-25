@@ -11,10 +11,10 @@ import { Patient } from '../../interface/patients-response.interface';
 })
 export class PatientsPageComponent {
   public searchTerm: string = ''
+  public currentPage: number = 1
+  public totalPages: number = 1
   public limit: number = 25
   public offset: number = 0
-  public totalPages: number = 1
-  public currentPage: number = 1
   public totalRegistries: number = 1
   public patients: Patient[] = []
   
@@ -33,7 +33,7 @@ export class PatientsPageComponent {
     this.patientService.getPatients({ limit: this.limit, offset: this.offset })
       .subscribe({
         next: ( response ) => {
-          console.log('patients ::: ', response)
+          console.log('patients :::: ', response)
           this.patients = response?.patients || []
           this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
           this.totalRegistries = response?.totalRegistries!
@@ -46,8 +46,8 @@ export class PatientsPageComponent {
 
   public onPageChange(page: number) {
     this.currentPage = page
-    this.offset = (this.currentPage - 1) * this.limit;
-    this.getPatients();
+    this.offset = (this.currentPage - 1) * this.limit
+    this.getPatients()
   }
 
   public handleSelectedPatient( patientId: number) {

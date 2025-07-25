@@ -1,57 +1,62 @@
-<app-search-bar (searchTermChange)="onSearchTermChange($event)"></app-search-bar>
-
-<div class="visit-table-container">
-  <table class="visit-table">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>Doctor</th>
-        <th>Paciente</th>
-        <th>Ultima Visita</th>
-        <th>Diagnostico</th>
-        <th>
-          <button class="plus-circle  table-opts"
-                [routerLink]="'new-visit'">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </th>
-      </tr>
-    </thead>
-    <tbody style="background-color: white;">
-      <tr *ngFor="let visit of dataToRender(); let idx = index">
-        <td>{{visit.id}}</td>
-        <td>{{visit.doctorName}}</td>
-        <td>{{visit.patientName}}</td>
-        <td><span class="badge date">{{visit.lastVisitDate | formatDate}}</span></td>
-        <td>
-          <div class="tooltip">
-            <span class="truncate-text">{{visit.diagnosis}}</span>
-              <span class="tooltip-text" [style]="{visibility: visit.diagnosis ? 'visible' : 'hidden'}">
-                {{visit.diagnosis}}
-              </span>
-          </div>
-        </td>
-        <td>
-          <div class="opts">
-            <div class="opts-btns edit"
-                (click)="handleSelectedVisit(visit.id)">
-              <i class="ph ph-pencil"></i>
-            </div>
-            <div class="opts-btns delete"
-                  (click)="deleteSelectedVisit(visit.id)">
-              <i class="ph ph-trash-simple"></i>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<app-pagination
-  [totalPages]="totalPages"
-  [currentPage]="currentPage"
-  [offset]="offset"
-  [totalRegistries]="totalRegistries"
-  (pageChange)="onPageChange($event)"
+<custom-header 
+  [headerText]="header"
+  [itemCounter]="totalRegistries"
+  [btnRouterLink]="'new-visit'"
+  (searchTerm)="onSearchTermChange($event)"
 />
+
+<section *ngIf="visits.length > 0; else nodata">
+  <div class="visit-table-container">
+    <table class="visit-table">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Identidad</th>
+          <th>Paciente</th>
+          <th>Doctor</th>
+          <th>Ultima Visita</th>
+          <th>Diagnostico</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody style="background-color: white;">
+        <tr (click)="handleSelectedVisit(visit.id)" *ngFor="let visit of dataToRender(); let idx = index">
+          <td>{{visit.id}}</td>
+          <td>{{visit.patientId}}</td>
+          <td>{{visit.patientName}}</td>
+          <td>{{visit.doctorName}}</td>
+          <td><span class="badge date">{{visit.lastVisitDate | formatDate}}</span></td>
+          <td>
+            <div class="tooltip">
+              <span class="truncate-text">{{visit.diagnosis}}</span>
+                <span class="tooltip-text" [style]="{visibility: visit.diagnosis ? 'visible' : 'hidden'}">
+                  {{visit.diagnosis}}
+                </span>
+            </div>
+          </td>
+          <td>
+            <div class="opts">
+              <div class="opts-btns delete"
+                    (click)="deleteSelectedVisit(visit.id); $event.stopPropagation()">
+                <i class="ph ph-trash-simple"></i>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <app-pagination
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [offset]="offset"
+    [totalRegistries]="totalRegistries"
+    [pageSize]="limit"
+    (pageChange)="onPageChange($event)"
+  />
+</section>
+
+<ng-template #nodata>
+  <no-data />
+</ng-template>
