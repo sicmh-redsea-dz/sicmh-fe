@@ -25,6 +25,7 @@ import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { CustomHeaderComponent } from './components/custom-header/custom-header.component';
 import { NoDataComponent } from './components/no-data/no-data.component';
+import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { NoDataComponent } from './components/no-data/no-data.component';
     MyProfileComponent,
     PermissionsComponent,
     CustomHeaderComponent,
-    NoDataComponent
+    NoDataComponent,
+    ToggleOptsComponent
   ],
   imports: [
     CommonModule,

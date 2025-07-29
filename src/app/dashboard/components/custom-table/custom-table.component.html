@@ -3,8 +3,7 @@
     <thead>
       <tr>
         <th *ngFor="let h of headers">{{ h }}</th>
-        <th>
-        </th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -16,23 +15,12 @@
           <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
           <td><span [className]="'badge ' + (item.Estado === 'Pagado' ? 'active' : 'warning')">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>
-          <td>
-            <div class="opts">
-              @if( item.Estado === 'Pagado') {
-                <div class="opts-btns action">
-                  <i class="ph ph-eye"></i>
-                </div>
-              } @else {
-                <div class="opts-btns action"
-                    (click)="execItemUpdate(item.InvoiceNumber)">
-                  <i class="ph ph-clock"></i>
-                </div>
-              } 
-              <div class="opts-btns delete"
-                  (click)="execItemDeletion(item.InvoiceNumber)">
-                <i class="ph ph-trash-simple"></i>
-              </div>
-            </div>
+          <td class="opts-wrapper">
+            <toggle-opts
+              [isEditBlocked]=" item.Estado === 'Pagado' ? true : false"
+              (editEvent)="execItemUpdate( item.InvoiceNumber )"
+              (deleteEvent)="execItemDeletion( item.InvoiceNumber )"
+            />
           </td>
         </tr>
       }

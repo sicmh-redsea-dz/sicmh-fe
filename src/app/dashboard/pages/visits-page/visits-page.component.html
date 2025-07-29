@@ -34,13 +34,11 @@
                 </span>
             </div>
           </td>
-          <td>
-            <div class="opts">
-              <div class="opts-btns delete"
-                    (click)="deleteSelectedVisit(visit.id); $event.stopPropagation()">
-                <i class="ph ph-trash-simple"></i>
-              </div>
-            </div>
+          <td class="opts-wrapper" (click)="$event.stopPropagation()">
+            <toggle-opts 
+              (deleteEvent)="deleteSelectedVisit( visit.id )"
+              (editEvent)="handleSelectedVisit( visit.id )"
+            />
           </td>
         </tr>
       </tbody>

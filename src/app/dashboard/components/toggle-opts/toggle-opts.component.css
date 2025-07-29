@@ -1,0 +1,76 @@
+.opts-wrapper {
+  position: relative;
+}
+
+.opts {
+  position: relative;
+  display: inline-block;
+}
+
+.opts-toggle {
+  cursor: pointer;
+  position: relative;
+}
+
+.opts-toggle i {
+  font-size: 1.25rem;
+  font-weight: bold;
+
+}
+
+.opts-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  min-width: 120px;
+}
+
+.opts-toggle:hover .opts-menu {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.opts-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.opts-btns.blocked {
+  color: #c4bebe;
+  cursor: not-allowed;
+}
+
+.opts-btns:not(.blocked):hover {
+  background-color: #ededed
+}
+
+.opts-btns.delete {
+  color: var(--color-red)
+}
+
+.opts-btns:hover.delete {
+  background-color: #fae3e3;
+}
+
+.opts-btns i {
+  font-size: 1rem;
+}
+
+.opts-divider {
+  border-top: 1px solid #ddd;
+  margin: 0.25rem 0;
+}

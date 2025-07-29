@@ -28,13 +28,11 @@
           <td>{{ patient.email }}</td>
           <td>{{ '+504 '+ patient.phone }}</td>
           <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
-          <td>
-            <div class="opts">
-              <div class="opts-btns delete"
-                    (click)="deleteSelectedVisit(patient.id); $event.stopPropagation()">
-                <i class="ph ph-trash-simple"></i>
-              </div>
-            </div>
+          <td class="opts-wrapper" (click)="$event.stopPropagation()">
+            <toggle-opts 
+              (editEvent)="handleSelectedPatient(patient.id)"
+              (deleteEvent)="deleteSelectedVisit( patient.id )"
+            />
           </td>
         </tr>
       </tbody>

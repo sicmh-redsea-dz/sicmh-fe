@@ -34,6 +34,7 @@
   color: var(--primary-color);
   font-size: 14px;
   transition: background-color .3s ease, color .3s ease;
+  cursor: pointer;
 }
 
 .create-button:hover {

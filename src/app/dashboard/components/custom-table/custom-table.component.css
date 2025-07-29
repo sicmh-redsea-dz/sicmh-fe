@@ -22,12 +22,13 @@
   font-size: .75rem;
   padding: .5rem .25rem;
   text-align: center;
-  width: 15%;
+  width: 16%;
 }
 
 .bill-table th:last-child,
 .bill-table td:last-child {
-  width: 10%;
+  line-height: 1;
+  width: 5%;
 }
 
 .bill-table th {

@@ -80,28 +80,6 @@
   border-radius: 50%;
 }
 
-td .opts {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem
-}
-
-.opts .opts-btns {
-  cursor: pointer;
-  text-align: center;
-  line-height: 1;
-  font-family: 'Poppins-Bold';
-  font-size: 1rem;
-}
-
-.opts-btns.edit {
-  color: navy
-}
-
-.opts-btns.delete {
-  color: red
-}
 
 /* Button styles for actions */
 .btn {
