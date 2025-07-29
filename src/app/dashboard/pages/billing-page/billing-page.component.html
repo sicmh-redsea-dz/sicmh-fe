@@ -1,8 +1,10 @@
 <custom-header 
-  [headerText]="'Facturación'"
   [itemCounter]="12"
-  (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
+  [headerText]="'Facturación'"
+  [isDwnldRerportLoading]="downloadingPdfReport"
+  (btnDownloadReport)="getPdfReport()"
   (searchTerm)="onSearchTermChange( $event )"
+  (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
 />
 
 <section *ngIf="bodyContent.length > 0; else nodata">

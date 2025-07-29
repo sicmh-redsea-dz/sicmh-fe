@@ -24,28 +24,54 @@
   justify-content: space-between;
 }
 
-.create-button {
+.action-button {
   display: flex;
   align-items: center;
-  border: 1px solid var(--primary-color);
+  border: 1px solid black;
+  color: black;
   border-radius: .5rem;
   padding: 10px;
   margin: 0 .5rem;
-  color: var(--primary-color);
   font-size: 14px;
   transition: background-color .3s ease, color .3s ease;
   cursor: pointer;
 }
 
-.create-button:hover {
-  background-color: #D5DBEA;
+.action-button.create {
+  border: 1px solid var(--primary-color);
   color: var(--primary-color);
 }
 
-.btn-txt {
+.action-button.create:hover {
+  background-color: #d5dbea;
+  color: var(--primary-color);
+}
+
+.action-button.download {
+  border: 1px solid var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.action-button.download:not(.loading):hover {
+  background-color: #d9f4ef;
+  color: var(--secondary-color);
+}
+
+.action-button.loading {
+  border: 1px solid #c4bebe;
+  color: #c4bebe;
+}
+
+.action-button:hover.loading {
+  cursor: wait;
+  border: 1px solid #c4bebe;
+  color: #c4bebe;
+}
+
+.action-button .btn-txt {
   margin-left: 4px;
 }
 
-.create-button:hover .btn-txt {
+.action-button:not(.loading):hover .btn-txt {
   text-decoration: underline;
 }

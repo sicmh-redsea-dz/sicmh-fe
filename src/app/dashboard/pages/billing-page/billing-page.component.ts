@@ -25,6 +25,7 @@ export class BillingPageComponent {
   public limit: number = 25
   public offset: number = 0
   public totalRegistries: number = 0
+  public downloadingPdfReport: boolean = false
 
   public drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
@@ -91,7 +92,6 @@ export class BillingPageComponent {
     })
       .subscribe({
         next: (response) => {
-          console.log('the response :::: ', response)
           const { data } = response!
           const {invoiceResp, totalRegistries} = data
           this.bodyContent = invoiceResp
@@ -138,6 +138,33 @@ export class BillingPageComponent {
         },
         error: ( err ) => {
           console.error('Error al eliminar la factura seleccionado:', err);
+        }
+      })
+  }
+
+  public getPdfReport() {
+    this.downloadingPdfReport = true
+    this.invoiceService.downloadPDFReport()
+      .pipe(
+        finalize(() => {
+          this.downloadingPdfReport = false
+        })
+      )
+      .subscribe({
+        next: ( res: Blob ) => {
+          const blob = new Blob([res], { type: 'application/pdf' })
+
+          const blobUrl = window.URL.createObjectURL( blob )
+
+          const link = document.createElement('a')
+          link.href = blobUrl
+          link.download = 'reporte-facturas-salus.pdf'
+          link.click()
+
+          window.URL.revokeObjectURL(blobUrl);
+        },
+        error: ( err ) => {
+          Swal.fire('Error', 'No se pudo generar el PDF', 'error')
         }
       })
   }

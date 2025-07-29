@@ -33,7 +33,6 @@ export class PatientsPageComponent {
     this.patientService.getPatients({ limit: this.limit, offset: this.offset })
       .subscribe({
         next: ( response ) => {
-          console.log('patients :::: ', response)
           this.patients = response?.patients || []
           this.totalPages = Math.ceil((response?.totalRegistries!) / this.limit )
           this.totalRegistries = response?.totalRegistries!

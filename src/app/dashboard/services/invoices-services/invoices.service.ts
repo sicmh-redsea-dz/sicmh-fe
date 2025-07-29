@@ -38,7 +38,6 @@ export class InvoicesService {
     return this.http.get<any>(url, { headers, params })
       .pipe(
         map((resp) => {
-          console.log('resp :::: ', resp)
           this._listOfInvoices.set(resp.data)
           return resp
         }),
@@ -148,6 +147,17 @@ export class InvoicesService {
           return of( false )
         })
       )
+  }
+
+  public downloadPDFReport(): Observable<any> {
+    const url: string = `${this.baseUrl}/app/invoice/generate-pdf`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+
+    return this.http.get(url, { headers, responseType: 'blob'});
   }
 
   private validateToken(): string | null {
