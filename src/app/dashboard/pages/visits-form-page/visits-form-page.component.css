@@ -92,10 +92,31 @@ select {
   font-size: .8rem;
 }
 
-.divider {
-  border: none;
+.fancy-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0.25rem 0;
+  color: var(--color-gray);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.fancy-divider::before,
+.fancy-divider::after {
+  content: '';
   border-top: 1px solid #ddd;
-  margin: .25rem 0;
+}
+
+.fancy-divider::before {
+  flex: .1;
+  margin-right: 0.5rem;
+}
+
+.fancy-divider::after {
+  flex: .9;
+  margin-left: 0.5rem;
 }
 
 .input-columns {

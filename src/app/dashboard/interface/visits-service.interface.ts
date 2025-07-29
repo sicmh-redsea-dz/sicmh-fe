@@ -76,4 +76,10 @@ export interface Visit {
     visitDate:          Date
     visitType:          string
     weight:             string
+
+
+    pathologicalHst: string | null
+    familyHst: string | null
+    surgicalHst: string | null
+    backgroundHst: string | null
 }

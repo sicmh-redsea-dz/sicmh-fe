@@ -47,13 +47,15 @@
           </option>
           <option *ngFor="let patient of listOfPatients()" 
                   [value]="patient.id">
-            {{patient.name}}
+            {{patient.name + ' ' + patient.lastName}}
           </option>
         </select>
       </div>
     </div>
 
-    <hr class="divider" />
+    <div class="fancy-divider">
+      <span>preclinica</span>
+    </div>
 
     <div class="input-columns">
       <!-- Columna izquierda (75%) -->
@@ -169,7 +171,45 @@
       </div>
     </div>
 
-    <hr class="divider" />
+    <div class="fancy-divider">
+      <span>Antecedentes</span>
+    </div>
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Patologicos</label>
+        <textarea 
+          formControlName="pathologicalHst"
+          placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
+      </div>
+
+      <div class="textarea-group">
+        <label>Familiares</label>
+        <textarea 
+          formControlName="familyHst"
+          placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
+      </div>
+    </div>
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Quirurgicos</label>
+        <textarea 
+          formControlName="surgicalHst"
+          placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
+      </div>
+
+      <div class="textarea-group">
+        <label>Habitos</label>
+        <textarea 
+          formControlName="backgroundHst"
+          placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
+      </div>
+    </div>
+
+    <div class="fancy-divider">
+      <span>intervencion</span>
+    </div>
 
     <div class="textareas-row">
       <div class="textarea-group">

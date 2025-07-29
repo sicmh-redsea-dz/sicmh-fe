@@ -53,7 +53,7 @@ const routes: Routes = [
           { path: 'permissions', component: PermissionsComponent },
         ]
       },
-      { path: '**', redirectTo: 'income/billings'}
+      { path: '**', redirectTo: 'visits/new-visit'}
     ]
   },
 ];

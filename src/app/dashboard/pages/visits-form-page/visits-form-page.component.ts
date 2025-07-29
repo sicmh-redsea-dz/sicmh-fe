@@ -37,12 +37,16 @@ export class VisitsFormPageComponent implements OnInit {
     fatPercentage : [this.caller !== 'nv' ? this.selectedVisit()?.bodyFatPercentage: '', [Validators.required]],
     glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel: '', [Validators.required]],
     height        : [this.caller !== 'nv' ? this.selectedVisit()?.height: '', [Validators.required]],
-    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: '', [Validators.required]],
+    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: ''],
     oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation: '', [Validators.required]],
     patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patientId: '', [Validators.required]],
     pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure: '', [Validators.required]],
     temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
     treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
+    pathologicalHst: [this.caller !== 'nv' ? this.selectedVisit()?.pathologicalHst: ''],
+    familyHst     : [this.caller !== 'nv' ? this.selectedVisit()?.familyHst: ''],
+    surgicalHst   : [this.caller !== 'nv' ? this.selectedVisit()?.surgicalHst: ''],
+    backgroundHst : [this.caller !== 'nv' ? this.selectedVisit()?.backgroundHst: ''],
     visceralFat   : [this.caller !== 'nv' ? this.selectedVisit()?.visceralFat: '', [Validators.required]],
     weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
   })
@@ -61,7 +65,6 @@ export class VisitsFormPageComponent implements OnInit {
           this.visitForm.reset();
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
-          console.log('hello')
           this.title = 'Editar visita'
           this.actionButtonText = 'Editar'
           this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
