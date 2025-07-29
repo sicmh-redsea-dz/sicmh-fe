@@ -91,7 +91,7 @@
   outline: none;
 }
 
-.submit-btn {
+/* .submit-btn {
   background-color: #4CAF50;
   color: white;
   padding: 0.75rem;
@@ -102,14 +102,32 @@
   width: 100%;
   margin-top: 1.5rem;
   transition: background-color 0.3s;
+} */
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-white);
+  color: var(--color-white);
+  background-color: var(--secondary-color);
+  border-radius: .5rem;
+  font-size: 14px;
+  transition: background-color .3s ease, color .3s ease;
+  cursor: pointer;
+
+  width: fit-content;
+  align-self: center;
+  padding: 10px;
+  margin: 0 .5rem;
 }
 
 .submit-btn:hover {
-  background-color: #45a049;
+  background-color: var(--hover-color);
 }
 
 .submit-btn:disabled {
-  background-color: grey;
+  background-color: var(--color-light-gray);
 }
 
 .patient-form textarea {

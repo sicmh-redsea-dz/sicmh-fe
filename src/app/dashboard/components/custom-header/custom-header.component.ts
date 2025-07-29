@@ -16,9 +16,10 @@ export class CustomHeaderComponent {
   @Output() btnDrawerTrigger = new EventEmitter()
   @Output() btnDownloadReport = new EventEmitter()
 
-  private router = inject( Router )
   public urlSegment: string = ''
   public showDonwloadBtn: boolean = false
+
+  private router = inject( Router )
 
   constructor() {
     this.urlSegment = (this.router.url).split('/')[2]
