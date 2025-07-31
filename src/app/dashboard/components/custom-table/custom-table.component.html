@@ -8,14 +8,14 @@
     </thead>
     <tbody>
       @for(item of bodyContent; track $index) {
-        <tr>
+        <tr (click)="execItemUpdate( item.InvoiceNumber )">
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
           <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
           <td><span [className]="'badge ' + (item.Estado === 'Pagado' ? 'active' : 'warning')">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>
-          <td class="opts-wrapper">
+          <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts
               [isEditBlocked]=" item.Estado === 'Pagado' ? true : false"
               (editEvent)="execItemUpdate( item.InvoiceNumber )"

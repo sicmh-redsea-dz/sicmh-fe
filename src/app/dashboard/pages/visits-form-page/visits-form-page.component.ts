@@ -18,6 +18,7 @@ import { ShortPatient } from '../../interface/patients-response.interface';
 export class VisitsFormPageComponent implements OnInit {
   
   public title = ''
+  public subtitle = ''
   public caller = ''
   public actionButtonText = ''
   private router = inject( Router )
@@ -131,6 +132,7 @@ export class VisitsFormPageComponent implements OnInit {
         if( urlSegment ) {
           this.caller = 'nv'
           this.title = 'Registro de visitas'
+          this.subtitle = 'Agrega los detalles de la visita médica.'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset();
           this.doctorSearchControl.reset();
@@ -138,6 +140,7 @@ export class VisitsFormPageComponent implements OnInit {
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
           this.title = 'Editar visita'
+          this.subtitle = 'Actualiza los detalles de la visita médica.'
           this.actionButtonText = 'Actualizar'
           this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
 
