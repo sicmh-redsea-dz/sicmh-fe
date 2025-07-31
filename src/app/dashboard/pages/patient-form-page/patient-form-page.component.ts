@@ -53,7 +53,7 @@ export class PatientFormPageComponent implements OnInit {
         }
         else {
           this.frameTitle = 'Editar Paciente'
-          this.actionButtonText = 'Editar'
+          this.actionButtonText = 'Actualizar'
         }
       })
   }

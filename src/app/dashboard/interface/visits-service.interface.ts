@@ -82,4 +82,7 @@ export interface Visit {
     familyHst: string | null
     surgicalHst: string | null
     backgroundHst: string | null
+
+    docName: string
+    patientName: string
 }

@@ -340,13 +340,12 @@ select {
   background-color: var(--secondary-color);
   border-radius: .5rem;
   font-size: 14px;
-  transition: background-color .3s ease, color .3s ease;
-  cursor: pointer;
-
+  cursor: pointer; 
   width: fit-content;
   align-self: center;
   padding: 10px;
   margin: 0 .5rem;
+  transition: background-color .3s ease, color .3s ease;
 }
 
 .submit-btn:hover {
@@ -365,4 +364,72 @@ select {
   .form-column {
     width: 100%;
   }
+}
+
+
+
+.autocomplete-wrapper {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-wrapper input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  height: 2.54rem;
+}
+
+
+.loader {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-top: 2px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  transform: translateY(-50%);
+}
+
+.dropdown-list {
+  position: absolute;
+  top: calc(100% + 2px); /* Asegura que esté justo debajo del input */
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000; /* Asegúrate de que tiene un z-index alto */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: añade sombra */
+  margin: 0; /* Elimina cualquier margen */
+  padding: 0; /* Elimina cualquier padding */
+  list-style: none; /* Elimina los bullets de la lista */
+}
+
+.dropdown-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid #eee; /* Separador visual */
+  font-size: .8rem;
+}
+
+.dropdown-list li:last-child {
+  border-bottom: none; /* No mostrar borde en el último elemento */
+}
+
+.dropdown-list li:hover {
+  background-color: #f5f5f5;
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
+  100% { transform: translateY(-50%) rotate(360deg); }
 }

@@ -23,34 +23,44 @@
               formControlName="date"/>
       </div>
 
-      <div class="input-group">
+      <div class="input-group" style="position: relative;">
         <label>Doctor</label>
-        <select formControlName="doctor">
-          <option disabled 
-                  selected
-                  value="">
-            Seleccione un doctor
-          </option>
-          <option *ngFor="let doctor of listOfDoctors()"
-                  [value]="doctor.id">
-            {{doctor.name}}
-          </option>
-        </select>
+        <div class="autocomplete-wrapper">
+          <input 
+            type="text"
+            placeholder="Buscar doctor..."
+            [formControl]="doctorSearchControl"
+            [value]="selectedDoctor?.name || ''"
+            (focus)="showDocDropdown = true"
+            (blur)="handleDocBlur()" 
+          />
+          <div *ngIf="isDocLoading" class="loader"></div>
+        </div>
+        <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
+          <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+            {{ doctor.name }}
+          </li>
+        </ul>
       </div>
 
-      <div class="input-group">
-        <label>Patient</label>
-        <select formControlName="patient">
-          <option disabled 
-                  selected
-                  value="">
-            Seleccione un doctor
-          </option>
-          <option *ngFor="let patient of listOfPatients()" 
-                  [value]="patient.id">
-            {{patient.name}}
-          </option>
-        </select>
+      <div class="input-group" style="position: relative;">
+        <label>Paciente</label>
+        <div class="autocomplete-wrapper">
+          <input 
+            type="text"
+            placeholder="Buscar paciente..."
+            [formControl]="patientSearchControl"
+            [value]="selectedPatient?.name || ''"
+            (focus)="showPatDropdown = true"
+            (blur)="handlePatBlur()" 
+          />
+          <div *ngIf="isPatLoading" class="loader"></div>
+        </div>
+        <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
+          <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+            {{ patient.name }}
+          </li>
+        </ul>
       </div>
     </div>
 

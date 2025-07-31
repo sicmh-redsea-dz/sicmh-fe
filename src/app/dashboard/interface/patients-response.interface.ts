@@ -20,6 +20,11 @@ export interface Patient {
   birthDate : string;
 }
 
+export interface ShortPatient {
+  id        : number;
+  name      : string;
+}
+
 export interface AddedUser {
   data: {
     patient: Patient

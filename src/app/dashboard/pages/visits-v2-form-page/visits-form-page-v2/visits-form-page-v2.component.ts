@@ -1,19 +1,21 @@
-import { Component, computed, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormVisit } from '../../../interface/visits-response.interface';
+import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
 import { Stock } from '../../../interface/visits-service.interface'
 import Swal from 'sweetalert2';
-import { map } from 'rxjs';
+
 import { formatNewDate, formatIncomingData } from '../../../helpers/dateFormatters';
+import { ShortPatient } from '../../../interface/patients-response.interface';
 
 @Component({
   selector: 'app-visits-form-page-v2',
   templateUrl: './visits-form-page-v2.component.html',
   styleUrl: './visits-form-page-v2.component.css'
 })
-export class VisitsFormPageV2Component {
+export class VisitsFormPageV2Component implements OnInit {
   public title = ''
   public caller = ''
   public actionButtonText = ''
@@ -25,8 +27,6 @@ export class VisitsFormPageV2Component {
   public bmiDisabled = true;
   public selectedStockItems: Stock[] = []
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
-  public listOfDoctors = computed(() => this.visitsService.listOfDoctors())
-  public listOfPatients = computed(() => this.visitsService.listOfPatients())
   public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
 
   public visitForm: FormGroup = this.fb.group({
@@ -40,10 +40,82 @@ export class VisitsFormPageV2Component {
     glucometry  : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel : '', [Validators.required]],
     weight      : [this.caller !== 'nv' ? this.selectedVisit()?.weight : '', [Validators.required]],
     height      : [this.caller !== 'nv' ? this.selectedVisit()?.height : '', [Validators.required]],
-    stockItems  : this.fb.array([],[Validators.required])
+    stockItems  : this.fb.array([])
   })
 
+  public doctorSearchControl = new FormControl()
+  public patientSearchControl = new FormControl()
+
+  public selectedDoctor: Doctor | null = null
+  public selectedPatient: ShortPatient | null = null
+
+  public searchDocResults: Doctor[] = []
+  public searchPatResults: Doctor[] = []
+
+  public isDocLoading: boolean = false
+  public isPatLoading: boolean = false
+
+  public showDocDropdown: boolean = false
+  public showPatDropdown: boolean = false
+
   ngOnInit(): void {
+
+    this.doctorSearchControl.valueChanges.pipe(
+      debounceTime( 600 ),
+      distinctUntilChanged(),
+      filter((term): term is string => term !== null),
+      tap(( term ) => {
+        const cleanTerm = term.trim() || ''
+        console.log('clean term :::: ', cleanTerm)
+        if ( cleanTerm.length === 0 ) {
+          this.visitForm.get('doctor')?.setValue(0)
+          this.searchDocResults = []
+          this.showDocDropdown = false
+          return
+        }
+        this.isDocLoading = true
+        this.searchDocResults = []
+        
+      }),
+      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() ))
+    ).subscribe({
+      next: ( results ) => {
+        this.searchDocResults = results
+        this.isDocLoading = false
+      },
+      error: () => {
+        this.isDocLoading = false
+      }
+    })
+
+    this.patientSearchControl.valueChanges.pipe(
+      debounceTime( 600 ),
+      distinctUntilChanged(),
+      filter((term): term is string => term !== null),
+      tap(( term ) => {
+        const cleanTerm = term.trim() || ''
+        if ( cleanTerm.length === 0 ) {
+          this.visitForm.get('patient')?.setValue(0)
+          this.searchPatResults = []
+          this.showPatDropdown = false
+          return
+        }
+        this.isPatLoading = true
+        this.searchPatResults = []
+        
+      }),
+      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() ))
+    ).subscribe({
+      next: ( results ) => {
+        this.searchPatResults = results
+        this.isPatLoading = false
+      },
+      error: () => {
+        this.isPatLoading = false
+      }
+    })
+
+
     this.activateRoute.url
       .pipe(
         map((urlSegment) => urlSegment),
@@ -54,13 +126,54 @@ export class VisitsFormPageV2Component {
           this.title = 'Registro de visitas'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset();
+          this.doctorSearchControl.reset();
+          this.patientSearchControl.reset();
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
           this.title = 'Editar visita'
-          this.actionButtonText = 'Editar'
+          this.actionButtonText = 'Actualizar'
           this.visitForm.get('date')!.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
+          this.initializeAutocompleteValues();
+
         }
       })
+  }
+
+  private initializeAutocompleteValues(): void {
+    // Verificar si hay una visita seleccionada y si estamos en modo edición
+    if (this.caller !== 'nv' && this.selectedVisit()) {
+      // Establecer valor para doctor
+      if (this.selectedVisit()?.docName) {
+        this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName));
+      }
+      
+      // Establecer valor para paciente
+      if (this.selectedVisit()?.patientName) {
+        this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName));
+      }
+    }
+  }
+
+  public selectDoctor( doctor: Doctor ) {
+    this.selectedDoctor = doctor
+    this.doctorSearchControl.setValue( doctor.name, { emitEvent: false })
+    this.visitForm.get('doctor')?.setValue( doctor.id )
+    this.showDocDropdown = false
+  }
+
+  public selectPatient( patient: ShortPatient ) {
+    this.selectedPatient = patient
+    this.patientSearchControl.setValue( patient.name, { emitEvent: false })
+    this.visitForm.get('patient')?.setValue( patient.id )
+    this.showPatDropdown = false
+  }
+
+  public handleDocBlur() {
+    setTimeout(() => this.showDocDropdown = false, 200)
+  }
+
+  public handlePatBlur() {
+    setTimeout(() => this.showPatDropdown = false, 200)
   }
 
   get stockItemsArray(): FormArray {

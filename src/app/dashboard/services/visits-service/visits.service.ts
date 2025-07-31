@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, ErrorHandler, inject, Injectable, signal } from '@angular/core';
 
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
@@ -31,12 +31,6 @@ export class VisitsService {
   private _listOfVisits = signal<SimpleVisit[]>([])
   readonly listOfVisits = this._listOfVisits.asReadonly()
 
-  private _listOfDoctors = signal<Staff[] | null>( null )
-  readonly listOfDoctors = this._listOfDoctors.asReadonly()
-
-  private _listOfPatients = signal<Patients[] | null>(null)
-  readonly listOfPatients = this._listOfPatients.asReadonly()
-
   private _listOfStockItems = signal<Stock[] | null>(null)
   readonly listOfStockItems = this._listOfStockItems.asReadonly()
 
@@ -46,23 +40,63 @@ export class VisitsService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`)
   }
 
+  public searchDoctors(term: string): Observable<any> {
+    const url: string = `${this.baseUrl}/app/visits/search/doctors`
+
+    const headers = this.authHeaders()
+
+    const params = new HttpParams()
+      .set('term', term)
+
+    return this.http.get<any>(url, { headers, params })
+      .pipe(
+        map(({ data })=> {
+          const { doctors } = data
+          return doctors
+        }),
+        catchError(( err ) => {
+          throwError(() => err.error.message)
+          return of( null )
+        })
+      )
+  }
+
+  public searchPatients(term: string): Observable<any> {
+    const url: string = `${this.baseUrl}/app/visits/search/patients`
+
+    const headers = this.authHeaders()
+
+    const params = new HttpParams()
+      .set('term', term)
+
+    return this.http.get<any>(url, { headers, params })
+      .pipe(
+        map(({ data })=> {
+          const { patients } = data
+          return patients
+        }),
+        catchError(( err ) => {
+          throwError(() => err.error.message)
+          return of( null )
+        })
+      )
+  }
+
   public getAllVisits(args: Delimiters): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits`
 
     const headers = this.authHeaders()
 
     const params = new HttpParams()
-    .set('offset', args.offset)
-    .set('limit', args.limit)
-    .set('term', args.term)
-    .set('default', args.default)
+      .set('offset', args.offset)
+      .set('limit', args.limit)
+      .set('term', args.term)
+      .set('default', args.default)
 
     return this.http.get<Histories>(url, { headers, params })
       .pipe(
         map(({data}) => {
           this._listOfVisits.set(data.visits)
-          this._listOfDoctors.set(data.staff)
-          this._listOfPatients.set(data.patients)
           this._listOfStockItems.set(data.stock)
           return data
         }),
