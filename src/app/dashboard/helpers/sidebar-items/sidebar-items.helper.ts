@@ -15,7 +15,7 @@ export const sidebarItmes = [
         routerLink: 'patients'
       }, 
       {
-        label:'Visitas', 
+        label:'Consulta Externa', 
         routerLink:'visits'
       },
       {

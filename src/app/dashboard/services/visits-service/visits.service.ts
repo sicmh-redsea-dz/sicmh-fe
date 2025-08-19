@@ -5,7 +5,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
-import { Histories, SimpleVisit, Staff, Patients, History, Visit, Stock } from '../../interface/visits-service.interface'
+import { Histories, SimpleVisit, Visit, Stock } from '../../interface/visits-service.interface'
 
 interface Delimiters {
   limit: number,
@@ -20,10 +20,6 @@ export class VisitsService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )
   private authStatus = inject( AuthService )
-
-  // usando computed() sin derivar ningun valor nuevo
-  // private _listOfVisits = signal<SimpleVisit[]>([])
-  // public listOfVisits = computed(() => this._listOfVisits())
 
   private _selectedVisit = signal<Visit | null>(null)
   readonly selectedVisit = this._selectedVisit.asReadonly()
@@ -97,7 +93,6 @@ export class VisitsService {
       .pipe(
         map(({data}) => {
           this._listOfVisits.set(data.visits)
-          this._listOfStockItems.set(data.stock)
           return data
         }),
         catchError(( err ) => {
@@ -107,17 +102,18 @@ export class VisitsService {
       )
   }
 
-  public getVisit(id: number): Observable<Visit | null> {
+  public getVisit(id: number): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits/${id}`
 
     const headers = this.authHeaders()   
       
-    return this.http.get<History>(url, { headers })
+    return this.http.get<any>(url, { headers })
       .pipe(
-        map(( data ) => {
+        map(({ data }) => {
           console.log('data', data)
-          this._selectedVisit.set( data.data )
-          return data.data
+          const { visit, stock } = data
+          this._selectedVisit.set( visit )
+          this._listOfStockItems.set( stock )
         }),
         catchError((err) => {
           throwError (() => err.message)

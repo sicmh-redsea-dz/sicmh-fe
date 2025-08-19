@@ -98,17 +98,8 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public handleSelectedVisit(id: number) {
-    this.visitsService.getVisit(id)
-      .subscribe({
-        next: ( visit ) => {
-          const { id } = visit!
-          let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
-          return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
-        },
-        error: ( err ) => {
-          console.error('Error al obtener los datos de la visita:', err);
-        }
-      })
+    let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
+    return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
   }
 
   public deleteSelectedVisit(id: number) {

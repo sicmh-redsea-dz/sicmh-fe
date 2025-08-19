@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, forkJoin, map, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
@@ -20,6 +20,7 @@ export class VisitsFormPageV2Component implements OnInit {
   public subtitle = ''
   public caller = ''
   public actionButtonText = ''
+  public visitId = ''
   private router = inject( Router )
   private fb = inject( FormBuilder )
   public visitsService = inject( VisitsService )
@@ -31,16 +32,16 @@ export class VisitsFormPageV2Component implements OnInit {
   public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
 
   public visitForm: FormGroup = this.fb.group({
-    patient     : [this.caller !== 'nv' ? this.selectedVisit()?.patientId : '', [Validators.required]],
-    doctor      : [this.caller !== 'nv' ? this.selectedVisit()?.staffId : '', [Validators.required]],
-    date        : [this.caller !== 'nv' ? '' : '', [Validators.required]],
-    notes       : [this.caller !== 'nv' ? this.selectedVisit()?.notes : '', []],
-    pressure    : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure : '', [Validators.required]],
-    oxygenation : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation : '', [Validators.required]],
-    temperature : [this.caller !== 'nv' ? this.selectedVisit()?.temperature : '', [Validators.required]],
-    glucometry  : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel : '', [Validators.required]],
-    weight      : [this.caller !== 'nv' ? this.selectedVisit()?.weight : '', [Validators.required]],
-    height      : [this.caller !== 'nv' ? this.selectedVisit()?.height : '', [Validators.required]],
+    patient     : ['', [Validators.required]],
+    doctor      : ['', [Validators.required]],
+    date        : ['', [Validators.required]],
+    notes       : ['', []],
+    pressure    : ['', [Validators.required]],
+    oxygenation : ['', [Validators.required]],
+    temperature : ['', [Validators.required]],
+    glucometry  : ['', [Validators.required]],
+    weight      : ['', [Validators.required]],
+    height      : ['', [Validators.required]],
     stockItems  : this.fb.array([])
   })
 
@@ -59,6 +60,8 @@ export class VisitsFormPageV2Component implements OnInit {
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
 
+  constructor( private route: ActivatedRoute ) {}
+
   ngOnInit(): void {
 
     this.doctorSearchControl.valueChanges.pipe(
@@ -67,7 +70,6 @@ export class VisitsFormPageV2Component implements OnInit {
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
-        console.log('clean term :::: ', cleanTerm)
         if ( cleanTerm.length === 0 ) {
           this.visitForm.get('doctor')?.setValue(0)
           this.searchDocResults = []
@@ -117,27 +119,31 @@ export class VisitsFormPageV2Component implements OnInit {
     })
 
 
+    // this.visitId = this.route.snapshot.paramMap.get('id') || ''
+    this.route.paramMap.subscribe( params => {
+      const id = params.get('id')
+      if ( !id ) return
+      this.handleSelectedVisit( +id )
+    })
+
+
     this.activateRoute.url
-      .pipe(
-        map((urlSegment) => urlSegment),
-      ).subscribe( segments => {
-        let urlSegment = segments[0].path === 'new-visit' ? true : false
-        if( urlSegment ) {
+      .subscribe((segments) => {
+        const firstSegment = segments[0]?.path;
+
+        if (firstSegment === 'new-visit') {
           this.caller = 'nv'
           this.title = 'Registro de emergencia'
           this.subtitle = 'Agrega los detalles de emergencia médica.'
           this.actionButtonText = 'Guardar'
-          this.visitForm.reset();
-          this.doctorSearchControl.reset();
-          this.patientSearchControl.reset();
+          this.visitForm.reset()
+          this.doctorSearchControl.reset()
+          this.patientSearchControl.reset()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
-        } else {
+        } else if (firstSegment) {
           this.title = 'Editar emergencia'
           this.subtitle = 'Actualiza los detalles de emergencia médica.'
           this.actionButtonText = 'Actualizar'
-          this.visitForm.get('date')!.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
-          this.initializeAutocompleteValues();
-
         }
       })
   }
@@ -210,6 +216,42 @@ export class VisitsFormPageV2Component implements OnInit {
 
             Swal.fire('Error', 'Error al generar visita nueva', 'error')
           }
+        }
+      })
+  }
+
+  public handleSelectedVisit( id: number ) {
+    this.visitsService.getVisit(id)
+      .subscribe({
+        next: () => {
+          const visit = this.selectedVisit()
+          if ( !visit ) return
+
+          this.visitForm.patchValue({
+            patient: visit.patientId,
+            doctor: visit.staffId,
+            date: formatIncomingData(visit.lastVisitDate),
+            notes: visit.notes,
+            pressure: visit.bloodPressure,
+            oxygenation: visit.oxygenSaturation,
+            temperature: visit.temperature,
+            glucometry: visit.glucoseLevel,
+            weight: visit.weight,
+            height: visit.height
+          })
+
+          this.initializeAutocompleteValues()
+
+          if( visit.usedInventory.length > 0 ) {
+            visit.usedInventory.map(( uv ) => {
+              this.selectedStockItems.push({...this.listOfStockItems()!.find( i => i.id === uv.stockId )!, currentQuantity: uv.stockQty})
+            })
+
+          }
+          
+        },
+        error: ( err ) => {
+          console.error('Error al obtener los datos de la visita:', err);
         }
       })
   }

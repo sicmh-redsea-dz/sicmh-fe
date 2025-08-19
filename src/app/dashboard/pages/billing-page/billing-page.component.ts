@@ -158,7 +158,7 @@ export class BillingPageComponent {
 
           const link = document.createElement('a')
           link.href = blobUrl
-          link.download = 'reporte-facturas-salus.pdf'
+          link.download = 'reporte-facturas-medit.pdf'
           link.click()
 
           window.URL.revokeObjectURL(blobUrl);

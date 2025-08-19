@@ -85,4 +85,6 @@ export interface Visit {
 
     docName: string
     patientName: string
+
+    usedInventory : { stockId: number, stockQty: number}[]
 }
