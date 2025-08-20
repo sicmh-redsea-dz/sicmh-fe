@@ -64,8 +64,21 @@
   border-bottom: 1px solid #ddd;
 }
 
-.visit-table tbody tr:hover {
-  background-color: #f1f1f1;
+.visit-table tr.pending {
+  background-color: #fffbea;
+}
+
+.visit-table tbody tr.pending:hover {
+  background-color: #fff5cc;
+  cursor: pointer;
+}
+
+.visit-table tr.payed {
+  background-color: #eaf6f0;
+}
+
+.visit-table tbody tr.payed:hover {
+  background-color: #d9efe2;
   cursor: pointer;
 }
 

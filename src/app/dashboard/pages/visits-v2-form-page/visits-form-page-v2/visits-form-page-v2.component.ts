@@ -149,14 +149,11 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   private initializeAutocompleteValues(): void {
-    // Verificar si hay una visita seleccionada y si estamos en modo edición
     if (this.caller !== 'nv' && this.selectedVisit()) {
-      // Establecer valor para doctor
       if (this.selectedVisit()?.docName) {
         this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName));
       }
       
-      // Establecer valor para paciente
       if (this.selectedVisit()?.patientName) {
         this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName));
       }

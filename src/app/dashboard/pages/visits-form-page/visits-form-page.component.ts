@@ -67,6 +67,7 @@ export class VisitsFormPageComponent implements OnInit {
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
 
+  constructor( private route: ActivatedRoute ) {}
 
   ngOnInit(): void {
     this.doctorSearchControl.valueChanges.pipe(
@@ -75,7 +76,6 @@ export class VisitsFormPageComponent implements OnInit {
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
-        console.log('clean term :::: ', cleanTerm)
         if ( cleanTerm.length === 0 ) {
           this.visitForm.get('doctor')?.setValue(0)
           this.searchDocResults = []
@@ -123,24 +123,30 @@ export class VisitsFormPageComponent implements OnInit {
         this.isPatLoading = false
       }
     })
+
+    this.route.paramMap.subscribe( params => {
+      const id = params.get('id')
+      if ( !id ) return
+      this.handleSelectedVisit( +id )
+    })
     
     this.activateRoute.url
       .pipe(
         map((urlSegment) => urlSegment),
       ).subscribe( segments => {
-        let urlSegment = segments[0].path === 'new-visit' ? true : false
+        let urlSegment = segments[0].path === 'new-visit'
         if( urlSegment ) {
           this.caller = 'nv'
-          this.title = 'Registro de visitas'
-          this.subtitle = 'Agrega los detalles de la visita médica.'
+          this.title = 'Registro de consulta externa'
+          this.subtitle = 'Agrega los detalles de la consulta externa.'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset();
           this.doctorSearchControl.reset();
           this.patientSearchControl.reset();
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
-          this.title = 'Editar visita'
-          this.subtitle = 'Actualiza los detalles de la visita médica.'
+          this.title = 'Editar consulta externa'
+          this.subtitle = 'Actualiza los detalles de la consulta externa.'
           this.actionButtonText = 'Actualizar'
           this.visitForm.get('date')?.setValue(formatIncomingData(this.selectedVisit()?.lastVisitDate!))
 
@@ -150,17 +156,12 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
    private initializeAutocompleteValues(): void {
-      // Verificar si hay una visita seleccionada y si estamos en modo edición
       if (this.caller !== 'nv' && this.selectedVisit()) {
-        // Establecer valor para doctor
-        if (this.selectedVisit()?.docName) {
-          this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName));
-        }
+        if (this.selectedVisit()?.docName)
+          this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName))
         
-        // Establecer valor para paciente
-        if (this.selectedVisit()?.patientName) {
-          this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName));
-        }
+        if (this.selectedVisit()?.patientName)
+          this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName))
       }
     }
 
@@ -198,7 +199,7 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisit) {
-    this.visitsService.createVisit( visit, 'sp' )
+    this.visitsService.createVisit( visit )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
@@ -210,6 +211,41 @@ export class VisitsFormPageComponent implements OnInit {
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
+        }
+      })
+  }
+
+  public handleSelectedVisit( id: number ) {
+    this.visitsService.getVisit( id )
+      .subscribe({
+        next: () => {
+          const visit = this.selectedVisit()
+          if ( !visit ) return
+
+          this.visitForm.patchValue({
+            ageAccordingToWeight: visit.ageBasedOnWeight,
+            BMI: visit.BMI,
+            date: formatIncomingData(visit.lastVisitDate),
+            diagnosis: visit.diagnosis,
+            doctor: visit.staffId,
+            fatPercentage: visit.bodyFatPercentage,
+            glucometry: visit.glucoseLevel,
+            height: visit.height,
+            notes: visit.notes,
+            oxygenation: visit.oxygenSaturation,
+            patient: visit.patientId,
+            pressure: visit.bloodPressure,
+            temperature: visit.temperature,
+            treatment: visit.treatment,
+            pathologicalHst: visit.pathologicalHst,
+            familyHst: visit.familyHst,
+            surgicalHst: visit.surgicalHst,
+            backgroundHst: visit.backgroundHst,
+            visceralFat: visit.visceralFat,
+            weight: visit.weight,
+          })
+
+          this.initializeAutocompleteValues()
         }
       })
   }

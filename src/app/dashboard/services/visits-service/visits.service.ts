@@ -141,7 +141,7 @@ export class VisitsService {
       )
   }
 
-  public createVisit(visit: FormVisit, origin='er'): Observable<boolean> {
+  public createVisit(visit: FormVisit): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/visits/create`
     const body = {...visit}
 

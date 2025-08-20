@@ -18,7 +18,7 @@ export class VisitsPageComponent implements OnInit {
   public totalRegistries: number = 0
   public visits: any[] = []
   public isDefaultER: boolean = false
-  public header: string = 'visitas'
+  public header: string = 'Consulta Externa'
 
   private router = inject( Router )
   public urlSegment: string = ''
@@ -38,29 +38,18 @@ export class VisitsPageComponent implements OnInit {
 
     this.urlSegment = (this.router.url).split('/')[2]
     
-    if ( this.urlSegment === 'emergency' )
+    if ( this.urlSegment === 'emergency' ) {
       this.header = 'emergencias'
       this.isDefaultER = true
-      this.getVisits()
+    }
   }
 
   public getVisits(searchTerm?: string) {
 
-    if ( 
-      !searchTerm && 
-      this.urlSegment === 'visits'
-    ) {
+    if ( !searchTerm ) {
       this.visits = []
       this.totalRegistries = 0
       return
-    }
-
-    if (
-      !searchTerm && 
-      this.urlSegment === 'emergency' &&
-      !this.isDefaultER
-    ) {
-      this.isDefaultER = true
     }
     
     this.visitsService.getAllVisits({
@@ -69,11 +58,6 @@ export class VisitsPageComponent implements OnInit {
       term: searchTerm ? searchTerm.trim() : '',
       default: this.isDefaultER  
     })
-      .pipe(
-        finalize(() => {
-          this.isDefaultER = false
-        })
-      )
       .subscribe({
         next: ( response ) => { 
           this.visits = response.visits || []

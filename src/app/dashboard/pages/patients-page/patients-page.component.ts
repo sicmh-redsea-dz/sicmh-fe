@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { Patient } from '../../interface/patients-response.interface';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
@@ -15,22 +16,41 @@ export class PatientsPageComponent {
   public totalPages: number = 1
   public limit: number = 25
   public offset: number = 0
-  public totalRegistries: number = 1
+  public totalRegistries: number = 0
   public patients: Patient[] = []
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
+  private searchTermSubject = new Subject<string>()
   
   constructor() {
-    this.getPatients()
+    this.searchTermSubject
+      .pipe(
+        debounceTime( 700 ),
+        distinctUntilChanged()
+      ).subscribe(( term: string ) => {
+        this.getPatients( term )
+      })
   }
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
+    this.searchTermSubject.next( term )
   }
 
-  public getPatients() {
-    this.patientService.getPatients({ limit: this.limit, offset: this.offset })
+  public getPatients( searchTerm?: string ) {
+
+    if ( !searchTerm ) {
+      this.patients = []
+      this.totalRegistries = 0
+      return
+    }
+    
+    this.patientService.getPatients({ 
+      limit: this.limit, 
+      offset: this.offset,
+      term: searchTerm ? searchTerm.trim() : ''
+    })
       .subscribe({
         next: ( response ) => {
           this.patients = response?.patients || []

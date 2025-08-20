@@ -5,9 +5,10 @@ import { catchError, map, Observable, of, tap, throwError } from 'rxjs'
 import { AddedUser, Data, FormPatient, Patient, PatientsResponse } from '../../interface/patients-response.interface'
 import { AuthService } from '../../../auth/services/auth.service'
 
-interface Pagination {
+interface Delimiters {
   limit: number,
-  offset: number
+  offset: number,
+  term: string
 }
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class PatientsService {
   public selectedPatient = computed(() => this._selectedPatient() )
   public listOfPatients = computed(() => this._listOfPatients())
 
-  public getPatients( pagination: Pagination):Observable<Data | null> {
+  public getPatients( pagination: Delimiters):Observable<Data | null> {
     const url: string = `${this.baseUrl}/app/patients`
     const token = localStorage.getItem('token')
     if ( !token ) this.authStatus.logout()
@@ -31,6 +32,7 @@ export class PatientsService {
     const params = new HttpParams()
       .set('limit', pagination.limit)
       .set('offset', pagination.offset)
+      .set('term', pagination.term)
 
     return this.http.get<PatientsResponse>( url, { headers, params } )
       .pipe(

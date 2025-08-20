@@ -20,7 +20,14 @@
         </tr>
       </thead>
       <tbody style="background-color: white;">
-        <tr (click)="handleSelectedVisit(visit.id)" *ngFor="let visit of dataToRender(); let idx = index">
+        <tr 
+          [ngClass]="{
+            'pending': visit.state === 'Pendiente',
+            'payed': visit.state === 'Pagado'
+          }"
+          (click)="handleSelectedVisit(visit.id)" 
+          *ngFor="let visit of dataToRender(); let idx = index"
+        >
           <td>{{visit.id}}</td>
           <td>{{visit.patientId}}</td>
           <td>{{visit.patientName}}</td>
