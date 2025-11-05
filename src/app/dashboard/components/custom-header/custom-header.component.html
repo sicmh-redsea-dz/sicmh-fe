@@ -4,7 +4,10 @@
     <span class="badge info">{{ itemCounter }}</span>
   </div>
   <div class="table-actions">
-    <app-search-bar (searchTermChange)="execSearchTerm($event)"></app-search-bar>
+    <app-search-bar 
+      (searchTermChange)="execSearchTerm($event)"
+      [placeholderText]="inputPlaceholder"
+    />
 
     <button *ngIf="btnRouterLink; else drawerTrigger" class="action-button create" [routerLink]="btnRouterLink">
       <i class="ph-bold ph-plus"></i>
@@ -18,15 +21,46 @@
       </button>
     </ng-template>
 
-    <button 
-      *ngIf="showDonwloadBtn" 
-      class="action-button download"
-      [ngClass]="{'loading': isDwnldRerportLoading}"
-      (click)="execDonwloadReport()"
+    <div 
+      class="download-wrap"
+      *ngIf="showDonwloadBtn"
+      [class.loading]="isDwnldRerportLoading"
     >
-      <i class="ph-bold ph-download-simple"></i>
-      <span class="btn-txt">Descargar reporte</span>
-    </button>
+      <button 
+        class="action-button download"
+        [ngClass]="{'loading': isDwnldRerportLoading}"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="ph-bold ph-download-simple"></i>
+        <span class="btn-txt">Descargar reporte</span>
+      </button>
+      <div 
+        class="download-menu"
+        role="menu"
+        aria-label="Opciones de descarga"
+      >
+        <button
+          class="menu-item"
+          type="button"
+          (click)="execDonwloadReport('td')"
+          role="menuitem"
+        >
+          <i class="ph-bold ph-file-pdf"></i>
+          <span>HOY</span>
+        </button>
+        <button
+          class="menu-item"
+          type="button"
+          (click)="execDonwloadReport('wk')"
+          role="menuitem"
+        >
+          <i class="ph-bold ph-file-pdf"></i>
+          <span>SEMANA</span>
+        </button>
+      </div>
+    </div>
+
 
   </div>
 </div>

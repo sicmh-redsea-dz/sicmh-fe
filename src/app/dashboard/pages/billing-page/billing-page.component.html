@@ -1,8 +1,9 @@
 <custom-header 
   [itemCounter]="12"
   [headerText]="'Facturación'"
+  [inputPlaceholder]="'Buscar factura...'"
   [isDwnldRerportLoading]="downloadingPdfReport"
-  (btnDownloadReport)="getPdfReport()"
+  (btnDownloadReport)="getPdfReport( $event )"
   (searchTerm)="onSearchTermChange( $event )"
   (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
 />

@@ -149,8 +149,8 @@ export class InvoicesService {
       )
   }
 
-  public downloadPDFReport(): Observable<any> {
-    const url: string = `${this.baseUrl}/app/invoice/generate-pdf`
+  public downloadPDFReport( term: string ): Observable<any> {
+    const url: string = `${this.baseUrl}/app/invoice/generate-pdf/${term}`
 
     const token = this.validateToken()
 

@@ -142,9 +142,9 @@ export class BillingPageComponent {
       })
   }
 
-  public getPdfReport() {
+  public getPdfReport(filter: string) {
     this.downloadingPdfReport = true
-    this.invoiceService.downloadPDFReport()
+    this.invoiceService.downloadPDFReport( filter )
       .pipe(
         finalize(() => {
           this.downloadingPdfReport = false

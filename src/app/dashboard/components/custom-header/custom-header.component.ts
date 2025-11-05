@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export class CustomHeaderComponent {
   @Input() headerText: string = ''
   @Input() itemCounter: number = 0
+  @Input() inputPlaceholder: string = ''
   @Input() btnRouterLink: string = ''
   @Input() isDwnldRerportLoading: boolean = false
 
@@ -37,7 +38,7 @@ export class CustomHeaderComponent {
     this.btnDrawerTrigger.emit()
   }
 
-  public execDonwloadReport() {
-    this.btnDownloadReport.emit()
+  public execDonwloadReport(term: string) {
+    this.btnDownloadReport.emit(term)
   }
 }
