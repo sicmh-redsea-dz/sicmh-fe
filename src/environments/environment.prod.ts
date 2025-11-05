@@ -1,6 +1,6 @@
 export const environment = {
-  production: false,
-  baseUrl: 'http://localhost:3000',
+  production: true,
+  baseUrl: 'https://zavder.space',
   firebaseConfig: {
     apiKey: "AIzaSyCryRI77FjNrqgRZ4glcq89NwEJ7RYW2gA",
     authDomain: "sampleapp-2a5cd.firebaseapp.com",
