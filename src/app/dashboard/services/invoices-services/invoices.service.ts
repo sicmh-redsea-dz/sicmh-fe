@@ -3,7 +3,7 @@ import { environment } from '../../../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { AuthService } from '../../../auth/services/auth.service';
-import { InvoiceResponse, Invoice, InvoiceForm } from '../../interface/invoice-response.interface';
+import { Invoice, InvoiceForm } from '../../interface/invoice-response.interface';
 
 interface Delimiters {
   limit: number,

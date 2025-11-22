@@ -52,5 +52,17 @@ export const sidebarItmes = [
       // }
     ],
     arrowIcon: 'ph-bold ph-caret-down'
+  },
+  {
+    label: 'Inventario',
+    icon: 'ph-bold ph-warehouse',
+    hasSubmenu: true,
+    subItems: [
+      {
+        label: 'Productos',
+        routerLink: 'inventory/products'
+      }
+    ],
+    arrowIcon: 'ph-bold ph-caret-down'
   }
 ]

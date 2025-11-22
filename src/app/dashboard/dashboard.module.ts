@@ -26,6 +26,7 @@ import { PermissionsComponent } from './pages/settings-page/permissions/permissi
 import { CustomHeaderComponent } from './components/custom-header/custom-header.component';
 import { NoDataComponent } from './components/no-data/no-data.component';
 import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
+import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 
 
 @NgModule({
@@ -51,7 +52,8 @@ import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.compon
     PermissionsComponent,
     CustomHeaderComponent,
     NoDataComponent,
-    ToggleOptsComponent
+    ToggleOptsComponent,
+    InventoryPageComponent
   ],
   imports: [
     CommonModule,

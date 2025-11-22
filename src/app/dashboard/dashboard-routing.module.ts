@@ -11,6 +11,7 @@ import { SettingsPageComponent } from './pages/settings-page/settings-page.compo
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
+import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,7 @@ const routes: Routes = [
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },
+      { path: 'inventory/products', component: InventoryPageComponent },
       { 
         path: 'settings', 
         component: SettingsPageComponent,

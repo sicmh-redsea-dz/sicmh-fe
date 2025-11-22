@@ -1,0 +1,48 @@
+<custom-header 
+    [itemCounter]="totalRegistries"
+    [headerText]="'Inventario General'"
+    [inputPlaceholder]="'Buscar producto...'"
+    [isDwnldRerportLoading]="downloadingPdfReport"
+    (searchTerm)="onSearchTermChange($event)"
+/>
+
+<div class="inv-table-container">
+    <table class="inv-table">
+        <thead>
+            <tr>
+                <th *ngFor="let h of headers">{{ h }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for ( item of bodyContent; track $index ) {
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.prodName }}</td>
+                    <td>{{ item.prodDesc }}</td>
+                    <td>{{ item.prodQuantity }}</td>
+                    <td>{{ item.prodUnitPrice }}</td>
+                    <td 
+                        class="opts-wrapper" 
+                        (click)="$event.stopPropagation()" 
+                        (keydown)="$event.stopPropagation()"
+                    >
+                        <toggle-opts 
+                            (deleteEvent)="some()"
+                            (editEvent)="some()"
+                        />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<app-pagination 
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [offset]="offset"
+    [totalRegistries]="totalRegistries"
+    [pageSize]="limit"
+    (pageChange)="onPageChange($event)"
+/>
