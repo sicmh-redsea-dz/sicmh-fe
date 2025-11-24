@@ -1,0 +1,85 @@
+.transfer-form {
+  padding: 0 .5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  gap: .25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-gray);
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 5px rgba(131, 131, 222, 0.5);
+  background-color: #fff;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+  margin-top: .5rem;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-white);
+  color: var(--color-white);
+  background-color: var(--secondary-color);
+  border-radius: .5rem;
+  font-size: 14px;
+  cursor: pointer;
+  width: fit-content;
+  align-self: center;
+  padding: 10px;
+  /* margin: 0 .5rem; */
+  transition: background-color .3s ease, color .3s ease;
+}
+
+.btn.submit {
+  background: #28a745;
+}
+
+.btn.submit:disabled {
+  background: var(--color-light-gray);
+}
+
+.btn.submit:disabled:hover {
+  background: var(--color-light-gray);
+  cursor: default;
+}
+
+.btn.cancel {
+  background: #dc3545;
+}
+
+.btn.submit:hover {
+  background: #218838;
+}
+
+.btn.cancel:hover {
+  background: #c82333;
+}

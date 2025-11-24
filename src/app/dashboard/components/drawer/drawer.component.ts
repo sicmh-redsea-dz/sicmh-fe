@@ -11,8 +11,13 @@ export class DrawerComponent {
   private drawerParams = inject( DrawerService )
 
   public dcInvoice = DrawerContents.INVOICE;
+  public dcTransfer = DrawerContents.TRANSFER;
   public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
-  public bodyToDisplay = computed(() => this.drawerParams.contentToDisplay())
+  public bodyToDisplay = computed(() => {
+    const value = this.drawerParams.contentToDisplay()
+    console.log('Drawer bodyToDisplay =', value)
+    return value
+  })
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
   public drawerHeader = computed(() => this.drawerParams.drawerTexts())
 

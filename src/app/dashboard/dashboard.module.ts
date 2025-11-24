@@ -27,6 +27,7 @@ import { CustomHeaderComponent } from './components/custom-header/custom-header.
 import { NoDataComponent } from './components/no-data/no-data.component';
 import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
+import { TransferComponent } from './components/drawer-body-components/transfers/transfer.component';
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import { InventoryPageComponent } from './pages/inventory-page/inventory-page.co
     CustomHeaderComponent,
     NoDataComponent,
     ToggleOptsComponent,
-    InventoryPageComponent
+    InventoryPageComponent,
+    TransferComponent
   ],
   imports: [
     CommonModule,

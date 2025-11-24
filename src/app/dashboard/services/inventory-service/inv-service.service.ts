@@ -18,7 +18,7 @@ export class InvServiceService {
   private readonly http = inject( HttpClient )
   private readonly authStatus = inject( AuthService )
 
-  private _listOfInvItems = signal( null )
+  private readonly _listOfInvItems = signal<string | null >( null )
   public listOfInvItems = computed(() => this._listOfInvItems())
 
   public getInventoryItems( args: Delimiters ): Observable< any > {
@@ -45,6 +45,22 @@ export class InvServiceService {
           return of( null )
         })
       )
+  }
+
+  public getInventoryItemById(id: string): Observable<any> {
+    const url = `${this.baseUrl}/app/inventory/${id}`
+    
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${ token }`)
+
+    return this.http.get(url, { headers }).pipe(
+      map((resp: any) => resp),
+      catchError((err) => {
+        return throwError(() => err.message)
+      })
+    )
   }
 
   private validateToken(): string | null {

@@ -2,6 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { InvServiceService } from '../../services/inventory-service/inv-service.service';
 import Swal from 'sweetalert2';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { DrawerService } from '../../services/drawer-service/drawer.service';
+import { DrawerContents } from '../../interface/drawer-content.enum';
 
 @Component({
   selector: 'app-inventory-page',
@@ -23,7 +25,8 @@ export class InventoryPageComponent implements OnInit {
   public offset: number = 0
   public totalRegistries: number = 0
   public downloadingPdfReport: boolean = false
-  private searchTermSubject = new Subject<string>()
+  public drawerParams = inject( DrawerService )
+  private readonly searchTermSubject = new Subject<string>()
 
   public bodyContent: any[] = []
   private readonly invService = inject( InvServiceService )
@@ -62,6 +65,19 @@ export class InventoryPageComponent implements OnInit {
         Swal.fire('Error', msg, 'error')
       }
     })
+  }
+
+  bootstrapInvoiceDrawer( itemId?: string ) {
+    if( itemId )
+      this.drawerParams.setInvoiceId.set( itemId )
+    
+    this.drawerParams.isDrawerOpen.set( true )
+    this.drawerParams.contentToDisplay.set( DrawerContents.TRANSFER )
+    this.drawerParams.drawerTexts.update( state => ({
+      ...state,
+      header: 'generar transferencia',
+      btnText: 'Generar'
+    }))
   }
 
   public onSearchTermChange( term: string ) {

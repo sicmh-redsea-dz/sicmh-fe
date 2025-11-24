@@ -7,8 +7,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ToggleOptsComponent {
   @Input() isEditBlocked: boolean = false
+  @Input() showTransferOpt: boolean = false
   @Output() editEvent = new EventEmitter() 
-  @Output() deleteEvent = new EventEmitter() 
+  @Output() deleteEvent = new EventEmitter()
+  @Output() transferEvent = new EventEmitter()
 
   public execEditEvent() {
     if ( this.isEditBlocked ) return
@@ -16,5 +18,8 @@ export class ToggleOptsComponent {
   }
   public execDeleteEvent() {
     this.deleteEvent.emit()
+  }
+  public execTransferEvent() {
+    this.transferEvent.emit()
   }
 }

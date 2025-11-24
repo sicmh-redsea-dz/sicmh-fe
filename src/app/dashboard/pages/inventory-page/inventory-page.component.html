@@ -4,6 +4,7 @@
     [inputPlaceholder]="'Buscar producto...'"
     [isDwnldRerportLoading]="downloadingPdfReport"
     (searchTerm)="onSearchTermChange($event)"
+    (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
 />
 
 <div class="inv-table-container">
@@ -27,7 +28,9 @@
                         (click)="$event.stopPropagation()" 
                         (keydown)="$event.stopPropagation()"
                     >
-                        <toggle-opts 
+                        <toggle-opts
+                            [showTransferOpt]="true"
+                            (transferEvent)="( bootstrapInvoiceDrawer( item.id ) )"
                             (deleteEvent)="some()"
                             (editEvent)="some()"
                         />
@@ -37,7 +40,7 @@
         </tbody>
     </table>
 </div>
-
+<app-drawer/>
 <app-pagination 
     [totalPages]="totalPages"
     [currentPage]="currentPage"

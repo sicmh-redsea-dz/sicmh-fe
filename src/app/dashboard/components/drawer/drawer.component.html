@@ -10,6 +10,9 @@
       @if ( bodyToDisplay() === dcInvoice ) {
         <app-drawer-invoice />
       }
+      @else if ( bodyToDisplay() === dcTransfer ) {
+        <app-transfer />
+      }
       @else {
         <p>There is no available content for this drawer.</p>
       }

@@ -2,21 +2,32 @@
     <div class="opts-toggle">
         <i class="ph ph-dots-three-vertical"></i>
         <div class="opts-menu" >
-            <!-- <div class="opts-btns">
-                <i class="ph ph-monitor"></i> Mostrar
-            </div> -->
+            @if( showTransferOpt ) {
+                <div 
+                    class="opts-btns"
+                    (click)="execTransferEvent()"
+                    (keypress)="execTransferEvent()"
+                >
+                    <i class="ph ph-monitor"></i> Traspaso
+                </div>
+            }
 
             <div 
                 class="opts-btns"
                 [ngClass]="{ 'blocked': isEditBlocked }" 
                 (click)="!isEditBlocked && execEditEvent()"
+                (keypress)="!isEditBlocked && execEditEvent()"
             >
                 <i class="ph ph-pencil-simple"></i> Editar
             </div>
 
             <div class="opts-divider"></div>
 
-            <div class="opts-btns delete" (click)="execDeleteEvent()">
+            <div 
+                class="opts-btns delete" 
+                (click)="execDeleteEvent()"
+                (keypress)="execDeleteEvent()"
+            >
                 <i class="ph ph-trash-simple"></i> Eliminar
             </div>
         </div>

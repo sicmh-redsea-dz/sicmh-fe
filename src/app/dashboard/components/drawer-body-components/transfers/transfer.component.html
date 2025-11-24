@@ -1,0 +1,37 @@
+<form class="transfer-form" [formGroup]="invoiceForm">
+    <div class="form-group">
+        <label for="subinv">Subinventario</label>
+        <option value="">Selecciona una subinventario</option>
+        <select id="subinv" formControlName="subinv">
+            <option value="1">Subinventario 1</option>
+            <option value="2">Subinventario 2</option>
+            <option value="3">Subinventario 3</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="qty">Cantidad</label>
+        <select id="qty" formControlName="qty">
+            <option value="">Selecciona una qty</option>
+            @for (q of itemQuantity; track q) {
+                <option [value]="q">{{ q }}</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-actions">
+        <button 
+            class="btn cancel"
+            type="button"
+            (click)="onHandleCancel()"
+        >
+            Cancelar
+        </button>
+        <button 
+            class="btn submit"
+            type="submit"
+            (click)="onHandleSubmit()"
+        >
+            Generar
+        </button>
+    </div>
+</form>
