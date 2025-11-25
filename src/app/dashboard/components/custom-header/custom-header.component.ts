@@ -20,7 +20,7 @@ export class CustomHeaderComponent {
   public urlSegment: string = ''
   public showDonwloadBtn: boolean = false
 
-  private router = inject( Router )
+  private readonly router = inject( Router )
 
   constructor() {
     this.urlSegment = (this.router.url).split('/')[2]

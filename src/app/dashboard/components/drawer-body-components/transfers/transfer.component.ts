@@ -72,19 +72,24 @@ export class TransferComponent implements OnInit {
   }
 
   onHandleSubmit() {
-    console.log('1')
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched()
       return
     }
-    console.log('2')
     
     const itemId = this.selectedItemId()
-    console.log('3')
     const { subinv, qty } = this.invoiceForm.value
-    console.log('4')
+    const origin = 1
 
-    console.log('Guardando transferencia:', { itemId, subinv, qty })
+    this.invService.transferItemById({ itemId, subinv, qty, origin }).subscribe({
+      next: ( resp ) => {
+        console.log( 'Transferencia exitosa', resp )
+        this.onHandleCancel()
+      },
+      error: ( err ) => {
+        console.error( err )
+      }
+    })
   }
   
   onHandleCancel() {

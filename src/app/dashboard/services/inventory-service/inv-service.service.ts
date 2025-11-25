@@ -21,7 +21,7 @@ export class InvServiceService {
   private readonly _listOfInvItems = signal<string | null >( null )
   public listOfInvItems = computed(() => this._listOfInvItems())
 
-  public getInventoryItems( args: Delimiters ): Observable< any > {
+  public getInventoryItems( args: Delimiters, subinvId: string ): Observable< any > {
     const url: string = `${ this.baseUrl }/app/inventory`
 
     const token = this.validateToken()
@@ -33,7 +33,8 @@ export class InvServiceService {
       .set('limit', args.limit)
       .set('offset', args.offset)
       .set('term', args.term)
-    console.log('query params', params.toString() )
+      .set('subinvId', subinvId)
+    
     return this.http.get( url, { headers, params } )
       .pipe(
         map(( resp: any ) => {
@@ -56,6 +57,25 @@ export class InvServiceService {
       .set('Authorization', `Bearer ${ token }`)
 
     return this.http.get(url, { headers }).pipe(
+      map((resp: any) => resp),
+      catchError((err) => {
+        return throwError(() => err.message)
+      })
+    )
+  }
+
+  public transferItemById( params: Record<string, any> ): Observable<any> {
+    
+    const url = `${this.baseUrl}/app/inventory/transfer`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${ token }`)
+
+    const body = params
+
+    return this.http.post(url, body, { headers }).pipe(
       map((resp: any) => resp),
       catchError((err) => {
         return throwError(() => err.message)

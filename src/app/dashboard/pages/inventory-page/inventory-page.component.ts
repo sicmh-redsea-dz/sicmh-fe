@@ -53,7 +53,8 @@ export class InventoryPageComponent implements OnInit {
       limit: this.limit,
       offset: this.offset,
       term: search
-    }).subscribe({
+    }, '1'
+    ).subscribe({
       next: ( response ) => {
         const { data } = response
         const { resp, totalRegistries } = data

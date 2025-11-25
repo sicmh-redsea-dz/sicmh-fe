@@ -59,9 +59,21 @@ export const sidebarItmes = [
     hasSubmenu: true,
     subItems: [
       {
-        label: 'Productos',
+        label: 'General',
         routerLink: 'inventory/products'
-      }
+      },
+      {
+        label: 'subinventario 1',
+        routerLink: 'inventory/products-sub1'
+      },
+      {
+        label: 'subinventario 2',
+        routerLink: 'inventory/products-sub2'
+      },
+      {
+        label: 'subinventario 3',
+        routerLink: 'inventory/products-sub2'
+      },
     ],
     arrowIcon: 'ph-bold ph-caret-down'
   }

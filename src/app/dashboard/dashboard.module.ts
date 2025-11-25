@@ -28,6 +28,9 @@ import { NoDataComponent } from './components/no-data/no-data.component';
 import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { TransferComponent } from './components/drawer-body-components/transfers/transfer.component';
+import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
+import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
+import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
 
 
 @NgModule({
@@ -55,7 +58,10 @@ import { TransferComponent } from './components/drawer-body-components/transfers
     NoDataComponent,
     ToggleOptsComponent,
     InventoryPageComponent,
-    TransferComponent
+    TransferComponent,
+    SubinvOnePageComponent,
+    SubinvTwoPageComponent,
+    SubinvThreePageComponent
   ],
   imports: [
     CommonModule,

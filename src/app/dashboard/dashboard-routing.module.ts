@@ -12,6 +12,9 @@ import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-fo
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
+import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
+import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
+import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
 
 const routes: Routes = [
   {
@@ -45,7 +48,18 @@ const routes: Routes = [
         ]
       },
       { path: 'income/billings', component: BillingPageComponent },
-      { path: 'inventory/products', component: InventoryPageComponent },
+
+      { 
+        path: 'inventory',
+        children: [
+          { path: 'products', component: InventoryPageComponent },
+          { path: 'products-sub1', component: SubinvOnePageComponent },
+          { path: 'products-sub2', component: SubinvTwoPageComponent },
+          { path: 'products-sub3', component: SubinvThreePageComponent }
+        ]
+        
+      },
+
       { 
         path: 'settings', 
         component: SettingsPageComponent,
