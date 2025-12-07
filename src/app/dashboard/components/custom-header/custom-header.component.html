@@ -9,19 +9,25 @@
       [placeholderText]="inputPlaceholder"
     />
 
-    <button *ngIf="btnRouterLink; else drawerTrigger" class="action-button create" [routerLink]="btnRouterLink">
-      <i class="ph-bold ph-plus"></i>
-      <span class="btn-txt">Crear Nuevo</span>
-    </button>
-
-    <ng-template 
-      #drawerTrigger
-    >
-      <button class="action-button create" (click)="execDrawerTrigger()">
+    <ng-container *ngIf="showCreateButton">
+      <button 
+        *ngIf="btnRouterLink; else drawerTrigger" 
+        class="action-button create" 
+        [routerLink]="btnRouterLink"
+      >
         <i class="ph-bold ph-plus"></i>
         <span class="btn-txt">Crear Nuevo</span>
       </button>
-    </ng-template>
+  
+      <ng-template 
+        #drawerTrigger
+      >
+        <button class="action-button create" (click)="execDrawerTrigger()">
+          <i class="ph-bold ph-plus"></i>
+          <span class="btn-txt">Crear Nuevo</span>
+        </button>
+      </ng-template>
+    </ng-container>
 
     <div 
       class="download-wrap"

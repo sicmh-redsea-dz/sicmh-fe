@@ -11,6 +11,7 @@ export class CustomHeaderComponent {
   @Input() itemCounter: number = 0
   @Input() inputPlaceholder: string = ''
   @Input() btnRouterLink: string = ''
+  @Input() showCreateButton: boolean = true
   @Input() isDwnldRerportLoading: boolean = false
 
   @Output() searchTerm = new EventEmitter()

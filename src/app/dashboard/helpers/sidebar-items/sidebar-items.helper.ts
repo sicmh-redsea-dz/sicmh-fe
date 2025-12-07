@@ -6,7 +6,7 @@ export const sidebarItmes = [
     routerLink: 'main'
   },
   {
-    label: 'Audiencia',
+    label: 'Atención Medica',
     icon: 'ph-bold ph-user',
     hasSubmenu: true,
     subItems: [
@@ -21,6 +21,10 @@ export const sidebarItmes = [
       {
         label:'Emergencias', 
         routerLink:'emergency'
+      },
+      {
+        label: 'Hospitalización',
+        routerLink: 'hospitalization'
       }
     ],
     arrowIcon: 'ph-bold ph-caret-down'
@@ -59,20 +63,20 @@ export const sidebarItmes = [
     hasSubmenu: true,
     subItems: [
       {
-        label: 'General',
+        label: 'Inventario General',
         routerLink: 'inventory/products'
       },
       {
-        label: 'subinventario 1',
+        label: 'Subinv - Emergencia',
         routerLink: 'inventory/products-sub1'
       },
       {
-        label: 'subinventario 2',
+        label: 'Subinv - Quirofano',
         routerLink: 'inventory/products-sub2'
       },
       {
-        label: 'subinventario 3',
-        routerLink: 'inventory/products-sub2'
+        label: 'Subinv - Hospitalización',
+        routerLink: 'inventory/products-sub3'
       },
     ],
     arrowIcon: 'ph-bold ph-caret-down'
