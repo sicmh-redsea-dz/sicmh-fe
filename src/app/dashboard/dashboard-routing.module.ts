@@ -15,6 +15,8 @@ import { InventoryPageComponent } from './pages/inventory-page/inventory-page.co
 import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
 import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
 import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
+import { VisitsV2HFormPageComponent } from './pages/visits-v2-h-form-page/visits-v2-h-form-page.component';
+import { VisitsV2OrFormPageComponent } from './pages/visits-v2-or-form-page/visits-v2-or-form-page.component';
 
 const routes: Routes = [
   {
@@ -31,6 +33,25 @@ const routes: Routes = [
 
         ]
       },
+
+      { path: 'o-room', component: VisitsPageComponent },
+      {
+        path: 'o-room',
+        children: [
+          { path: 'new-visit', component: VisitsV2OrFormPageComponent },
+          { path: 'edit-visit/:id', component: VisitsV2OrFormPageComponent }
+        ]
+      },
+
+      { path: 'hospitalization', component: VisitsPageComponent },
+      {
+        path: 'hospitalization',
+        children: [
+          { path: 'new-visit', component: VisitsV2HFormPageComponent },
+          { path: 'edit-visit/:id', component: VisitsV2HFormPageComponent }
+        ]
+      },
+
       { path: 'emergency', component: VisitsPageComponent },
       {
         path: 'emergency',
@@ -39,6 +60,7 @@ const routes: Routes = [
           { path: 'new-visit', component: VisitsFormPageV2Component },
         ]
       },
+
       { path: 'visits', component: VisitsPageComponent },
       {
         path: 'visits',
@@ -47,6 +69,7 @@ const routes: Routes = [
           { path: 'new-visit', component: VisitsFormPageComponent },
         ]
       },
+
       { path: 'income/billings', component: BillingPageComponent },
 
       { 

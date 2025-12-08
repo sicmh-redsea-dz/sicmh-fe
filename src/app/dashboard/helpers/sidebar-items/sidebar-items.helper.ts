@@ -14,13 +14,17 @@ export const sidebarItmes = [
         label: 'Pacientes', 
         routerLink: 'patients'
       }, 
-      {
-        label:'Consulta Externa', 
-        routerLink:'visits'
-      },
+      // {
+      //   label:'Consulta Externa', 
+      //   routerLink:'visits'
+      // },
       {
         label:'Emergencias', 
         routerLink:'emergency'
+      },
+      {
+        label: 'Quirofano',
+        routerLink: 'o-room'
       },
       {
         label: 'Hospitalización',

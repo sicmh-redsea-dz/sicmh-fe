@@ -1,14 +1,14 @@
-import { Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, forkJoin, map, switchMap, tap } from 'rxjs';
-import { VisitsService } from '../../../services/visits-service/visits.service';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
+import { VisitsService } from '../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
-import { Stock } from '../../../interface/visits-service.interface'
+import { Doctor, FormVisit } from '../../interface/visits-response.interface';
+import { Stock } from '../../interface/visits-service.interface';
 import Swal from 'sweetalert2';
 
-import { formatNewDate, formatIncomingData } from '../../../helpers/dateFormatters';
-import { ShortPatient } from '../../../interface/patients-response.interface';
+import { formatIncomingData, formatNewDate } from '../../helpers/dateFormatters';
+import { ShortPatient } from '../../interface/patients-response.interface';
 
 type StockItemPayload = {
   id: number
@@ -20,13 +20,12 @@ type FormVisitWithStock = FormVisit & {
   stockItems?: StockItemPayload[]
 }
 
-
 @Component({
-  selector: 'app-visits-form-page-v2',
-  templateUrl: './visits-form-page-v2.component.html',
-  styleUrl: './visits-form-page-v2.component.css'
+  selector: 'app-visits-v2-h-form-page',
+  templateUrl: './visits-v2-h-form-page.component.html',
+  styleUrl: './visits-v2-h-form-page.component.css'
 })
-export class VisitsFormPageV2Component implements OnInit {
+export class VisitsV2HFormPageComponent {
   public title = ''
   public subtitle = ''
   public caller = ''
@@ -137,13 +136,12 @@ export class VisitsFormPageV2Component implements OnInit {
       this.handleSelectedVisit( +id )
     })
 
-    this.visitsService.searchStockItems( 2 )
+    this.visitsService.searchStockItems( 4 )
       .subscribe({
         error: ( err ) => {
           console.log('Error calling stock items in emergency')
         }
       })
-
 
     this.activateRoute.url
       .subscribe((segments) => {
@@ -151,16 +149,16 @@ export class VisitsFormPageV2Component implements OnInit {
 
         if (firstSegment === 'new-visit') {
           this.caller = 'nv'
-          this.title = 'Registro de emergencia'
-          this.subtitle = 'Agrega los detalles de emergencia médica.'
+          this.title = 'Registro de hospitalización'
+          this.subtitle = 'Agrega los detalles de hospitalización.'
           this.actionButtonText = 'Guardar'
           this.visitForm.reset()
           this.doctorSearchControl.reset()
           this.patientSearchControl.reset()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else if (firstSegment) {
-          this.title = 'Editar emergencia'
-          this.subtitle = 'Actualiza los detalles de emergencia médica.'
+          this.title = 'Editar hospitalización'
+          this.subtitle = 'Actualiza los detalles de hospitalización.'
           this.actionButtonText = 'Actualizar'
         }
       })
@@ -210,24 +208,22 @@ export class VisitsFormPageV2Component implements OnInit {
 
   public onHandleSubmit() {
     const visit = this.visitForm.value as FormVisitWithStock
-
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )
     : this.handleEditVisit( visit )
   }
 
   public handleCreateVisit(visit: FormVisitWithStock) {
-    const DEFAULT_SUBINVENTORY_ID = 2
-
-    const payload: FormVisitWithStock = {
-      ...visit,
-      stockItems: visit.stockItems?.map(item => ({
-        ...item,
-        subinventoryId: DEFAULT_SUBINVENTORY_ID
-      })) ?? []
-    }
+    const DEFAULT_SUBINVENTORY_ID = 3
     
-    this.visitsService.createVisit( payload, 'emergency' )
+        const payload: FormVisitWithStock = {
+          ...visit,
+          stockItems: visit.stockItems?.map(item => ({
+            ...item,
+            subinventoryId: DEFAULT_SUBINVENTORY_ID
+          })) ?? []
+        }
+    this.visitsService.createVisit( visit, 'hospitalization' )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {

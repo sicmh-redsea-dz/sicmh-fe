@@ -11,7 +11,7 @@ interface Delimiters {
   limit: number,
   offset: number,
   term: string,
-  default: boolean
+  ext: string
 }
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,26 @@ export class VisitsService {
     const token = localStorage.getItem('token')
     if( !token ) this.authStatus.logout()
     return new HttpHeaders().set('Authorization', `Bearer ${token}`)
+  }
+
+  public searchStockItems( term: number ): Observable<any> {
+    const url: string = `${this.baseUrl}/app/visits/search/stock-items`
+
+    const headers = this.authHeaders()
+
+    const params = new HttpParams()
+      .set('term', term)
+
+    return this.http.get<any>(url, { headers, params })
+      .pipe(
+        map(({ data }) => {
+          this._listOfStockItems.set( data.stock )
+        }),
+        catchError(( err ) => {
+          throwError(() => err.error.message )
+          return of( null )
+        })
+      )
   }
 
   public searchDoctors(term: string): Observable<any> {
@@ -87,7 +107,7 @@ export class VisitsService {
       .set('offset', args.offset)
       .set('limit', args.limit)
       .set('term', args.term)
-      .set('default', args.default)
+      .set('ext', args.ext)
 
     return this.http.get<Histories>(url, { headers, params })
       .pipe(
@@ -113,7 +133,6 @@ export class VisitsService {
           console.log('data', data)
           const { visit, stock } = data
           this._selectedVisit.set( visit )
-          this._listOfStockItems.set( stock )
         }),
         catchError((err) => {
           throwError (() => err.message)
@@ -141,9 +160,9 @@ export class VisitsService {
       )
   }
 
-  public createVisit(visit: FormVisit): Observable<boolean> {
+  public createVisit(visit: FormVisit, origin: string): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/visits/create`
-    const body = {...visit}
+    const body = {...visit, origin}
 
     const headers = this.authHeaders()
 

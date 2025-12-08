@@ -31,6 +31,8 @@ import { TransferComponent } from './components/drawer-body-components/transfers
 import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
 import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
 import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
+import { VisitsV2HFormPageComponent } from './pages/visits-v2-h-form-page/visits-v2-h-form-page.component';
+import { VisitsV2OrFormPageComponent } from './pages/visits-v2-or-form-page/visits-v2-or-form-page.component';
 
 
 @NgModule({
@@ -61,7 +63,9 @@ import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three
     TransferComponent,
     SubinvOnePageComponent,
     SubinvTwoPageComponent,
-    SubinvThreePageComponent
+    SubinvThreePageComponent,
+    VisitsV2HFormPageComponent,
+    VisitsV2OrFormPageComponent
   ],
   imports: [
     CommonModule,

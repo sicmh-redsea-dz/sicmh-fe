@@ -17,7 +17,6 @@ export class VisitsPageComponent implements OnInit {
   public offset: number = 0
   public totalRegistries: number = 0
   public visits: any[] = []
-  public isDefaultER: boolean = false
   public header: string = 'Consulta Externa'
 
   private router = inject( Router )
@@ -38,10 +37,14 @@ export class VisitsPageComponent implements OnInit {
 
     this.urlSegment = (this.router.url).split('/')[2]
     
-    if ( this.urlSegment === 'emergency' ) {
+    if ( this.urlSegment === 'emergency' )
       this.header = 'emergencias'
-      this.isDefaultER = true
-    }
+
+    if ( this.urlSegment === 'hospitalization' )
+      this.header = 'hospitalización'
+
+    if ( this.urlSegment === 'o-room' )
+      this.header = 'quirofano'
   }
 
   public getVisits(searchTerm?: string) {
@@ -56,7 +59,7 @@ export class VisitsPageComponent implements OnInit {
       limit: this.limit, 
       offset: this.offset, 
       term: searchTerm ? searchTerm.trim() : '',
-      default: this.isDefaultER  
+      ext: this.urlSegment
     })
       .subscribe({
         next: ( response ) => { 
@@ -82,7 +85,7 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public handleSelectedVisit(id: number) {
-    let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
+    let urlFragment = this.urlSegment
     return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
   }
 
@@ -118,8 +121,7 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public handleNewRegister() {
-    let urlFragment = this.urlSegment === 'emergency' ? 'emergency' : 'visits'
-    console.log('url: ', urlFragment)
+    let urlFragment = this.urlSegment
     this.router.navigateByUrl(`/dashboard/${urlFragment}/new-visit`)
 
   }

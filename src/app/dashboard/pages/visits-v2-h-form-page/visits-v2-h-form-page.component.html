@@ -1,0 +1,192 @@
+<div class="container">
+  <div class="header-container">
+    <button class="back-arrow" 
+            [routerLink]="['/dashboard', 'hospitalization']">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="form-header">
+      <h1>{{title}}</h1>
+      <p>{{subtitle}}</p>
+    </div>
+    <p class="subtle-text" *ngIf="caller !== 'nv' ">{{idTag}}</p>
+  </div>
+
+  <form class="medical-form" 
+        autocomplete="off"
+        [formGroup]="visitForm"
+        (ngSubmit)="onHandleSubmit()">
+
+    <div class="input-row">
+      <div class="input-group date-group">
+        <label>Date</label>
+        <input type="date" 
+              formControlName="date"/>
+      </div>
+
+      <div class="input-group" style="position: relative;">
+        <label>Doctor</label>
+        <div class="autocomplete-wrapper">
+          <input 
+            type="text"
+            placeholder="Buscar doctor..."
+            [formControl]="doctorSearchControl"
+            [value]="selectedDoctor?.name || ''"
+            (focus)="showDocDropdown = true"
+            (blur)="handleDocBlur()" 
+          />
+          <div *ngIf="isDocLoading" class="loader"></div>
+        </div>
+        <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
+          <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+            {{ doctor.name }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="input-group" style="position: relative;">
+        <label>Paciente</label>
+        <div class="autocomplete-wrapper">
+          <input 
+            type="text"
+            placeholder="Buscar paciente..."
+            [formControl]="patientSearchControl"
+            [value]="selectedPatient?.name || ''"
+            (focus)="showPatDropdown = true"
+            (blur)="handlePatBlur()" 
+          />
+          <div *ngIf="isPatLoading" class="loader"></div>
+        </div>
+        <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
+          <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+            {{ patient.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="input-columns">
+      <!-- Columna izquierda (75%) -->
+      <div class="left-column">
+        <div class="number-input-group">
+          <label>Presion</label>
+          <div class="number-input">
+            <input type="text" 
+                  formControlName="pressure" 
+                  placeholder="Ej. 120/80 mmHg"/>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Temperatura</label>
+          <div class="number-input">
+            <input type="number" 
+                  formControlName="temperature"
+                  placeholder="Ej. 36º"/>
+            <div class="button-group">
+              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Altura</label>
+          <div class="number-input">
+            <input type="number" 
+                  formControlName="height" 
+                  placeholder="Ej. 1.75"/>
+            <div class="button-group">
+              <select>
+                <option value="mts">cms</option>
+                <option value="pgs">pgs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Glucometria</label>
+          <div class="number-input">
+            <input type="number"
+                  formControlName="glucometry"
+                  placeholder="Ej. 90 mg/dL"/>
+            <div class="button-group">
+              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Oxigenacion</label>
+          <div class="number-input">
+            <input type="number"
+                  formControlName="oxygenation" 
+                  placeholder="Ej. 100%"/>
+            <div class="button-group">
+              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
+              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
+            </div>
+          </div>
+        </div>
+        <div class="number-input-group">
+          <label>Peso</label>
+          <div class="number-input">
+            <input type="number" 
+                  formControlName="weight"
+                  placeholder="Ej. 120"/>
+            <div class="button-group">
+              <select>
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-vertical"></div>
+      <!-- Columna derecha (25%) -->
+       <div class="right-column">
+         <div class="form-group">
+           <label>Inventario</label>
+           <select name="stock" (change)="handleChange($event)">
+             <option value="">Selecciona un elemento</option>
+              @for( s of listOfStockItems(); track $index ) {
+                <option [value]="s.id">{{s.productName}}</option>
+              }
+           </select>
+           @if(selectedStockItems.length > 0) {
+             <ul class="list">
+               @for(ss of selectedStockItems; track $index) {
+                 <li>
+                   <span [style]="{width: '50%'}">{{$index+1 +'. '+ ss.productName}}</span>
+                   <div>
+                     <i class="icon arrow fa-solid fa-chevron-left" (click)="decrementQuantity($index)"></i>
+                     <span [style]="{marginRight: '.5rem'}">{{ss.currentQuantity}}</span>
+                     <span [style]="{fontWeight: 'bold'}">/</span>
+                     <span [style]="{marginLeft: '.5rem'}">{{ss.productQuantity}}</span>
+                      <i class="icon arrow fa-solid fa-chevron-right" (click)="incrementQuantity($index)"></i>
+                   </div>
+                   <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
+                 </li>
+               }
+             </ul>
+           }
+         </div>
+       </div>
+    </div>
+
+    <hr class="divider" />
+    
+    <div class="textarea-full">
+      <label>Notas</label>
+      <textarea formControlName="notes"
+                placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
+    </div>
+
+    <button class="submit-btn" 
+            [disabled]="visitForm.invalid" 
+            type="submit">
+      {{actionButtonText}}
+    </button>
+  </form>
+</div>

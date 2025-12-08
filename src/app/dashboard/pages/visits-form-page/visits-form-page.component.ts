@@ -199,7 +199,7 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisit) {
-    this.visitsService.createVisit( visit )
+    this.visitsService.createVisit( visit, 'visits' )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
