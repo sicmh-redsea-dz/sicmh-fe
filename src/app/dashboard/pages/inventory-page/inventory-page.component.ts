@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inventory-page',
@@ -27,7 +28,7 @@ export class InventoryPageComponent implements OnInit {
   public downloadingPdfReport: boolean = false
   public drawerParams = inject( DrawerService )
   private readonly searchTermSubject = new Subject<string>()
-
+  private router = inject(Router)
   public bodyContent: any[] = []
   private readonly invService = inject( InvServiceService )
 
@@ -45,6 +46,20 @@ export class InventoryPageComponent implements OnInit {
   }
 
   public some() {}
+
+  public handleSelectedItem( itemId: string ) {
+    this.invService.getInventoryItemById( itemId )
+      .subscribe({
+        next: ( item ) => {
+          console.log(' the item :::: ', item)
+          const { id } = item
+          return this.router.navigateByUrl(`/dashboard/inventory/products/edit-item/${String( id )}`)
+        },
+        error: ( err ) => {
+          console.error('Error al obtener los datos del articulo:', err)
+        }
+      })
+  }
 
   public getInventoryItems( term?: string ) {
     const search = (term ?? this.searchTerm).trim()

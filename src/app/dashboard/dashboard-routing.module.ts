@@ -17,6 +17,7 @@ import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.
 import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
 import { VisitsV2HFormPageComponent } from './pages/visits-v2-h-form-page/visits-v2-h-form-page.component';
 import { VisitsV2OrFormPageComponent } from './pages/visits-v2-or-form-page/visits-v2-or-form-page.component';
+import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 
 const routes: Routes = [
   {
@@ -76,6 +77,8 @@ const routes: Routes = [
         path: 'inventory',
         children: [
           { path: 'products', component: InventoryPageComponent },
+          { path: 'products/new-item', component: InventoryFormPageComponent},
+          { path: 'products/edit-item/:id', component: InventoryFormPageComponent},
           { path: 'products-sub1', component: SubinvOnePageComponent },
           { path: 'products-sub2', component: SubinvTwoPageComponent },
           { path: 'products-sub3', component: SubinvThreePageComponent }

@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="header-container">
+    <button 
+        class="back-arrow"
+        [routerLink]="['/dashboard/inventory/products']"
+    >
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="form-header">
+      <h1>{{title}}</h1>
+      <p>Completa toda la información solicitada del articulo.</p>
+    </div>
+  </div>
+
+  <form class="patient-form"
+        autocomplete="off"
+        [formGroup]="articleForm"
+        (ngSubmit)="onHandleSubmit()">
+    <div class="form-content">
+
+      <div class="form-column">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input  class=""
+                  type="text" 
+                  formControlName="prodName" 
+                  placeholder="Nombre del articulo">
+          <div class="error-message" *ngIf="articleForm.get('prodName')?.touched && articleForm.get('prodName')?.invalid">
+            <small *ngIf="articleForm.get('prodName')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="articleForm.get('prodName')?.errors?.['minlength']">Debe tener al menos 2 caracteres.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Precio por unidad</label>
+          <input  class="" 
+                  type="number" 
+                  formControlName="prodUnitPrice" 
+                  placeholder="Precio por unidad del articulo">
+          <div class="error-message" *ngIf="articleForm.get('prodUnitPrice')?.touched && articleForm.get('prodUnitPrice')?.invalid">
+            <small *ngIf="articleForm.get('prodUnitPrice')?.errors?.['required']">Este campo es obligatorio.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-column">
+        <div class="form-group">
+          <label>Minimo en almacen</label>
+          <input  class="" 
+                  type="number" 
+                  formControlName="prodMinStock" 
+                  placeholder="Cantidad minima en almacen">
+        </div>
+
+        <div class="form-group">
+          <label>Cantidad a ingresar</label>
+          <input  [ngClass]="{'ng-touched': articleForm.get('email')?.touched}" 
+                  type="number" 
+                  formControlName="prodQty" 
+                  placeholder="Cantidad de articulos a ingresar">
+          <div class="error-message" *ngIf="articleForm.get('prodQty')?.touched && articleForm.get('prodQty')?.invalid">
+            <small *ngIf="articleForm.get('prodQty')?.errors?.['required']">Este campo es obligatorio.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label>Descripción del articulo</label>
+      <textarea 
+        rows="3" 
+        class="" 
+        formControlName="prodDesc" 
+        placeholder="Información adicional sobre el articulo">
+      </textarea>
+    </div>
+
+    <button 
+      class="submit-btn"
+      [disabled]="articleForm.invalid"
+      type="submit"
+    >
+      {{actionButtonText}}
+    </button>
+  </form>
+</div>

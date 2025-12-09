@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../auth/services/auth.service';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { Article } from '../../interface/article.interface';
 
 interface Delimiters {
   limit: number,
@@ -17,6 +18,9 @@ export class InvServiceService {
   private readonly baseUrl: string = environment.baseUrl
   private readonly http = inject( HttpClient )
   private readonly authStatus = inject( AuthService )
+
+  private _selectedItem = signal<Article | null >( null )
+  public selectedItem = computed(() => this._selectedItem() )
 
   private readonly _listOfInvItems = signal<string | null >( null )
   public listOfInvItems = computed(() => this._listOfInvItems())
@@ -57,7 +61,10 @@ export class InvServiceService {
       .set('Authorization', `Bearer ${ token }`)
 
     return this.http.get(url, { headers }).pipe(
-      map((resp: any) => resp),
+      map((resp: any) => {
+        this._selectedItem.set( resp.data )
+        return resp.data
+      }),
       catchError((err) => {
         return throwError(() => err.message)
       })
@@ -81,6 +88,42 @@ export class InvServiceService {
         return throwError(() => err.message)
       })
     )
+  }
+
+  public saveArticle( params: Record< string, any>): Observable<any> {
+    const url = `${this.baseUrl}/app/inventory/new-item`
+
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${ token }`)
+
+    return this.http.post(url, params, { headers })
+      .pipe(
+        map( resp => resp),
+        catchError( err => {
+          return throwError(() => err.message )
+        })
+
+      )
+  }
+
+  public updArticle( params: Record< string, any>, articId: number): Observable<any> {
+    const url = `${this.baseUrl}/app/inventory/edit-item/${articId}`
+    
+    const token = this.validateToken()
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${ token }`)
+
+    return this.http.patch(url, params, { headers })
+      .pipe(
+        map( resp => resp),
+        catchError( err => {
+          return throwError(() => err.message )
+        })
+
+      )
   }
 
   private validateToken(): string | null {

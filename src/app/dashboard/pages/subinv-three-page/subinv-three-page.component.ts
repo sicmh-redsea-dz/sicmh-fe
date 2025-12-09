@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { InvServiceService } from '../../services/inventory-service/inv-service.service';
 import Swal from 'sweetalert2';
 
@@ -30,6 +30,15 @@ export class SubinvThreePageComponent implements OnInit {
   
     ngOnInit(): void {
       this.getInventoryItems()
+    }
+
+    constructor() {
+      this.searchTermSubject.pipe(
+        debounceTime( 700 ),
+        distinctUntilChanged()
+      ).subscribe(( term: string) => {
+        this.getInventoryItems( term )
+      })
     }
     
     some() {}

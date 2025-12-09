@@ -1,10 +1,10 @@
 <custom-header 
+    [btnRouterLink]="'new-item'"
     [itemCounter]="totalRegistries"
     [headerText]="'Inventario General'"
     [inputPlaceholder]="'Buscar producto...'"
     [isDwnldRerportLoading]="downloadingPdfReport"
     (searchTerm)="onSearchTermChange($event)"
-    (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
 />
 
 <div class="inv-table-container">
@@ -32,7 +32,7 @@
                             [showTransferOpt]="true"
                             (transferEvent)="( bootstrapInvoiceDrawer( item.id ) )"
                             (deleteEvent)="some()"
-                            (editEvent)="some()"
+                            (editEvent)="handleSelectedItem( item.id )"
                         />
                     </td>
                 </tr>
