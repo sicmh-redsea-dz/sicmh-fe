@@ -33,11 +33,8 @@ export class TransferComponent implements OnInit {
     if (id) {
       this.invService.getInventoryItemById(id).subscribe({
         next: (resp) => {
-          const { data } = resp
-          console.log('Detalle del producto', data)
-
           this.itemQuantity = Array.from(
-            { length: data.prodQuantity },
+            { length: resp.prodQuantity },
             (_, i) => i + 1
           )
         },
