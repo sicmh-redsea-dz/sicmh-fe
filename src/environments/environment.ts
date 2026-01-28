@@ -2,11 +2,11 @@ export const environment = {
   production: false,
   baseUrl: 'http://localhost:3000',
   firebaseConfig: {
-    apiKey: "AIzaSyCryRI77FjNrqgRZ4glcq89NwEJ7RYW2gA",
-    authDomain: "sampleapp-2a5cd.firebaseapp.com",
-    projectId: "sampleapp-2a5cd",
-    storageBucket: "sampleapp-2a5cd.firebasestorage.app",
-    messagingSenderId: "280943927008",
-    appId: "1:280943927008:web:7d244c0bdefc7cc4faba85"
+    apiKey: "AIzaSyDKG7fmZ-xSS6nHaT_8FxIv8jCPRWZjVcE",
+    authDomain: "sampleapp-d2514.firebaseapp.com",
+    projectId: "sampleapp-d2514",
+    storageBucket: "sampleapp-d2514.firebasestorage.app",
+    messagingSenderId: "922225932198",
+    appId: "1:922225932198:web:2a2ab70f430a5330f8c167"
   }
 }

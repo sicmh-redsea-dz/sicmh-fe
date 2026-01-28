@@ -37,10 +37,9 @@ export class RegisterPageComponent {
     try {
       const authenticatedUser = await this.authService.signUp(email, password)
       const idToken = await authenticatedUser.user.getIdToken()
-      console.log('usuario creado correctamente con G')
       this.register( authenticatedUser.user.uid, idToken )
     } catch ( err ) {
-      console.log('error al crear el usuario con G: ', err)
+      Swal.fire('Error', 'No se pudo crear el usuario', 'error')
     }
   }
   

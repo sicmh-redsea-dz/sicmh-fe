@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { catchError, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
+import { catchError, from, map, Observable, of, switchMap, throwError } from 'rxjs'
 import { User, AuthStatus, LoginResponse, CheckTokenResponse } from '../interfaces'
 import { RegisterResponse } from '../interfaces/register-response.interface'
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onIdTokenChanged } from '@angular/fire/auth'
@@ -47,7 +47,7 @@ export class AuthService {
 
   private setAuthentication(user: User, token: string): boolean {
     this._currentUser.set( user )
-    this._authStatus.set( AuthStatus.authentitcated )
+    this._authStatus.set( AuthStatus.authenticated )
     localStorage.setItem('token', token)
     return true
   }
@@ -88,7 +88,6 @@ export class AuthService {
             const accessToken = GoogleAuthProvider.credentialFromResult(authenticatedUser)?.accessToken;
             
             return this.http.post<any>(`${this.baseUrl}/auth/check-user`, { uid }).pipe(
-              tap(({ existingUser, exists }) => console.log(existingUser, exists)),
               switchMap(({ existingUser, exists }) => {
                 if (exists) {
                   return of(this.setAuthentication(existingUser!, idToken))
@@ -104,8 +103,6 @@ export class AuthService {
   }
 
   private registerWithGoogle(name:string, email:string, uid:string, idToken:string, accessToken:string): Observable<boolean> {
-    console.log('register with google')
-    console.log(name, email, uid, idToken, accessToken)
     const url = `${this.baseUrl}/auth/gregister`
     const body = { name, email, uid, idToken, accessToken }
     return this.http.post<RegisterResponse>(url, body)
@@ -139,6 +136,7 @@ export class AuthService {
           )
         }),
         catchError(() => {
+          this._currentUser.set(null)
           this._authStatus.set(AuthStatus.notAuthenticated)
           return of(false)
         })
@@ -156,13 +154,13 @@ export class AuthService {
 
   logout() {
     this._auth.signOut()
-      .then(() => {
+      .catch( error => {
+        console.error('Error al cerrar sesión: ', error)
+      })
+      .finally(() => {
         localStorage.removeItem('token')
         this._currentUser.set(null)
         this._authStatus.set(AuthStatus.notAuthenticated)
-      })
-      .catch( error => {
-        console.error('Error al cerrar sesión: ', error)
       })
   }
 }

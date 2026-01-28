@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment'
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { AuthService } from '../../../auth/services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable, throwError } from 'rxjs';
+import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,16 +11,11 @@ export class DashboardService {
   private readonly baseUrl: string = environment.baseUrl
 
   private http = inject( HttpClient )
-  private authStatus = inject( AuthService )
+  private authHeaders = inject( AuthHeadersService )
 
   public getDataForDashb(): Observable<any> {
     const url: string = `${this.baseUrl}/app`
-    const token = localStorage.getItem('token')
-
-      if ( !token ) this.authStatus.logout()
-
-      const headers = new HttpHeaders()
-        .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
       return this.http.get<any>( url, { headers })
         .pipe(
@@ -30,8 +25,7 @@ export class DashboardService {
             return { cardData, visitData }
           }),
           catchError(( err ) => {
-            throwError(() => err.error.message)
-            return of( null )
+            return throwError(() => err?.error?.message ?? err?.message)
           })
         )
 

@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 import { map } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { FormPatient } from '../../interface/patients-response.interface';
-import { createSingleton } from 'tippy.js';
 
 @Component({
   selector: 'app-patient-form-page',
@@ -84,7 +83,7 @@ export class PatientFormPageComponent implements OnInit {
           }
         },
         error: ( error ) => {
-          Swal.fire('Error', error.message, 'error')
+          Swal.fire('Error', error, 'error')
         },
       })
   }

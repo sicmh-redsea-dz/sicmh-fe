@@ -8,6 +8,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class ToggleOptsComponent {
   @Input() isEditBlocked: boolean = false
   @Input() showTransferOpt: boolean = false
+  @Input() showEditOpt: boolean = true
+  @Input() showDeleteOpt: boolean = true
   @Output() editEvent = new EventEmitter() 
   @Output() deleteEvent = new EventEmitter()
   @Output() transferEvent = new EventEmitter()

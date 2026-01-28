@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { computed, ErrorHandler, inject, Injectable, signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { AuthService } from '../../../auth/services/auth.service';
+import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { environment } from '../../../../environments/environment';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
 import { Histories, SimpleVisit, Visit, Stock } from '../../interface/visits-service.interface'
 
@@ -19,7 +19,7 @@ interface Delimiters {
 export class VisitsService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )
-  private authStatus = inject( AuthService )
+  private authHeaders = inject( AuthHeadersService )
 
   private _selectedVisit = signal<Visit | null>(null)
   readonly selectedVisit = this._selectedVisit.asReadonly()
@@ -30,16 +30,10 @@ export class VisitsService {
   private _listOfStockItems = signal<Stock[] | null>(null)
   readonly listOfStockItems = this._listOfStockItems.asReadonly()
 
-  private authHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`)
-  }
-
   public searchStockItems( term: number ): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits/search/stock-items`
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('term', term)
@@ -50,8 +44,7 @@ export class VisitsService {
           this._listOfStockItems.set( data.stock )
         }),
         catchError(( err ) => {
-          throwError(() => err.error.message )
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -59,7 +52,7 @@ export class VisitsService {
   public searchDoctors(term: string): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits/search/doctors`
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('term', term)
@@ -71,8 +64,7 @@ export class VisitsService {
           return doctors
         }),
         catchError(( err ) => {
-          throwError(() => err.error.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -80,7 +72,7 @@ export class VisitsService {
   public searchPatients(term: string): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits/search/patients`
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('term', term)
@@ -92,8 +84,7 @@ export class VisitsService {
           return patients
         }),
         catchError(( err ) => {
-          throwError(() => err.error.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -101,7 +92,7 @@ export class VisitsService {
   public getAllVisits(args: Delimiters): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits`
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('offset', args.offset)
@@ -116,27 +107,25 @@ export class VisitsService {
           return data
         }),
         catchError(( err ) => {
-          throwError(() => err.error.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
 
-  public getVisit(id: number): Observable<any> {
+  public getVisit(id: number): Observable<Visit> {
     const url: string = `${this.baseUrl}/app/visits/${id}`
 
-    const headers = this.authHeaders()   
+    const headers = this.authHeaders.buildAuthHeaders()   
       
     return this.http.get<any>(url, { headers })
       .pipe(
         map(({ data }) => {
-          console.log('data', data)
-          const { visit, stock } = data
+          const { visit } = data
           this._selectedVisit.set( visit )
+          return visit
         }),
         catchError((err) => {
-          throwError (() => err.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -145,17 +134,15 @@ export class VisitsService {
     const url: string = `${this.baseUrl}/app/visits/edit/${id}`
     const body = {...visit}
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.patch(url, body, { headers })
       .pipe(
         map((something) => {
-          console.log('something: ', something)
           return true
         }),
         catchError((err) => {
-          throwError(() => err.message )
-          return of(false)
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -164,7 +151,7 @@ export class VisitsService {
     const url: string = `${this.baseUrl}/app/visits/create`
     const body = {...visit, origin}
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.post(url, body, { headers })
       .pipe(
@@ -172,8 +159,7 @@ export class VisitsService {
           return true
         }),
         catchError(( err ) => {
-          throwError(() => err.message)
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -181,17 +167,15 @@ export class VisitsService {
   public deleteVisit(id: number): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/visits/${id}`
 
-    const headers = this.authHeaders()
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.delete(url, { headers })
       .pipe(
         map((data) => {
-          console.log( data )
           return true
         }),
         catchError(( err ) => {
-          throwError(() => err.message )
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }

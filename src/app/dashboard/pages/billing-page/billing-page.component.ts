@@ -1,9 +1,11 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, DestroyRef, effect, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
 import { InvoicesService } from '../../services/invoices-services/invoices.service';
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Invoice } from '../../interface/invoice-response.interface';
 
 @Component({
   selector: 'app-billing-page',
@@ -29,15 +31,17 @@ export class BillingPageComponent {
 
   public drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
-  public bodyContent: any[] = []
+  public bodyContent: Invoice[] = []
   private searchTermSubject = new Subject<string>()
+  private destroyRef = inject(DestroyRef)
 
   constructor() {
     this.getInvoices()
 
     this.searchTermSubject.pipe(
       debounceTime( 700 ),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(( term: string) => {
       this.getInvoices( term )
     })
@@ -52,6 +56,8 @@ export class BillingPageComponent {
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
+    this.currentPage = 1
+    this.offset = 0
     this.searchTermSubject.next( term )
   }
 
@@ -85,10 +91,12 @@ export class BillingPageComponent {
   }
 
   public getInvoices( term?: string ) {
+    const search = (term ?? this.searchTerm).trim()
+
     this.invoiceService.getInvoices({
       limit: this.limit, 
       offset: this.offset, 
-      term: term ? term.trim() : ''
+      term: search
     })
       .subscribe({
         next: (response) => {
@@ -133,11 +141,10 @@ export class BillingPageComponent {
     this.invoiceService.deleteInvoice(id)
       .subscribe({
         next: ( result ) => {
-          console.log('res: ', result)
           if( result ) this.drawerParams.triggerInvoiceRefresh()
         },
         error: ( err ) => {
-          console.error('Error al eliminar la factura seleccionado:', err);
+          Swal.fire('Error', err, 'error')
         }
       })
   }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
 
@@ -15,7 +15,6 @@ export class DrawerComponent {
   public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
   public bodyToDisplay = computed(() => {
     const value = this.drawerParams.contentToDisplay()
-    console.log('Drawer bodyToDisplay =', value)
     return value
   })
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())

@@ -20,7 +20,7 @@ export class AppComponent {
     switch(this.authService.authStatus()){
       case AuthStatus.checking:
         return;
-      case AuthStatus.authentitcated:
+      case AuthStatus.authenticated:
           this.router.navigateByUrl('/dashboard');
           break;
       case AuthStatus.notAuthenticated:

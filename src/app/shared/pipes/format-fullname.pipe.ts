@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Patient } from '../interface/patients-response.interface';
+import { Patient } from '../../dashboard/interface/patients-response.interface';
 
 @Pipe({
   name: 'formatFullname'

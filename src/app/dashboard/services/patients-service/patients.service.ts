@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../../environments/environment'
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs'
+import { catchError, map, Observable, throwError } from 'rxjs'
 import { AddedUser, Data, FormPatient, Patient, PatientsResponse } from '../../interface/patients-response.interface'
-import { AuthService } from '../../../auth/services/auth.service'
+import { AuthHeadersService } from '../../../core/http/auth-headers.service'
 
 interface Delimiters {
   limit: number,
@@ -16,7 +16,7 @@ interface Delimiters {
 export class PatientsService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )
-  private authStatus = inject( AuthService )
+  private authHeaders = inject( AuthHeadersService )
   private _listOfPatients = signal<Data | null>( null )
   private _selectedPatient = signal<Patient | null>( null )
   public selectedPatient = computed(() => this._selectedPatient() )
@@ -24,10 +24,7 @@ export class PatientsService {
 
   public getPatients( pagination: Delimiters):Observable<Data | null> {
     const url: string = `${this.baseUrl}/app/patients`
-    const token = localStorage.getItem('token')
-    if ( !token ) this.authStatus.logout()
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('limit', pagination.limit)
@@ -41,21 +38,14 @@ export class PatientsService {
           return data
         }),
         catchError(( err ) => {
-          throwError(() => err.error.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
 
   public getPatient( patientId:number ): Observable<Patient | null> {
       const url: string = `${this.baseUrl}/app/patients/${patientId}`
-      const token = localStorage.getItem('token')
-      if( !token ) {
-        this.authStatus.logout()
-        return of( null )
-      }
-      const headers = new HttpHeaders()
-        .set('Authorization', `Bearer ${token}`)
+      const headers = this.authHeaders.buildAuthHeaders()
 
       return this.http.get<AddedUser>( url, { headers } )
         .pipe(
@@ -64,8 +54,7 @@ export class PatientsService {
             return data.patient
           }),
           catchError(( err ) => {
-            throwError(() => err.message )
-            return of( null )
+            return throwError(() => err?.error?.message ?? err?.message)
           })
         )
   }
@@ -73,58 +62,38 @@ export class PatientsService {
   public savePatient(patient: FormPatient): Observable<AddedUser | null> {
     const url: string = `${this.baseUrl}/app/patients/new-patient`
     const body = {...patient}
-    const token = localStorage.getItem('token')
-
-    if( !token ) {
-      this.authStatus.logout()
-      return of( null )
-    }
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.post<AddedUser>( url, body, { headers } )
       .pipe(
-        catchError(( err ) => throwError(() => err ))
+        catchError(( err ) => throwError(() => err?.error?.message ?? err?.message))
       )
   }
 
   public editPatient(patient: FormPatient, patientId: number): Observable<AddedUser | null> {
     const url: string = `${this.baseUrl}/app/patients/${patientId}`
     const body = {...patient}
-    const token = localStorage.getItem('token')
-    if( !token ) {
-      this.authStatus.logout()
-      return of( null )
-    }
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.patch<AddedUser>(url, body, {headers})
       .pipe(
         catchError(( err ) => {
-          throwError(() => err.message )
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
 
   public deletePatient(id: number): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/patients/${id}`
-    const token: string | null = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.delete(url, { headers })
       .pipe(
         map((data) => {
-          console.log( data )
           return true
         }),
         catchError(( err ) => {
-          throwError(() => err.message )
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }

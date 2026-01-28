@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { AuthService } from '../../../auth/services/auth.service';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { AuthHeadersService } from '../../../core/http/auth-headers.service';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { Article } from '../../interface/article.interface';
 
 interface Delimiters {
@@ -14,24 +14,21 @@ interface Delimiters {
 @Injectable({
   providedIn: 'root'
 })
-export class InvServiceService {
+export class InventoryService {
   private readonly baseUrl: string = environment.baseUrl
   private readonly http = inject( HttpClient )
-  private readonly authStatus = inject( AuthService )
+  private readonly authHeaders = inject( AuthHeadersService )
 
   private _selectedItem = signal<Article | null >( null )
   public selectedItem = computed(() => this._selectedItem() )
 
-  private readonly _listOfInvItems = signal<string | null >( null )
+  private readonly _listOfInvItems = signal<Article[] | null >( null )
   public listOfInvItems = computed(() => this._listOfInvItems())
 
   public getInventoryItems( args: Delimiters, subinvId: string ): Observable< any > {
     const url: string = `${ this.baseUrl }/app/inventory`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${ token }`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const params = new HttpParams()
       .set('limit', args.limit)
@@ -42,31 +39,28 @@ export class InvServiceService {
     return this.http.get( url, { headers, params } )
       .pipe(
         map(( resp: any ) => {
-          this._listOfInvItems.set( resp.data )
+          const items = resp?.data?.resp ?? []
+          this._listOfInvItems.set( items as Article[] )
           return resp
         }),
         catchError(( err ) => {
-          throwError(() => err.message )
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
 
-  public getInventoryItemById(id: string): Observable<any> {
+  public getInventoryItemById(id: string | number): Observable<Article> {
     const url = `${this.baseUrl}/app/inventory/${id}`
     
-    const token = this.validateToken()
+    const headers = this.authHeaders.buildAuthHeaders()
 
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${ token }`)
-
-    return this.http.get(url, { headers }).pipe(
-      map((resp: any) => {
+    return this.http.get<{ data: Article }>(url, { headers }).pipe(
+      map((resp: { data: Article }) => {
         this._selectedItem.set( resp.data )
         return resp.data
       }),
       catchError((err) => {
-        return throwError(() => err.message)
+        return throwError(() => err?.error?.message ?? err?.message)
       })
     )
   }
@@ -75,17 +69,14 @@ export class InvServiceService {
     
     const url = `${this.baseUrl}/app/inventory/transfer`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${ token }`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     const body = params
 
     return this.http.post(url, body, { headers }).pipe(
       map((resp: any) => resp),
       catchError((err) => {
-        return throwError(() => err.message)
+        return throwError(() => err?.error?.message ?? err?.message)
       })
     )
   }
@@ -93,16 +84,13 @@ export class InvServiceService {
   public saveArticle( params: Record< string, any>): Observable<any> {
     const url = `${this.baseUrl}/app/inventory/new-item`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${ token }`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.post(url, params, { headers })
       .pipe(
         map( resp => resp),
         catchError( err => {
-          return throwError(() => err.message )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
 
       )
@@ -111,24 +99,16 @@ export class InvServiceService {
   public updArticle( params: Record< string, any>, articId: number): Observable<any> {
     const url = `${this.baseUrl}/app/inventory/edit-item/${articId}`
     
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${ token }`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.patch(url, params, { headers })
       .pipe(
         map( resp => resp),
         catchError( err => {
-          return throwError(() => err.message )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
 
       )
   }
 
-  private validateToken(): string | null {
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
-    return token
-  }
 }

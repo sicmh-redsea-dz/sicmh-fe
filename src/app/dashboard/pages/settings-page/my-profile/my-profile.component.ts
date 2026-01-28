@@ -1,12 +1,13 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-my-profile',
   templateUrl: './my-profile.component.html',
   styleUrl: './my-profile.component.css'
 })
-export class MyProfileComponent {
+export class MyProfileComponent implements OnInit {
   
   profileForm!: FormGroup;
   userImageUrl: string | null = null;
@@ -15,8 +16,8 @@ export class MyProfileComponent {
 
   ngOnInit(): void {
     this.profileForm = this.fb.group({
-      username: ['Juan Pérez'],
-      email: ['juan@example.com'],
+      username: [''],
+      email: [''],
       language: ['es'],
       theme: ['light']
     });
@@ -36,17 +37,7 @@ export class MyProfileComponent {
   }
 
   saveProfile(): void {
-    const { username, email, language, theme } = this.profileForm.value;
-
-    console.log('Datos guardados:', {
-      username,
-      email,
-      image: this.userImageUrl,
-      language,
-      theme
-    });
-
-    alert('Cambios guardados con éxito');
+    Swal.fire('Éxito', 'Cambios guardados con éxito', 'success');
   }
 
   toggleTheme(): void {

@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { sidebarItmes } from '../../helpers/sidebar-items/sidebar-items.helper';
+import { sidebarItems } from '../../helpers/sidebar-items/sidebar-items.helper';
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { AuthService } from '../../../auth/services/auth.service';
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
- public items = sidebarItmes
+ public items = sidebarItems
  public toggledStates:boolean[] = []
  public toggledSidebar:boolean = false
  private authService = inject( AuthService )
@@ -21,7 +21,7 @@ export class SidebarComponent {
   public get user() {
     return {
       name: this.userSignal()?.name,
-      role: this.userSignal()?.roles[0]
+      role: this.userSignal()?.roles?.[0] ?? ''
     }
   }
 

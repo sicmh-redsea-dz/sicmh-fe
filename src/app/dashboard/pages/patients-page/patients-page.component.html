@@ -32,7 +32,7 @@
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts 
               (editEvent)="handleSelectedPatient(patient.id)"
-              (deleteEvent)="deleteSelectedVisit( patient.id )"
+              (deleteEvent)="deleteSelectedPatient( patient.id )"
             />
           </td>
         </tr>

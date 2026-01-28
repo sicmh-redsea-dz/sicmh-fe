@@ -1,0 +1,41 @@
+<div class="opts">
+    <div class="opts-toggle">
+        <i class="ph ph-dots-three-vertical"></i>
+        <div class="opts-menu" >
+            @if( showTransferOpt ) {
+                <div 
+                    class="opts-btns"
+                    (click)="execTransferEvent()"
+                    (keypress)="execTransferEvent()"
+                >
+                    <i class="ph ph-monitor"></i> Traspaso
+                </div>
+            }
+
+            @if ( showEditOpt ) {
+                <div 
+                    class="opts-btns"
+                    [ngClass]="{ 'blocked': isEditBlocked }" 
+                    (click)="!isEditBlocked && execEditEvent()"
+                    (keypress)="!isEditBlocked && execEditEvent()"
+                >
+                    <i class="ph ph-pencil-simple"></i> Editar
+                </div>
+            }
+
+            @if ( showDeleteOpt ) {
+                @if ( showEditOpt ) {
+                    <div class="opts-divider"></div>
+                }
+
+                <div 
+                    class="opts-btns delete" 
+                    (click)="execDeleteEvent()"
+                    (keypress)="execDeleteEvent()"
+                >
+                    <i class="ph ph-trash-simple"></i> Eliminar
+                </div>
+            }
+        </div>
+    </div>
+</div>

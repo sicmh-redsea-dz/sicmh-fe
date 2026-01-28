@@ -1,14 +1,16 @@
-import { Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, forkJoin, map, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
 import { Stock } from '../../../interface/visits-service.interface'
 import Swal from 'sweetalert2';
 
-import { formatNewDate, formatIncomingData } from '../../../helpers/dateFormatters';
+import { formatNewDate, formatIncomingData } from '../../../../shared/utils/date-formatters';
 import { ShortPatient } from '../../../interface/patients-response.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { pressureValidator } from '../../../helpers/visits-form/visits-form-page.helper';
 
 type StockItemPayload = {
   id: number
@@ -31,13 +33,20 @@ export class VisitsFormPageV2Component implements OnInit {
   public subtitle = ''
   public caller = ''
   public actionButtonText = ''
-  public visitId = ''
+  public origin = 'emergency'
+  public stockSearchId = 2
+  public includeSubinventoryInPayload = true
+  public payloadSubinventoryId = 2
+  public titleNew = 'Registro de emergencia'
+  public subtitleNew = 'Agrega los detalles de emergencia médica.'
+  public titleEdit = 'Editar emergencia'
+  public subtitleEdit = 'Actualiza los detalles de emergencia médica.'
   private router = inject( Router )
   private fb = inject( FormBuilder )
   public visitsService = inject( VisitsService )
-  private activateRoute = inject( ActivatedRoute )
+  private route = inject( ActivatedRoute )
+  private destroyRef = inject( DestroyRef )
 
-  public bmiDisabled = true;
   public selectedStockItems: Stock[] = []
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
   public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
@@ -47,7 +56,7 @@ export class VisitsFormPageV2Component implements OnInit {
     doctor      : ['', [Validators.required]],
     date        : ['', [Validators.required]],
     notes       : ['', []],
-    pressure    : ['', [Validators.required]],
+    pressure    : ['', [Validators.required, pressureValidator()]],
     oxygenation : ['', [Validators.required]],
     temperature : ['', [Validators.required]],
     glucometry  : ['', [Validators.required]],
@@ -63,7 +72,7 @@ export class VisitsFormPageV2Component implements OnInit {
   public selectedPatient: ShortPatient | null = null
 
   public searchDocResults: Doctor[] = []
-  public searchPatResults: Doctor[] = []
+  public searchPatResults: ShortPatient[] = []
 
   public isDocLoading: boolean = false
   public isPatLoading: boolean = false
@@ -71,9 +80,39 @@ export class VisitsFormPageV2Component implements OnInit {
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
 
-  constructor( private route: ActivatedRoute ) {}
-
   ngOnInit(): void {
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+      const {
+        origin,
+        stockSearchId,
+        includeSubinventoryInPayload,
+        payloadSubinventoryId,
+        titleNew,
+        subtitleNew,
+        titleEdit,
+        subtitleEdit,
+      } = data;
+
+      if (origin) this.origin = origin;
+      if (stockSearchId) this.stockSearchId = stockSearchId;
+      if (includeSubinventoryInPayload !== undefined) this.includeSubinventoryInPayload = includeSubinventoryInPayload;
+      if (payloadSubinventoryId) this.payloadSubinventoryId = payloadSubinventoryId;
+      if (titleNew) this.titleNew = titleNew;
+      if (subtitleNew) this.subtitleNew = subtitleNew;
+      if (titleEdit) this.titleEdit = titleEdit;
+      if (subtitleEdit) this.subtitleEdit = subtitleEdit;
+
+      if ( this.stockSearchId ) {
+        this.visitsService.searchStockItems( this.stockSearchId )
+          .subscribe({
+            error: ( err ) => {
+              console.error('Error calling stock items', err)
+            }
+          })
+      }
+    })
 
     this.doctorSearchControl.valueChanges.pipe(
       debounceTime( 600 ),
@@ -91,7 +130,8 @@ export class VisitsFormPageV2Component implements OnInit {
         this.searchDocResults = []
         
       }),
-      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() ))
+      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() )),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
         this.searchDocResults = results
@@ -118,7 +158,8 @@ export class VisitsFormPageV2Component implements OnInit {
         this.searchPatResults = []
         
       }),
-      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() ))
+      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() )),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
         this.searchPatResults = results
@@ -129,38 +170,35 @@ export class VisitsFormPageV2Component implements OnInit {
       }
     })
 
-
-    // this.visitId = this.route.snapshot.paramMap.get('id') || ''
-    this.route.paramMap.subscribe( params => {
-      const id = params.get('id')
-      if ( !id ) return
-      this.handleSelectedVisit( +id )
-    })
-
-    this.visitsService.searchStockItems( 2 )
-      .subscribe({
-        error: ( err ) => {
-          console.log('Error calling stock items in emergency')
-        }
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe( params => {
+        const id = params.get('id')
+        if ( !id ) return
+        this.handleSelectedVisit( +id )
       })
 
 
-    this.activateRoute.url
+    this.route.url
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((segments) => {
         const firstSegment = segments[0]?.path;
 
         if (firstSegment === 'new-visit') {
           this.caller = 'nv'
-          this.title = 'Registro de emergencia'
-          this.subtitle = 'Agrega los detalles de emergencia médica.'
+          this.title = this.titleNew
+          this.subtitle = this.subtitleNew
           this.actionButtonText = 'Guardar'
           this.visitForm.reset()
           this.doctorSearchControl.reset()
           this.patientSearchControl.reset()
+          this.selectedStockItems = []
+          this.stockItemsArray.clear()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else if (firstSegment) {
-          this.title = 'Editar emergencia'
-          this.subtitle = 'Actualiza los detalles de emergencia médica.'
+          this.caller = 'ev'
+          this.title = this.titleEdit
+          this.subtitle = this.subtitleEdit
           this.actionButtonText = 'Actualizar'
         }
       })
@@ -217,17 +255,17 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisitWithStock) {
-    const DEFAULT_SUBINVENTORY_ID = 2
-
-    const payload: FormVisitWithStock = {
-      ...visit,
-      stockItems: visit.stockItems?.map(item => ({
-        ...item,
-        subinventoryId: DEFAULT_SUBINVENTORY_ID
-      })) ?? []
-    }
+    const payload: FormVisitWithStock = this.includeSubinventoryInPayload
+      ? {
+        ...visit,
+        stockItems: visit.stockItems?.map(item => ({
+          ...item,
+          subinventoryId: this.payloadSubinventoryId
+        })) ?? []
+      }
+      : visit
     
-    this.visitsService.createVisit( payload, 'emergency' )
+    this.visitsService.createVisit( payload, this.origin )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
@@ -268,16 +306,25 @@ export class VisitsFormPageV2Component implements OnInit {
 
           this.initializeAutocompleteValues()
 
-          if( visit.usedInventory.length > 0 ) {
-            visit.usedInventory.map(( uv ) => {
-              this.selectedStockItems.push({...this.listOfStockItems()!.find( i => i.id === uv.stockId )!, currentQuantity: uv.stockQty})
-            })
+          this.selectedStockItems = []
+          this.stockItemsArray.clear()
 
+          if( visit.usedInventory.length > 0 ) {
+            const stockItems = this.listOfStockItems() ?? []
+            visit.usedInventory.forEach(( uv ) => {
+              const matched = stockItems.find( i => i.id === uv.stockId )
+              if ( matched ) {
+                this.selectedStockItems.push({
+                  ...matched,
+                  currentQuantity: uv.stockQty
+                })
+              }
+            })
           }
           
         },
         error: ( err ) => {
-          console.error('Error al obtener los datos de la visita:', err);
+          Swal.fire('Error', err, 'error')
         }
       })
   }
@@ -330,13 +377,17 @@ export class VisitsFormPageV2Component implements OnInit {
   public handleChange(event: any) {
     const { target } = event
     const value = target.value
+    const stockItems = this.listOfStockItems() ?? []
     if (this.selectedStockItems.length === 0){
-      const existingItem = this.listOfStockItems()!.find((item: any) => item.id === parseInt(value));
+      const existingItem = stockItems.find((item: any) => item.id === parseInt(value));
       if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
     } 
     else {
       const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
-      if (!existingItem) this.selectedStockItems.push({...this.listOfStockItems()!.find((item: any) => item.id === parseInt(value))!, currentQuantity: 1})
+      if (!existingItem) {
+        const matched = stockItems.find((item: any) => item.id === parseInt(value))
+        if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
+      }
     }
     this.loadDataOfStockArray()
   }
@@ -359,17 +410,4 @@ export class VisitsFormPageV2Component implements OnInit {
     })
   }
 
-  private calculateBMI(): void {
-    const weight = this.visitForm.get('weight')?.value
-    const height = this.visitForm.get('height')?.value
-    if (weight && height) {
-      const heightInMeters = height / 100
-      const bmi = weight / (heightInMeters * heightInMeters)
-      this.visitForm.get('BMI')?.setValue(bmi.toFixed(2).toString())
-      this.bmiDisabled = false
-    } else {
-      this.visitForm.get('BMI')?.setValue('')
-      this.bmiDisabled = true
-    }
-  }
 }

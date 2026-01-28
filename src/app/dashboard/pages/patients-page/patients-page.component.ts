@@ -1,9 +1,10 @@
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { Patient } from '../../interface/patients-response.interface';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-patients',
@@ -22,12 +23,14 @@ export class PatientsPageComponent {
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
   private searchTermSubject = new Subject<string>()
+  private destroyRef = inject(DestroyRef)
   
   constructor() {
     this.searchTermSubject
       .pipe(
         debounceTime( 700 ),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
       ).subscribe(( term: string ) => {
         this.getPatients( term )
       })
@@ -35,12 +38,15 @@ export class PatientsPageComponent {
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
+    this.currentPage = 1
+    this.offset = 0
     this.searchTermSubject.next( term )
   }
 
   public getPatients( searchTerm?: string ) {
+    const search = (searchTerm ?? this.searchTerm).trim()
 
-    if ( !searchTerm ) {
+    if ( !search ) {
       this.patients = []
       this.totalRegistries = 0
       return
@@ -49,7 +55,7 @@ export class PatientsPageComponent {
     this.patientService.getPatients({ 
       limit: this.limit, 
       offset: this.offset,
-      term: searchTerm ? searchTerm.trim() : ''
+      term: search
     })
       .subscribe({
         next: ( response ) => {
@@ -77,12 +83,12 @@ export class PatientsPageComponent {
           return this.router.navigateByUrl(`dashboard/patients/${id.toString()}`)
         }, 
         error: (err) => {
-          console.error('Error al obtener los datos del paciente:', err);
+          Swal.fire('Error', err, 'error')
         }
       })
   }
 
-  public deleteSelectedVisit(id: number) {
+  public deleteSelectedPatient(id: number) {
     Swal.fire({
       title: 'Estas seguro?',
       text: 'Esta acción no se puede revertir.',
@@ -115,7 +121,7 @@ export class PatientsPageComponent {
           if( result ) this.getPatients()
         },
         error:( err ) => {
-          console.error('Error al eliminar el paciente seleccionado:', err);
+          Swal.fire('Error', err, 'error')
         }
       })
   }

@@ -12,11 +12,6 @@ import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-fo
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
-import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
-import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
-import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
-import { VisitsV2HFormPageComponent } from './pages/visits-v2-h-form-page/visits-v2-h-form-page.component';
-import { VisitsV2OrFormPageComponent } from './pages/visits-v2-or-form-page/visits-v2-or-form-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 
 const routes: Routes = [
@@ -39,8 +34,34 @@ const routes: Routes = [
       {
         path: 'o-room',
         children: [
-          { path: 'new-visit', component: VisitsV2OrFormPageComponent },
-          { path: 'edit-visit/:id', component: VisitsV2OrFormPageComponent }
+          { 
+            path: 'new-visit', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'oroom',
+              stockSearchId: 3,
+              includeSubinventoryInPayload: false,
+              payloadSubinventoryId: 3,
+              titleNew: 'Registro de quirofano',
+              subtitleNew: 'Agrega los detalles de quirofano.',
+              titleEdit: 'Editar quirofano',
+              subtitleEdit: 'Actualiza los detalles de quirofano.'
+            }
+          },
+          { 
+            path: 'edit-visit/:id', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'oroom',
+              stockSearchId: 3,
+              includeSubinventoryInPayload: false,
+              payloadSubinventoryId: 3,
+              titleNew: 'Registro de quirofano',
+              subtitleNew: 'Agrega los detalles de quirofano.',
+              titleEdit: 'Editar quirofano',
+              subtitleEdit: 'Actualiza los detalles de quirofano.'
+            }
+          }
         ]
       },
 
@@ -48,8 +69,34 @@ const routes: Routes = [
       {
         path: 'hospitalization',
         children: [
-          { path: 'new-visit', component: VisitsV2HFormPageComponent },
-          { path: 'edit-visit/:id', component: VisitsV2HFormPageComponent }
+          { 
+            path: 'new-visit', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'hospitalization',
+              stockSearchId: 4,
+              includeSubinventoryInPayload: false,
+              payloadSubinventoryId: 4,
+              titleNew: 'Registro de hospitalización',
+              subtitleNew: 'Agrega los detalles de hospitalización.',
+              titleEdit: 'Editar hospitalización',
+              subtitleEdit: 'Actualiza los detalles de hospitalización.'
+            }
+          },
+          { 
+            path: 'edit-visit/:id', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'hospitalization',
+              stockSearchId: 4,
+              includeSubinventoryInPayload: false,
+              payloadSubinventoryId: 4,
+              titleNew: 'Registro de hospitalización',
+              subtitleNew: 'Agrega los detalles de hospitalización.',
+              titleEdit: 'Editar hospitalización',
+              subtitleEdit: 'Actualiza los detalles de hospitalización.'
+            }
+          }
         ]
       },
 
@@ -57,8 +104,34 @@ const routes: Routes = [
       {
         path: 'emergency',
         children: [
-          { path: 'edit-visit/:id', component: VisitsFormPageV2Component },
-          { path: 'new-visit', component: VisitsFormPageV2Component },
+          { 
+            path: 'edit-visit/:id', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'emergency',
+              stockSearchId: 2,
+              includeSubinventoryInPayload: true,
+              payloadSubinventoryId: 2,
+              titleNew: 'Registro de emergencia',
+              subtitleNew: 'Agrega los detalles de emergencia médica.',
+              titleEdit: 'Editar emergencia',
+              subtitleEdit: 'Actualiza los detalles de emergencia médica.'
+            }
+          },
+          { 
+            path: 'new-visit', 
+            component: VisitsFormPageV2Component,
+            data: {
+              origin: 'emergency',
+              stockSearchId: 2,
+              includeSubinventoryInPayload: true,
+              payloadSubinventoryId: 2,
+              titleNew: 'Registro de emergencia',
+              subtitleNew: 'Agrega los detalles de emergencia médica.',
+              titleEdit: 'Editar emergencia',
+              subtitleEdit: 'Actualiza los detalles de emergencia médica.'
+            }
+          },
         ]
       },
 
@@ -76,12 +149,56 @@ const routes: Routes = [
       { 
         path: 'inventory',
         children: [
-          { path: 'products', component: InventoryPageComponent },
+          { 
+            path: 'products', 
+            component: InventoryPageComponent,
+            data: {
+              headerText: 'Inventario General',
+              subinventoryId: '1',
+              showCreateButton: true,
+              showTransferOpt: true,
+              enableEdit: true,
+              enableDelete: false
+            }
+          },
           { path: 'products/new-item', component: InventoryFormPageComponent},
           { path: 'products/edit-item/:id', component: InventoryFormPageComponent},
-          { path: 'products-sub1', component: SubinvOnePageComponent },
-          { path: 'products-sub2', component: SubinvTwoPageComponent },
-          { path: 'products-sub3', component: SubinvThreePageComponent }
+          { 
+            path: 'products-sub1', 
+            component: InventoryPageComponent,
+            data: {
+              headerText: 'Subinventario de Emergencia',
+              subinventoryId: '2',
+              showCreateButton: false,
+              showTransferOpt: false,
+              enableEdit: false,
+              enableDelete: false
+            }
+          },
+          { 
+            path: 'products-sub2', 
+            component: InventoryPageComponent,
+            data: {
+              headerText: 'Subinventario de Quirofano',
+              subinventoryId: '3',
+              showCreateButton: false,
+              showTransferOpt: false,
+              enableEdit: false,
+              enableDelete: false
+            }
+          },
+          { 
+            path: 'products-sub3', 
+            component: InventoryPageComponent,
+            data: {
+              headerText: 'Subinventario de Hospitalización',
+              subinventoryId: '4',
+              showCreateButton: false,
+              showTransferOpt: false,
+              enableEdit: false,
+              enableDelete: false
+            }
+          }
         ]
         
       },

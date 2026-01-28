@@ -19,6 +19,7 @@ export interface SimpleVisit {
     patientId:     string
     lastVisitDate: Date
     diagnosis:     null | string
+    state?:        string
 }
 
 export interface Staff {

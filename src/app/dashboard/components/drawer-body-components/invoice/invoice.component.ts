@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DrawerService } from '../../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../../interface/drawer-content.enum';
-import { formatIncomingData, formatNewDate } from '../../../helpers/dateFormatters';
+import { formatIncomingData, formatNewDate } from '../../../../shared/utils/date-formatters';
 
 interface Options {
   patients: any[]
@@ -106,7 +106,8 @@ export class InvoiceComponent implements OnInit {
   public handleChange(event: any) {
     const name = event.target.name
     const value = event.target.value
-    const selectedOption: any[] = this.options[name as keyof typeof Option]
+    const key = name as keyof Options
+    const selectedOption: any[] = this.options[key] ?? []
     const selectedItem = selectedOption.find((item) => item.id === parseInt(value))
     if(this.selectedServices.find((item) => item.id === parseInt(value))) return
     this.selectedServices.push({description: selectedItem.serviceName, id: selectedItem.id, price: selectedItem.servicePrice, desc: selectedItem.serviceDescription})

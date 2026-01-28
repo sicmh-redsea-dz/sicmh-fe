@@ -1,33 +1,32 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PatientsService } from '../../services/patients-service/patients.service';
 import Swal from 'sweetalert2';
-import { InvServiceService } from '../../services/inventory-service/inv-service.service';
+import { InventoryService } from '../../services/inventory-service/inventory.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inventory-form-page',
   templateUrl: './inventory-form-page.component.html',
   styleUrl: './inventory-form-page.component.css'
 })
-export class InventoryFormPageComponent {
+export class InventoryFormPageComponent implements OnInit {
 public title = ''
   public caller = ''
   public actionButtonText = ''
+  public itemId: number | null = null
   private fb = inject( FormBuilder )
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )
-  private patientService = inject( PatientsService )
-  private invService = inject( InvServiceService )
-  public selectedItem = computed(() => this.invService.selectedItem())
-  public selectedUser = computed(() => this.patientService.selectedPatient() )
+  private invService = inject( InventoryService )
+  private destroyRef = inject( DestroyRef )
   
   public articleForm: FormGroup = this.fb.group({
-    prodDesc      : [this.caller !== 'np' ? this.selectedItem()?.prodDesc : '', []],
-    prodMinStock  : [this.caller !== 'np' ? this.selectedItem()?.prodMinStock : '', []],
-    prodName      : [this.caller !== 'np' ?this.selectedItem()?.prodName : '', [Validators.required, Validators.maxLength(20)]],
-    prodQty       : [this.caller !== 'np' ? this.selectedItem()?.prodQuantity || '' : '', [Validators.required]],
-    prodUnitPrice : [this.caller !== 'np' ? this.selectedItem()?.prodUnitPrice : '', [Validators.required]],
+    prodDesc      : ['', []],
+    prodMinStock  : ['', []],
+    prodName      : ['', [Validators.required, Validators.maxLength(20)]],
+    prodQty       : ['', [Validators.required]],
+    prodUnitPrice : ['', [Validators.required]],
   })
 
   public set frameTitle(v: string) {
@@ -42,12 +41,25 @@ public title = ''
       this.actionButtonText = 'Guardar';
       this.articleForm.reset();
     } else {
+      this.caller = 'ep';
       this.frameTitle = 'Editar articulo';
       this.actionButtonText = 'Actualizar';
+      this.activeRoute.paramMap
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((params) => {
+          const id = params.get('id');
+          if (id) {
+            this.loadItem(id);
+          }
+        })
     }
   }
 
   public onHandleSubmit() {
+    if (this.articleForm.invalid) {
+      this.articleForm.markAllAsTouched()
+      return
+    }
     const article = this.articleForm.value
     this.caller === 'np'
     ? this.handleCreateArticle( article )
@@ -55,16 +67,17 @@ public title = ''
   }
 
   private handleEditArticle( article: any ) {
-    this.invService.updArticle(article, this.selectedItem()!.id)
+    if (this.itemId === null) return
+    this.invService.updArticle(article, this.itemId)
       .subscribe({
         next: () => {
             Swal.fire('Success', `Article has been edited!`, 'success')
               .then(() => {
-                this.router.navigateByUrl('/dashboard/patients')
+                this.router.navigateByUrl('/dashboard/inventory/products')
               })
         },
         error: ( error ) => {
-          Swal.fire('Error', error.message, 'error')
+          Swal.fire('Error', error, 'error')
         },
       })
   }
@@ -77,13 +90,32 @@ public title = ''
             const { prodName } = item?.data
             Swal.fire('Success', `${prodName} has been added!`, 'success')
               .then(() => {
-                this.router.navigateByUrl('/dashboard/patients')
+                this.router.navigateByUrl('/dashboard/inventory/products')
               })
           }
         },
         error: (message) => {
           Swal.fire('Error', message, 'error')
         },
+      })
+  }
+
+  private loadItem(id: string) {
+    this.invService.getInventoryItemById(id)
+      .subscribe({
+        next: ( item ) => {
+          this.itemId = item.id
+          this.articleForm.patchValue({
+            prodDesc: item.prodDesc,
+            prodMinStock: item.prodMinStock,
+            prodName: item.prodName,
+            prodQty: item.prodQuantity,
+            prodUnitPrice: item.prodUnitPrice,
+          })
+        },
+        error: ( err ) => {
+          Swal.fire('Error', err, 'error')
+        }
       })
   }
 }

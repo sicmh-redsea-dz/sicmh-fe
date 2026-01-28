@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { InvServiceService } from '../../services/inventory-service/inv-service.service';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { InventoryService } from '../../services/inventory-service/inventory.service';
 import Swal from 'sweetalert2';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
-import { Router } from '@angular/router';
+import { Article } from '../../interface/article.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inventory-page',
@@ -29,34 +31,63 @@ export class InventoryPageComponent implements OnInit {
   public drawerParams = inject( DrawerService )
   private readonly searchTermSubject = new Subject<string>()
   private router = inject(Router)
-  public bodyContent: any[] = []
-  private readonly invService = inject( InvServiceService )
+  private route = inject(ActivatedRoute)
+  public bodyContent: Article[] = []
+  private readonly invService = inject( InventoryService )
+  public headerText: string = 'Inventario General'
+  public subinventoryId: string = '1'
+  public showCreateButton: boolean = true
+  public showTransferOpt: boolean = true
+  public enableEdit: boolean = true
+  public enableDelete: boolean = false
+  private destroyRef = inject(DestroyRef)
 
   constructor() {
     this.searchTermSubject.pipe(
       debounceTime( 700 ),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(( term: string) => {
       this.getInventoryItems( term )
     })
   }
 
   ngOnInit(): void {
-    this.getInventoryItems()
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+      const {
+        headerText,
+        subinventoryId,
+        showCreateButton,
+        showTransferOpt,
+        enableEdit,
+        enableDelete,
+      } = data;
+
+      if (headerText) this.headerText = headerText;
+      if (subinventoryId) this.subinventoryId = subinventoryId;
+      if (showCreateButton !== undefined) this.showCreateButton = showCreateButton;
+      if (showTransferOpt !== undefined) this.showTransferOpt = showTransferOpt;
+      if (enableEdit !== undefined) this.enableEdit = enableEdit;
+      if (enableDelete !== undefined) this.enableDelete = enableDelete;
+
+      this.currentPage = 1
+      this.offset = 0
+      this.getInventoryItems()
+    })
   }
 
-  public some() {}
-
-  public handleSelectedItem( itemId: string ) {
+  public handleSelectedItem( itemId: number | string ) {
+    if ( !this.enableEdit ) return
     this.invService.getInventoryItemById( itemId )
       .subscribe({
         next: ( item ) => {
-          console.log(' the item :::: ', item)
           const { id } = item
           return this.router.navigateByUrl(`/dashboard/inventory/products/edit-item/${String( id )}`)
         },
         error: ( err ) => {
-          console.error('Error al obtener los datos del articulo:', err)
+          Swal.fire('Error', err, 'error')
         }
       })
   }
@@ -68,12 +99,12 @@ export class InventoryPageComponent implements OnInit {
       limit: this.limit,
       offset: this.offset,
       term: search
-    }, '1'
+    }, this.subinventoryId
     ).subscribe({
       next: ( response ) => {
         const { data } = response
         const { resp, totalRegistries } = data
-        this.bodyContent = resp
+        this.bodyContent = resp as Article[]
         this.totalPages = Math.ceil((totalRegistries) / this.limit )
         this.totalRegistries = totalRegistries
       },
@@ -83,9 +114,10 @@ export class InventoryPageComponent implements OnInit {
     })
   }
 
-  bootstrapInvoiceDrawer( itemId?: string ) {
+  bootstrapInvoiceDrawer( itemId?: number | string ) {
+    if ( !this.showTransferOpt ) return
     if( itemId )
-      this.drawerParams.setInvoiceId.set( itemId )
+      this.drawerParams.setInvoiceId.set( String( itemId ) )
     
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.TRANSFER )
@@ -98,6 +130,8 @@ export class InventoryPageComponent implements OnInit {
 
   public onSearchTermChange( term: string ) {
     this.searchTerm = term
+    this.currentPage = 1
+    this.offset = 0
     this.searchTermSubject.next( term )
   }
 
@@ -105,5 +139,9 @@ export class InventoryPageComponent implements OnInit {
     this.currentPage = page
     this.offset = (this.currentPage - 1) * this.limit
     this.getInventoryItems()
+  }
+
+  public handleDeleteItem() {
+    if ( !this.enableDelete ) return
   }
 }

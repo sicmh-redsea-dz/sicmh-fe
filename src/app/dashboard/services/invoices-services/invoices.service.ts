@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
-import { AuthService } from '../../../auth/services/auth.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { catchError, map, Observable, throwError } from 'rxjs';
+import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { Invoice, InvoiceForm } from '../../interface/invoice-response.interface';
 
 interface Delimiters {
@@ -17,7 +17,7 @@ interface Delimiters {
 export class InvoicesService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )
-  private authStatus = inject( AuthService )
+  private authHeaders = inject( AuthHeadersService )
 
   private _listOfInvoices = signal<Invoice[] | null>( null )
   public listOfInvoices = computed(() => this._listOfInvoices())
@@ -25,10 +25,7 @@ export class InvoicesService {
   public getInvoices(args: Delimiters): Observable<any> {
     const url: string = `${this.baseUrl}/app/invoice`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
     
     const params = new HttpParams()
       .set('limit', args.limit)
@@ -42,8 +39,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          throwError(() => err.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -51,10 +47,7 @@ export class InvoicesService {
   public getOneInvoice(invoiceId: string): Observable<any | null> {
     const url: string = `${this.baseUrl}/app/invoice/${invoiceId}`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.get(url, { headers })
       .pipe(
@@ -62,8 +55,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          throwError(() => err.message )
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -71,10 +63,7 @@ export class InvoicesService {
   public getDataForInvoice(): Observable<any | null> {
     const url: string = `${this.baseUrl}/app/invoice/raw`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
     
     return this.http.get( url, { headers })
       .pipe(
@@ -82,8 +71,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          throwError(() => err.message)
-          return of( null )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -92,10 +80,7 @@ export class InvoicesService {
     const url: string = `${this.baseUrl}/app/invoice/create`
     const body = {...invoiceForm, origin: true}
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.post(url, body, { headers })
       .pipe(
@@ -103,8 +88,7 @@ export class InvoicesService {
           return true
         }),
         catchError(( err ) => {
-          throwError(() => err.message)
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -113,20 +97,15 @@ export class InvoicesService {
     const url = `${this.baseUrl}/app/invoice/${id}`
     const body = {...invoiceForm}
 
-    const token = this.validateToken()
-    
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
       
     return this.http.patch(url, body, { headers })
       .pipe(
         map((item) => {
-          console.log('updated item: ', item)
           return true
         }),
         catchError(( err ) => {
-          throwError(() => err.message)
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -134,17 +113,13 @@ export class InvoicesService {
   public deleteInvoice(id: string): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/invoice/${id}`
 
-    const token = this.validateToken()
-
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
+    const headers = this.authHeaders.buildAuthHeaders()
 
     return this.http.delete(url, { headers })
       .pipe(
         map(() => true),
         catchError((err) => {
-          throwError(() => err.message)
-          return of( false )
+          return throwError(() => err?.error?.message ?? err?.message)
         })
       )
   }
@@ -152,17 +127,9 @@ export class InvoicesService {
   public downloadPDFReport( term: string ): Observable<any> {
     const url: string = `${this.baseUrl}/app/invoice/generate-pdf/${term}`
 
-    const token = this.validateToken()
+    const headers = this.authHeaders.buildAuthHeaders()
 
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${token}`)
-
-    return this.http.get(url, { headers, responseType: 'blob'});
+    return this.http.get(url, { headers, responseType: 'blob' });
   }
 
-  private validateToken(): string | null {
-    const token = localStorage.getItem('token')
-    if( !token ) this.authStatus.logout()
-    return token
-  }
 }

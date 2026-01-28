@@ -1,14 +1,16 @@
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, computed, inject, OnDestroy, OnInit, } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
-import { formatIncomingData, formatNewDate } from '../../helpers/dateFormatters';
+import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
 import { Staff } from '../../interface/visits-service.interface';
 import { ShortPatient } from '../../interface/patients-response.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { pressureValidator } from '../../helpers/visits-form/visits-form-page.helper';
 
 @Component({
   selector: 'app-visits-form-page',
@@ -24,9 +26,9 @@ export class VisitsFormPageComponent implements OnInit {
   private router = inject( Router )
   private fb = inject( FormBuilder )
   public visitsService = inject( VisitsService )
-  private activateRoute = inject( ActivatedRoute )
+  private route = inject( ActivatedRoute )
+  private destroyRef = inject( DestroyRef )
 
-  public bmiDisabled = true;
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
 
   public visitForm: FormGroup = this.fb.group({
@@ -41,7 +43,7 @@ export class VisitsFormPageComponent implements OnInit {
     notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: ''],
     oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation: '', [Validators.required]],
     patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patientId: '', [Validators.required]],
-    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure: '', [Validators.required]],
+    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure: '', [Validators.required, pressureValidator()]],
     temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
     treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
     pathologicalHst: [this.caller !== 'nv' ? this.selectedVisit()?.pathologicalHst: ''],
@@ -59,15 +61,13 @@ export class VisitsFormPageComponent implements OnInit {
   public selectedPatient: ShortPatient | null = null
 
   public searchDocResults: Doctor[] = []
-  public searchPatResults: Doctor[] = []
+  public searchPatResults: ShortPatient[] = []
 
   public isDocLoading: boolean = false
   public isPatLoading: boolean = false
 
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
-
-  constructor( private route: ActivatedRoute ) {}
 
   ngOnInit(): void {
     this.doctorSearchControl.valueChanges.pipe(
@@ -86,7 +86,8 @@ export class VisitsFormPageComponent implements OnInit {
         this.searchDocResults = []
         
       }),
-      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() ))
+      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() )),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
         this.searchDocResults = results
@@ -113,7 +114,8 @@ export class VisitsFormPageComponent implements OnInit {
         this.searchPatResults = []
         
       }),
-      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() ))
+      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() )),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
         this.searchPatResults = results
@@ -124,15 +126,18 @@ export class VisitsFormPageComponent implements OnInit {
       }
     })
 
-    this.route.paramMap.subscribe( params => {
-      const id = params.get('id')
-      if ( !id ) return
-      this.handleSelectedVisit( +id )
-    })
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe( params => {
+        const id = params.get('id')
+        if ( !id ) return
+        this.handleSelectedVisit( +id )
+      })
     
-    this.activateRoute.url
+    this.route.url
       .pipe(
         map((urlSegment) => urlSegment),
+        takeUntilDestroyed(this.destroyRef),
       ).subscribe( segments => {
         let urlSegment = segments[0].path === 'new-visit'
         if( urlSegment ) {
@@ -145,6 +150,7 @@ export class VisitsFormPageComponent implements OnInit {
           this.patientSearchControl.reset();
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
+          this.caller = 'ev'
           this.title = 'Editar consulta externa'
           this.subtitle = 'Actualiza los detalles de la consulta externa.'
           this.actionButtonText = 'Actualizar'
@@ -246,6 +252,9 @@ export class VisitsFormPageComponent implements OnInit {
           })
 
           this.initializeAutocompleteValues()
+        },
+        error: ( err ) => {
+          Swal.fire('Error', err, 'error')
         }
       })
   }
@@ -282,19 +291,5 @@ export class VisitsFormPageComponent implements OnInit {
   compareDoctors = (a: Staff, b: Staff): boolean => {
     return a && b ? a.id === b.id : a === b;
   };
-
-  private calculateBMI(): void {
-    const weight = this.visitForm.get('weight')?.value
-    const height = this.visitForm.get('height')?.value
-    if (weight && height) {
-      const heightInMeters = height / 100
-      const bmi = weight / (heightInMeters * heightInMeters)
-      this.visitForm.get('BMI')?.setValue(bmi.toFixed(2).toString())
-      this.bmiDisabled = false
-    } else {
-      this.visitForm.get('BMI')?.setValue('')
-      this.bmiDisabled = true
-    }
-  }
 
 }

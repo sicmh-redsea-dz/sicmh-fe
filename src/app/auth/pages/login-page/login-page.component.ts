@@ -36,10 +36,10 @@ export class LoginPageComponent {
     try {
       const authenticatedUser = await this.authService.signIn(email, password)
       const idToken = await authenticatedUser.user.getIdToken()
-      console.log('usuario ingreso correctamente con G')
+      
       this.login(idToken)
     } catch ( err ) {
-      console.log('error al ingresar el usuario con G: ', err)
+      Swal.fire('Error', 'No se pudo iniciar sesión', 'error')
     }
   }
 

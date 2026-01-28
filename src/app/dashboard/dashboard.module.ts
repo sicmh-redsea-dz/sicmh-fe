@@ -7,33 +7,21 @@ import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-l
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
-import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
-import { FormatDatePipe } from './pipes/format-date.pipe';
 import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VisitsPageComponent } from './pages/visits-page/visits-page.component';
 import { VisitsFormPageComponent } from './pages/visits-form-page/visits-form-page.component';
-import { SearchBarComponent } from './components/search-bar/search-bar.component';
-import { PaginationComponent } from './components/pagination/pagination.component';
 import { BillingPageComponent } from './pages/billing-page/billing-page.component';
-import { CustomTableComponent } from './components/custom-table/custom-table.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { InvoiceComponent } from './components/drawer-body-components/invoice/invoice.component';
 import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
-import { CustomHeaderComponent } from './components/custom-header/custom-header.component';
-import { NoDataComponent } from './components/no-data/no-data.component';
-import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { TransferComponent } from './components/drawer-body-components/transfers/transfer.component';
-import { SubinvOnePageComponent } from './pages/subinv-one-page/subinv-one-page.component';
-import { SubinvTwoPageComponent } from './pages/subinv-two-page/subinv-two-page.component';
-import { SubinvThreePageComponent } from './pages/subinv-three-page/subinv-three-page.component';
-import { VisitsV2HFormPageComponent } from './pages/visits-v2-h-form-page/visits-v2-h-form-page.component';
-import { VisitsV2OrFormPageComponent } from './pages/visits-v2-or-form-page/visits-v2-or-form-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -42,31 +30,18 @@ import { InventoryFormPageComponent } from './pages/inventory-form-page/inventor
     SidebarComponent,
     PatientsPageComponent,
     DashboardPageComponent,
-    FormatFullnamePipe,
-    FormatDatePipe,
     PatientFormPageComponent,
     VisitsPageComponent,
     VisitsFormPageComponent,
-    SearchBarComponent,
-    PaginationComponent,
     BillingPageComponent,
-    CustomTableComponent,
     DrawerComponent,
     InvoiceComponent,
     SettingsPageComponent,
     VisitsFormPageV2Component,
     MyProfileComponent,
     PermissionsComponent,
-    CustomHeaderComponent,
-    NoDataComponent,
-    ToggleOptsComponent,
     InventoryPageComponent,
     TransferComponent,
-    SubinvOnePageComponent,
-    SubinvTwoPageComponent,
-    SubinvThreePageComponent,
-    VisitsV2HFormPageComponent,
-    VisitsV2OrFormPageComponent,
     InventoryFormPageComponent
   ],
   imports: [
@@ -74,7 +49,8 @@ import { InventoryFormPageComponent } from './pages/inventory-form-page/inventor
     DashboardRoutingModule,
     ReactiveFormsModule,
     FullCalendarModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ]
 })
 export class DashboardModule { }
