@@ -1,10 +1,24 @@
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Component, computed, inject, OnInit, } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { Component, DestroyRef, inject, OnInit, } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { map } from 'rxjs';
+import { filter, map, switchMap, tap } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
-import { FormPatient } from '../../interface/patients-response.interface';
+import { FormPatient, Patient } from '../../interface/patients-response.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+type PatientFormValue = {
+  id: string
+  firstName: string
+  lastName: string
+  birthdate: string
+  gender: string
+  phone: string
+  email: string
+  address: string
+  image: string
+  notes: string
+}
 
 @Component({
   selector: 'app-patient-form-page',
@@ -12,56 +26,54 @@ import { FormPatient } from '../../interface/patients-response.interface';
   styleUrl: './patient-form-page.component.css'
 })
 export class PatientFormPageComponent implements OnInit {
-  public title = ''
-  public caller = ''
-  public actionButtonText = ''
-  private fb = inject( FormBuilder )
+  public title = 'Registro de Pacientes'
+  public actionButtonText = 'Guardar'
+  public isEditMode = false
+  private patientId: number | null = null
+  private fb = inject( FormBuilder ).nonNullable
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )
   private patientService = inject( PatientsService )
-  public selectedUser = computed(() => this.patientService.selectedPatient() )
+  private destroyRef = inject( DestroyRef )
   
-  public patientForm: FormGroup = this.fb.group({
-    id        : [this.caller !== 'np' ?this.selectedUser()?.id : '', [Validators.required, Validators.maxLength(20)]],
-    firstName : [this.caller !== 'np' ? this.selectedUser()?.name : '', [Validators.required, Validators.minLength(2)]],
-    lastName  : [this.caller !== 'np' ? this.selectedUser()?.lastName : '', [Validators.required, Validators.minLength(2)]],
-    birthdate : [this.caller !== 'np' ? this.formatDate(this.selectedUser()?.birthDate) : '', [Validators.required]],
-    gender    : [this.caller !== 'np' ? this.selectedUser()?.gender || '' : '', [Validators.required]],
-    phone     : [this.caller !== 'np' ?this.selectedUser()?.phone : '', [Validators.required, Validators.maxLength(8)]],
-    email     : [this.caller !== 'np' ?this.selectedUser()?.email : '', [Validators.required, Validators.email]],
-    address   : [this.caller !== 'np' ?this.selectedUser()?.address : '', [Validators.required]],
+  public patientForm = this.fb.group({
+    id        : ['', [Validators.required, Validators.maxLength(20)]],
+    firstName : ['', [Validators.required, Validators.minLength(2)]],
+    lastName  : ['', [Validators.required, Validators.minLength(2)]],
+    birthdate : ['', [Validators.required]],
+    gender    : ['', [Validators.required]],
+    phone     : ['', [Validators.required, Validators.maxLength(8)]],
+    email     : ['', [Validators.required, Validators.email]],
+    address   : ['', [Validators.required]],
     image     : [''],
     notes     : ['']
   })
-
-  public set frameTitle(v: string) {
-    this.title = v;
-  }
   
   ngOnInit(): void {
-    this.activeRoute.url
+    this.activeRoute.paramMap
       .pipe(
-        map((urlSegment) => urlSegment),
-      ).subscribe(segments => {
-        let urlSegment = segments[0].path === 'new-patient' ? true : false
-        if(urlSegment) {
-          this.caller = 'np'
-          this.frameTitle = 'Registro de Paciente'
-          this.actionButtonText = 'Guardar'
-          this.patientForm.reset();
-        }
-        else {
-          this.frameTitle = 'Editar Paciente'
-          this.actionButtonText = 'Actualizar'
-        }
+        map((params) => params.get('id')),
+        tap((id) => {
+          if (id)
+            this.setEditMode(Number(id))
+          else
+            this.setCreateMode()
+        }),
+        filter((id): id is string => id !== null),
+        switchMap((id) => this.patientService.getPatient(Number(id))),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((patient) => {
+        if (!patient) return
+        this.patchForm(patient)
       })
   }
 
   public onHandleSubmit() {
-    const patient = this.patientForm.value
-    this.caller === 'np'
-    ? this.handleCreatePatient( patient )
-    : this.handleEditPatient( patient )
+    const patient: PatientFormValue = this.patientForm.getRawValue()
+    this.isEditMode
+      ? this.handleEditPatient(patient, this.patientId)
+      : this.handleCreatePatient(patient)
   }
 
   private formatDate( dateString: string | undefined ): string {
@@ -70,8 +82,37 @@ export class PatientFormPageComponent implements OnInit {
     return date.toISOString().split('T')[0]
   }
 
-  private handleEditPatient( patient: FormPatient ) {
-    this.patientService.editPatient(patient, this.selectedUser()!.id)
+  private setEditMode(id: number) {
+    this.isEditMode = true
+    this.patientId = Number.isNaN(id) ? null : id
+    this.title = 'Editar Paciente'
+    this.actionButtonText = 'Actualizar'
+  }
+
+  private setCreateMode() {
+    this.isEditMode = false
+    this.patientId = null
+    this.title = 'Registro de Pacientes'
+    this.actionButtonText = 'Guardar'
+    this.patientForm.reset()
+  }
+
+  private patchForm(patient: Patient) {
+    this.patientForm.patchValue({
+      id: patient.idNumber,
+      firstName: patient.name,
+      lastName: patient.lastName,
+      birthdate: this.formatDate(patient.birthDate),
+      gender: patient.gender,
+      phone: patient.phone,
+      email: patient.email,
+      address: patient.address
+    })
+  }
+
+  private handleEditPatient( patient: FormPatient, patientId: number | null ) {
+    if (patientId === null) return
+    this.patientService.editPatient(patient, patientId)
       .subscribe({
         next: (editedUser) => {
           if( editedUser ) {
