@@ -117,7 +117,7 @@ export class AuthService {
     const token = localStorage.getItem('token')
     
     if( !token ){
-      this.logout()
+      this.clearAuthState()
       return of(false)
     } 
 
@@ -136,8 +136,7 @@ export class AuthService {
           )
         }),
         catchError(() => {
-          this._currentUser.set(null)
-          this._authStatus.set(AuthStatus.notAuthenticated)
+          this.clearAuthState()
           return of(false)
         })
       )
@@ -152,15 +151,17 @@ export class AuthService {
     );
   }
 
+  private clearAuthState(): void {
+    localStorage.removeItem('token')
+    this._currentUser.set(null)
+    this._authStatus.set(AuthStatus.notAuthenticated)
+  }
+
   logout() {
+    this.clearAuthState()
     this._auth.signOut()
       .catch( error => {
         console.error('Error al cerrar sesión: ', error)
-      })
-      .finally(() => {
-        localStorage.removeItem('token')
-        this._currentUser.set(null)
-        this._authStatus.set(AuthStatus.notAuthenticated)
       })
   }
 }
