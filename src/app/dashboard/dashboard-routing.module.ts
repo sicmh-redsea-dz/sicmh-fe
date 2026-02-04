@@ -20,20 +20,19 @@ const routes: Routes = [
     component: DashboardLayoutComponent,
     children: [
       { path: 'main', component: DashboardPageComponent },
-      { path: 'patients', component: PatientsPageComponent },
       {
         path: 'patients',
         children: [
-          { path: ':id', component: PatientFormPageComponent },
+          { path: '', component: PatientsPageComponent, pathMatch: 'full' },
           { path: 'new-patient', component: PatientFormPageComponent },
-
+          { path: ':id', component: PatientFormPageComponent },
         ]
       },
 
-      { path: 'o-room', component: VisitsPageComponent },
       {
         path: 'o-room',
         children: [
+          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
@@ -65,10 +64,10 @@ const routes: Routes = [
         ]
       },
 
-      { path: 'hospitalization', component: VisitsPageComponent },
       {
         path: 'hospitalization',
         children: [
+          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
@@ -100,10 +99,10 @@ const routes: Routes = [
         ]
       },
 
-      { path: 'emergency', component: VisitsPageComponent },
       {
         path: 'emergency',
         children: [
+          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageV2Component,
@@ -135,12 +134,12 @@ const routes: Routes = [
         ]
       },
 
-      { path: 'visits', component: VisitsPageComponent },
       {
         path: 'visits',
         children: [
-          { path: 'edit-visit/:id', component: VisitsFormPageComponent },
+          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
           { path: 'new-visit', component: VisitsFormPageComponent },
+          { path: 'edit-visit/:id', component: VisitsFormPageComponent },
         ]
       },
 
