@@ -20,12 +20,11 @@ export class LoginPageComponent {
   })
 
   private login(idToken:string) {
-    const { email, password } = this.loginForm.value;
-    this.authService.login( email, password, idToken )
+    this.authService.login( idToken )
       .subscribe({
         next: () => this.router.navigateByUrl('/dashboard'),
-        error: ( message ) => {
-          Swal.fire( 'Error', message, 'error')
+        error: ( err ) => {
+          Swal.fire( 'Error', this.getErrorMessage(err), 'error')
         }
       })
   }
@@ -41,6 +40,14 @@ export class LoginPageComponent {
     } catch ( err ) {
       Swal.fire('Error', 'No se pudo iniciar sesión', 'error')
     }
+  }
+
+  private getErrorMessage(err: any): string {
+    const message = err?.error?.message
+    if ( Array.isArray(message) ) {
+      return message.map((item) => item.msg).join(', ')
+    }
+    return message || 'No se pudo iniciar sesión'
   }
 
 }

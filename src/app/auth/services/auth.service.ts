@@ -52,64 +52,65 @@ export class AuthService {
     return true
   }
 
-  login( email: string, password: string, idToken: string ): Observable<boolean> {
+  private buildIdTokenHeaders(idToken: string): HttpHeaders {
+    return new HttpHeaders().set('Authorization', `Bearer ${ idToken }`)
+  }
+
+  login( idToken: string ): Observable<boolean> {
     const url = `${this.baseUrl}/auth/login`
-    const body = { email, password }
+    const headers = this.buildIdTokenHeaders( idToken )
 
-    return this.http.post<LoginResponse>(url, body)
+    return this.http.post<LoginResponse>(url, {}, { headers })
       .pipe(
-        map(({user}) => this.setAuthentication(user, idToken)),
-        catchError( err => throwError(() => err.error.message))
+        map(({user}) => this.setAuthentication(user, idToken))
       )
   }
 
-  register(name: string, email: string, password: string, uid:string, idToken: string): Observable<boolean> {
+  register(name: string | null, idToken: string, accessToken?: string): Observable<boolean> {
     const url = `${this.baseUrl}/auth/register`
-    const body = { name, email, password, uid }
+    const headers = this.buildIdTokenHeaders( idToken )
+    const body: { name?: string; accessToken?: string } = {}
 
-    return this.http.post<RegisterResponse>(url, body)
+    if (name) {
+      body.name = name
+    }
+
+    if (accessToken) {
+      body.accessToken = accessToken
+    }
+
+    return this.http.post<RegisterResponse>(url, body, { headers })
       .pipe(
-        map(({user}) => this.setAuthentication(user, idToken)),
-        catchError( err => throwError(() => err.error.message))
+        map(({user}) => this.setAuthentication(user, idToken))
       )
   }
 
-  signInWithG(): Observable<any> {
+  signInWithG(): Observable<boolean> {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     
     return from(signInWithPopup(this._auth, provider)).pipe(
       switchMap((authenticatedUser) => {
         const user = authenticatedUser.user;
-        const { displayName, email, uid } = user;
+        const { displayName, email } = user;
   
         return from(user.getIdToken()).pipe(
           switchMap((idToken) => {
             const accessToken = GoogleAuthProvider.credentialFromResult(authenticatedUser)?.accessToken;
             
-            return this.http.post<any>(`${this.baseUrl}/auth/check-user`, { uid }).pipe(
-              switchMap(({ existingUser, exists }) => {
-                if (exists) {
-                  return of(this.setAuthentication(existingUser!, idToken))
-                } else {
-                  return this.registerWithGoogle(displayName!, email!, uid, idToken, accessToken!);
+            return this.login(idToken).pipe(
+              catchError((err) => {
+                if (err?.status === 404) {
+                  const fallbackName = displayName || email || ''
+                  return this.register(fallbackName, idToken, accessToken ?? undefined)
                 }
+                return throwError(() => err)
               })
-            );
+            )
           })
         );
       })
     );
-  }
-
-  private registerWithGoogle(name:string, email:string, uid:string, idToken:string, accessToken:string): Observable<boolean> {
-    const url = `${this.baseUrl}/auth/gregister`
-    const body = { name, email, uid, idToken, accessToken }
-    return this.http.post<RegisterResponse>(url, body)
-      .pipe(
-        map(({user}) => this.setAuthentication(user, idToken)),
-        catchError( err => throwError(() => err.error.message))
-      )
   }
 
   checkAuthStatus(): Observable<boolean> {
