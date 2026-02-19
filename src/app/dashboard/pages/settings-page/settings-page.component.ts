@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-settings-page',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './settings-page.component.css'
 })
 export class SettingsPageComponent {
+  private authService = inject(AuthService)
+  public canManagePermissions = computed(() =>
+    this.authService.hasPermission('settings.permissions.manage')
+  )
 
 }

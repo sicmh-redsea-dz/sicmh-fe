@@ -1,10 +1,11 @@
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject } from '@angular/core';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { Patient } from '../../interface/patients-response.interface';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-patients',
@@ -19,6 +20,16 @@ export class PatientsPageComponent {
   public offset: number = 0
   public totalRegistries: number = 0
   public patients: Patient[] = []
+  private authService = inject( AuthService )
+  public canCreatePatient = computed(() =>
+    this.authService.hasPermission('patients.create')
+  )
+  public canEditPatient = computed(() =>
+    this.authService.hasPermission('patients.update')
+  )
+  public canDeletePatient = computed(() =>
+    this.authService.hasPermission('patients.delete')
+  )
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
@@ -76,6 +87,7 @@ export class PatientsPageComponent {
   }
 
   public handleSelectedPatient( patientId: number) {
+    if (!this.canEditPatient()) return
     this.patientService.getPatient(patientId)
       .subscribe({
         next: (patient) => {
@@ -89,6 +101,7 @@ export class PatientsPageComponent {
   }
 
   public deleteSelectedPatient(id: number) {
+    if (!this.canDeletePatient()) return
     Swal.fire({
       title: 'Estas seguro?',
       text: 'Esta acción no se puede revertir.',

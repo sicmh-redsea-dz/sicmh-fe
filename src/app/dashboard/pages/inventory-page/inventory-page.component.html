@@ -4,7 +4,7 @@
     [headerText]="headerText"
     [inputPlaceholder]="'Buscar producto...'"
     [isDwnldRerportLoading]="downloadingPdfReport"
-    [showCreateButton]="showCreateButton"
+    [showCreateButton]="showCreateButton && canCreateInventory()"
     (searchTerm)="onSearchTermChange($event)"
 />
 
@@ -31,9 +31,10 @@
                             (keydown)="$event.stopPropagation()"
                         >
                             <toggle-opts
-                                [showTransferOpt]="showTransferOpt"
-                                [showEditOpt]="enableEdit"
-                                [showDeleteOpt]="enableDelete"
+                                *ngIf="(showTransferOpt && canTransferInventory()) || (enableEdit && canUpdateInventory()) || (enableDelete && canUpdateInventory())"
+                                [showTransferOpt]="showTransferOpt && canTransferInventory()"
+                                [showEditOpt]="enableEdit && canUpdateInventory()"
+                                [showDeleteOpt]="enableDelete && canUpdateInventory()"
                                 (transferEvent)="bootstrapInvoiceDrawer( item.id )"
                                 (deleteEvent)="handleDeleteItem()"
                                 (editEvent)="handleSelectedItem( item.id )"

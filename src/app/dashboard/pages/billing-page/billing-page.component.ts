@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
@@ -6,6 +6,7 @@ import { InvoicesService } from '../../services/invoices-services/invoices.servi
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Invoice } from '../../interface/invoice-response.interface';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-billing-page',
@@ -28,6 +29,16 @@ export class BillingPageComponent {
   public offset: number = 0
   public totalRegistries: number = 0
   public downloadingPdfReport: boolean = false
+  private authService = inject( AuthService )
+  public canCreateInvoice = computed(() =>
+    this.authService.hasPermission('invoice.create')
+  )
+  public canEditInvoice = computed(() =>
+    this.authService.hasPermission('invoice.update')
+  )
+  public canDeleteInvoice = computed(() =>
+    this.authService.hasPermission('invoice.delete')
+  )
 
   public drawerParams = inject( DrawerService )
   private invoiceService = inject( InvoicesService )
@@ -69,6 +80,7 @@ export class BillingPageComponent {
 
 
   public bootstrapInvoiceDrawerToUpd(invoiceId: string) {
+    if (!this.canEditInvoice()) return
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
     this.drawerParams.setToUpdate.set( true )
@@ -81,6 +93,7 @@ export class BillingPageComponent {
   }
 
   public bootstrapInvoiceDrawer() {
+    if (!this.canCreateInvoice()) return
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
     this.drawerParams.drawerTexts.update( state => ({
@@ -113,6 +126,7 @@ export class BillingPageComponent {
   }
 
   public deleteSelectedInvoice(invoiceId: string) {
+    if (!this.canDeleteInvoice()) return
     Swal.fire({
       title: `Are you sure you want to delete this element [${invoiceId}]?`,
       text: 'This action is irreversible. Proceed with caution.',
@@ -150,6 +164,7 @@ export class BillingPageComponent {
   }
 
   public getPdfReport(filter: string) {
+    if (!this.authService.hasPermission('invoice.read')) return
     this.downloadingPdfReport = true
     this.invoiceService.downloadPDFReport( filter )
       .pipe(

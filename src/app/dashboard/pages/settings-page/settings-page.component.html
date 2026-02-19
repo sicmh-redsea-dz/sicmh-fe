@@ -11,7 +11,7 @@
           Mi Perfil
         </span>
       </li>
-      <li>
+      <li *ngIf="canManagePermissions()">
         <span
           [routerLink]="['permissions']"
           routerLinkActive="active"

@@ -3,6 +3,7 @@
   [inputPlaceholder]="'Buscar pacientes...'"
   [itemCounter]="totalRegistries"
   [btnRouterLink]="'new-visit'"
+  [showCreateButton]="canCreateVisit()"
   (searchTerm)="onSearchTermChange($event)"
 />
 
@@ -44,6 +45,9 @@
           </td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts 
+              *ngIf="canEditVisit() || canDeleteVisit()"
+              [showEditOpt]="canEditVisit()"
+              [showDeleteOpt]="canDeleteVisit()"
               (deleteEvent)="deleteSelectedVisit( visit.id )"
               (editEvent)="handleSelectedVisit( visit.id )"
             />

@@ -3,6 +3,7 @@
   [headerText]="'Facturación'"
   [inputPlaceholder]="'Buscar factura...'"
   [isDwnldRerportLoading]="downloadingPdfReport"
+  [showCreateButton]="canCreateInvoice()"
   (btnDownloadReport)="getPdfReport( $event )"
   (searchTerm)="onSearchTermChange( $event )"
   (btnDrawerTrigger)="bootstrapInvoiceDrawer()"
@@ -12,6 +13,8 @@
   <app-custom-table 
     [headers]="headers"
     [bodyContent]="bodyContent"
+    [canEdit]="canEditInvoice()"
+    [canDelete]="canDeleteInvoice()"
     (insertItem)="bootstrapInvoiceDrawer()"
     (finishUpdatingItem)="bootstrapInvoiceDrawerToUpd($event)"
     (deleteSelectedItem)="deleteSelectedInvoice($event)"/>

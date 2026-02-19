@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { catchError, from, map, Observable, of, switchMap, throwError } from 'rxjs'
 import { User, AuthStatus, LoginResponse, CheckTokenResponse } from '../interfaces'
+import { Permission, getPermissionsForRoles } from '../permissions/permissions'
 import { RegisterResponse } from '../interfaces/register-response.interface'
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onIdTokenChanged } from '@angular/fire/auth'
 
@@ -20,6 +21,7 @@ export class AuthService {
 
   public currentUser = computed(() => this._currentUser())
   public authStatus = computed(() => this._authStatus())
+  public permissions = computed(() => getPermissionsForRoles(this._currentUser()?.roles))
 
   private _auth = inject( Auth )
 
@@ -164,5 +166,18 @@ export class AuthService {
       .catch( error => {
         console.error('Error al cerrar sesión: ', error)
       })
+  }
+
+  public hasPermission(required: Permission | Permission[]): boolean {
+    const permissions = this.permissions()
+    const requiredList = Array.isArray(required) ? required : [required]
+
+    return requiredList.every((permission) => permissions.has(permission))
+  }
+
+  public hasAnyPermission(required: Permission[]): boolean {
+    if (required.length === 0) return true
+    const permissions = this.permissions()
+    return required.some((permission) => permissions.has(permission))
   }
 }

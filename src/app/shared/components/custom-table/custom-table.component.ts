@@ -8,6 +8,8 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 export class CustomTableComponent {
   @Input() headers: string[] = []
   @Input() bodyContent: any[] = []
+  @Input() canEdit: boolean = true
+  @Input() canDelete: boolean = true
   @Output() deleteSelectedItem = new EventEmitter()
   @Output() finishUpdatingItem = new EventEmitter()
   @Output() insertItem = new EventEmitter()

@@ -8,7 +8,10 @@
     </thead>
     <tbody>
       @for(item of bodyContent; track $index) {
-        <tr (click)="execItemUpdate( item.InvoiceNumber )">
+        <tr 
+          (click)="canEdit ? execItemUpdate( item.InvoiceNumber ) : null"
+          [class.readonly]="!canEdit"
+        >
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
@@ -17,7 +20,10 @@
           <td>{{ item.Monto }}</td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts
-              [isEditBlocked]=" item.Estado === 'Pagado' ? true : false"
+              *ngIf="canEdit || canDelete"
+              [isEditBlocked]="!canEdit || item.Estado === 'Pagado'"
+              [showEditOpt]="canEdit"
+              [showDeleteOpt]="canDelete"
               (editEvent)="execItemUpdate( item.InvoiceNumber )"
               (deleteEvent)="execItemDeletion( item.InvoiceNumber )"
             />
@@ -27,4 +33,3 @@
     </tbody>
   </table>
 </div>
-
