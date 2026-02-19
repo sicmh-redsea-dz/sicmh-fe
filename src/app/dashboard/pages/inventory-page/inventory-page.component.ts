@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InventoryService } from '../../services/inventory-service/inventory.service';
 import Swal from 'sweetalert2';
@@ -7,6 +7,7 @@ import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
 import { Article } from '../../interface/article.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-inventory-page',
@@ -40,6 +41,16 @@ export class InventoryPageComponent implements OnInit {
   public showTransferOpt: boolean = true
   public enableEdit: boolean = true
   public enableDelete: boolean = false
+  private authService = inject(AuthService)
+  public canCreateInventory = computed(() =>
+    this.authService.hasPermission('inventory.create')
+  )
+  public canUpdateInventory = computed(() =>
+    this.authService.hasPermission('inventory.update')
+  )
+  public canTransferInventory = computed(() =>
+    this.authService.hasPermission('inventory.transfer')
+  )
   private destroyRef = inject(DestroyRef)
 
   constructor() {
@@ -79,7 +90,7 @@ export class InventoryPageComponent implements OnInit {
   }
 
   public handleSelectedItem( itemId: number | string ) {
-    if ( !this.enableEdit ) return
+    if ( !this.enableEdit || !this.canUpdateInventory() ) return
     this.invService.getInventoryItemById( itemId )
       .subscribe({
         next: ( item ) => {
@@ -115,7 +126,7 @@ export class InventoryPageComponent implements OnInit {
   }
 
   bootstrapInvoiceDrawer( itemId?: number | string ) {
-    if ( !this.showTransferOpt ) return
+    if ( !this.showTransferOpt || !this.canTransferInventory() ) return
     if( itemId )
       this.drawerParams.setInvoiceId.set( String( itemId ) )
     
@@ -142,6 +153,6 @@ export class InventoryPageComponent implements OnInit {
   }
 
   public handleDeleteItem() {
-    if ( !this.enableDelete ) return
+    if ( !this.enableDelete || !this.canUpdateInventory() ) return
   }
 }

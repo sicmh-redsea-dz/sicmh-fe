@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout.component';
+import { permissionsGuard } from '../auth/guards';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
 import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
@@ -19,24 +20,53 @@ const routes: Routes = [
     path: '',
     component: DashboardLayoutComponent,
     children: [
-      { path: 'main', component: DashboardPageComponent },
+      { 
+        path: 'main', 
+        component: DashboardPageComponent,
+        canActivate: [permissionsGuard],
+        data: { permissions: ['dashboard.view'] }
+      },
       {
         path: 'patients',
         children: [
-          { path: '', component: PatientsPageComponent, pathMatch: 'full' },
-          { path: 'new-patient', component: PatientFormPageComponent },
-          { path: ':id', component: PatientFormPageComponent },
+          { 
+            path: '', 
+            component: PatientsPageComponent, 
+            pathMatch: 'full',
+            canActivate: [permissionsGuard],
+            data: { permissions: ['patients.read'] }
+          },
+          { 
+            path: 'new-patient', 
+            component: PatientFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['patients.create'] }
+          },
+          { 
+            path: ':id', 
+            component: PatientFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['patients.update'] }
+          },
         ]
       },
 
       {
         path: 'o-room',
         children: [
-          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
+          { 
+            path: '', 
+            component: VisitsPageComponent, 
+            pathMatch: 'full',
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'] }
+          },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.create'],
               origin: 'oroom',
               stockSearchId: 3,
               includeSubinventoryInPayload: false,
@@ -50,7 +80,9 @@ const routes: Routes = [
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.update'],
               origin: 'oroom',
               stockSearchId: 3,
               includeSubinventoryInPayload: false,
@@ -67,11 +99,19 @@ const routes: Routes = [
       {
         path: 'hospitalization',
         children: [
-          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
+          { 
+            path: '', 
+            component: VisitsPageComponent, 
+            pathMatch: 'full',
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'] }
+          },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.create'],
               origin: 'hospitalization',
               stockSearchId: 4,
               includeSubinventoryInPayload: false,
@@ -85,7 +125,9 @@ const routes: Routes = [
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.update'],
               origin: 'hospitalization',
               stockSearchId: 4,
               includeSubinventoryInPayload: false,
@@ -102,11 +144,19 @@ const routes: Routes = [
       {
         path: 'emergency',
         children: [
-          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
+          { 
+            path: '', 
+            component: VisitsPageComponent, 
+            pathMatch: 'full',
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'] }
+          },
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.update'],
               origin: 'emergency',
               stockSearchId: 2,
               includeSubinventoryInPayload: true,
@@ -120,7 +170,9 @@ const routes: Routes = [
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['visits.create'],
               origin: 'emergency',
               stockSearchId: 2,
               includeSubinventoryInPayload: true,
@@ -137,13 +189,34 @@ const routes: Routes = [
       {
         path: 'visits',
         children: [
-          { path: '', component: VisitsPageComponent, pathMatch: 'full' },
-          { path: 'new-visit', component: VisitsFormPageComponent },
-          { path: 'edit-visit/:id', component: VisitsFormPageComponent },
+          { 
+            path: '', 
+            component: VisitsPageComponent, 
+            pathMatch: 'full',
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'] }
+          },
+          { 
+            path: 'new-visit', 
+            component: VisitsFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.create'] }
+          },
+          { 
+            path: 'edit-visit/:id', 
+            component: VisitsFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'] }
+          },
         ]
       },
 
-      { path: 'income/billings', component: BillingPageComponent },
+      { 
+        path: 'income/billings', 
+        component: BillingPageComponent,
+        canActivate: [permissionsGuard],
+        data: { permissions: ['invoice.read'] }
+      },
 
       { 
         path: 'inventory',
@@ -151,7 +224,9 @@ const routes: Routes = [
           { 
             path: 'products', 
             component: InventoryPageComponent,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['inventory.read'],
               headerText: 'Inventario General',
               subinventoryId: '1',
               showCreateButton: true,
@@ -160,12 +235,24 @@ const routes: Routes = [
               enableDelete: false
             }
           },
-          { path: 'products/new-item', component: InventoryFormPageComponent},
-          { path: 'products/edit-item/:id', component: InventoryFormPageComponent},
+          { 
+            path: 'products/new-item', 
+            component: InventoryFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['inventory.create'] }
+          },
+          { 
+            path: 'products/edit-item/:id', 
+            component: InventoryFormPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['inventory.update'] }
+          },
           { 
             path: 'products-sub1', 
             component: InventoryPageComponent,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['inventory.read'],
               headerText: 'Subinventario de Emergencia',
               subinventoryId: '2',
               showCreateButton: false,
@@ -177,7 +264,9 @@ const routes: Routes = [
           { 
             path: 'products-sub2', 
             component: InventoryPageComponent,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['inventory.read'],
               headerText: 'Subinventario de Quirofano',
               subinventoryId: '3',
               showCreateButton: false,
@@ -189,7 +278,9 @@ const routes: Routes = [
           { 
             path: 'products-sub3', 
             component: InventoryPageComponent,
+            canActivate: [permissionsGuard],
             data: {
+              permissions: ['inventory.read'],
               headerText: 'Subinventario de Hospitalización',
               subinventoryId: '4',
               showCreateButton: false,
@@ -199,7 +290,6 @@ const routes: Routes = [
             }
           }
         ]
-        
       },
 
       { 
@@ -208,7 +298,12 @@ const routes: Routes = [
         children: [
           { path: '', redirectTo: 'my-profile', pathMatch: 'full' },
           { path: 'my-profile', component: MyProfileComponent },
-          { path: 'permissions', component: PermissionsComponent },
+          { 
+            path: 'permissions', 
+            component: PermissionsComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['settings.permissions.manage'] }
+          },
         ]
       },
       { path: '**', redirectTo: 'main'}

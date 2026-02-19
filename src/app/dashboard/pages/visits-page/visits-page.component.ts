@@ -1,10 +1,11 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit } from '@angular/core';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SimpleVisit } from '../../interface/visits-service.interface';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-visits-page',
@@ -20,6 +21,16 @@ export class VisitsPageComponent implements OnInit {
   public totalRegistries: number = 0
   public visits: SimpleVisit[] = []
   public header: string = 'Consulta Externa'
+  private authService = inject(AuthService)
+  public canCreateVisit = computed(() =>
+    this.authService.hasPermission('visits.create')
+  )
+  public canEditVisit = computed(() =>
+    this.authService.hasPermission('visits.update')
+  )
+  public canDeleteVisit = computed(() =>
+    this.authService.hasPermission('visits.delete')
+  )
 
   private router = inject( Router )
   public urlSegment: string = ''
@@ -92,11 +103,13 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public handleSelectedVisit(id: number) {
+    if (!this.canEditVisit()) return
     let urlFragment = this.urlSegment
     return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
   }
 
   public deleteSelectedVisit(id: number) {
+    if (!this.canDeleteVisit()) return
     Swal.fire({
       title: 'Estas seguro?',
       text: 'Esta acción no se puede revertir.',
@@ -128,6 +141,7 @@ export class VisitsPageComponent implements OnInit {
   }
 
   public handleNewRegister() {
+    if (!this.canCreateVisit()) return
     let urlFragment = this.urlSegment
     this.router.navigateByUrl(`/dashboard/${urlFragment}/new-visit`)
 

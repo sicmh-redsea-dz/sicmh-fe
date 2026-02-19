@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { GoogleAuthProvider } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-register-page',
@@ -21,13 +20,13 @@ export class RegisterPageComponent {
     password: ['' ,[Validators.required, Validators.minLength(6)]],
   })
 
-  private register( uid: string, idToken: string ) {
-    const { name, email, password } = this.myForm.value;
-    this.authService.register(name, email, password, uid, idToken)
+  private register( idToken: string ) {
+    const { name } = this.myForm.value;
+    this.authService.register(name, idToken)
       .subscribe({
         next: () => this.router.navigateByUrl('/dashboard'),
-        error: ( message ) => {
-          Swal.fire('Error', message, 'error')
+        error: ( err ) => {
+          Swal.fire('Error', this.getErrorMessage(err), 'error')
         }
       })
   }
@@ -37,7 +36,7 @@ export class RegisterPageComponent {
     try {
       const authenticatedUser = await this.authService.signUp(email, password)
       const idToken = await authenticatedUser.user.getIdToken()
-      this.register( authenticatedUser.user.uid, idToken )
+      this.register( idToken )
     } catch ( err ) {
       Swal.fire('Error', 'No se pudo crear el usuario', 'error')
     }
@@ -50,9 +49,17 @@ export class RegisterPageComponent {
         next: () => {
           this.router.navigateByUrl('/dashboard')
         },
-        error: ( message ) => {
-          Swal.fire('Error', message, 'error')
+        error: ( err ) => {
+          Swal.fire('Error', this.getErrorMessage(err), 'error')
         }
       })
+  }
+
+  private getErrorMessage(err: any): string {
+    const message = err?.error?.message
+    if ( Array.isArray(message) ) {
+      return message.map((item) => item.msg).join(', ')
+    }
+    return message || 'No se pudo crear el usuario'
   }
 }

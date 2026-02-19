@@ -21,7 +21,7 @@
     <div class="menu">
       <p class="title">Principal</p>
       <ul>
-        <li *ngFor="let item of items; let idx = index" 
+        <li *ngFor="let item of items(); let idx = index" 
           [class]="toggledStates[idx] ? 'active' : ' '">
           <a [routerLink]="item.routerLink" 
             (click)="toggleItem(idx)">

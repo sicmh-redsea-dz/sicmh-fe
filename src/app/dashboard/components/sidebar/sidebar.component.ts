@@ -1,6 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
-import { sidebarItems } from '../../helpers/sidebar-items/sidebar-items.helper';
+import { Component, computed, effect, inject } from '@angular/core';
+import { SidebarItem, sidebarItems } from '../../helpers/sidebar-items/sidebar-items.helper';
 import { AuthService } from '../../../auth/services/auth.service';
+import { Permission } from '../../../auth/permissions/permissions';
 
 @Component({
   selector: 'app-sidebar',
@@ -8,14 +9,40 @@ import { AuthService } from '../../../auth/services/auth.service';
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
- public items = sidebarItems
+ private authService = inject( AuthService )
+ public items = computed<SidebarItem[]>(() => {
+  return sidebarItems
+    .map((item) => {
+      const isItemAllowed = this.isAllowed(item.requiredPermissions)
+
+      if (item.hasSubmenu && item.subItems) {
+        const subItems = item.subItems.filter((subItem) =>
+          this.isAllowed(subItem.requiredPermissions)
+        )
+
+        if (subItems.length === 0) return null
+
+        return {
+          ...item,
+          subItems,
+          hasSubmenu: true
+        }
+      }
+
+      if (!isItemAllowed) return null
+      return item
+    })
+    .filter((item): item is SidebarItem => item !== null)
+ })
  public toggledStates:boolean[] = []
  public toggledSidebar:boolean = false
- private authService = inject( AuthService )
  private userSignal = computed(() => this.authService.currentUser())
 
   constructor(){
-    this.toggledStates = this.items.map(() => false);
+    effect(() => {
+      const currentItems = this.items()
+      this.toggledStates = currentItems.map(() => false)
+    })
   }
 
   public get user() {
@@ -45,6 +72,11 @@ export class SidebarComponent {
   public handleSubmenuOnCollapse(idx: number){
     if( !this.toggledSidebar ) return
     this.toggledStates[idx] = false
+  }
+
+  private isAllowed(required?: Permission[]): boolean {
+    if (!required || required.length === 0) return true
+    return this.authService.hasAnyPermission(required)
   }
 
   public onLogout() {
