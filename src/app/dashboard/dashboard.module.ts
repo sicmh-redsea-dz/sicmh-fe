@@ -25,6 +25,7 @@ import { InventoryFormPageComponent } from './pages/inventory-form-page/inventor
 import { SharedModule } from '../shared/shared.module';
 import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
+import { PatientViewComponent } from './components/drawer-body-components/patient-view/patient-view.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page
     TransferComponent,
     InventoryFormPageComponent,
     BedsManagementPageComponent,
-    OrRoomsManagementPageComponent
+    OrRoomsManagementPageComponent,
+    PatientViewComponent
   ],
   imports: [
     CommonModule,

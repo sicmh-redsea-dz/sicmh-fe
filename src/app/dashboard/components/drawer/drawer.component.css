@@ -4,7 +4,7 @@
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(15, 23, 42, 0.45);
   visibility: hidden;
   opacity: 0;
   transition: opacity .3s, visibility .3s;
@@ -21,15 +21,16 @@
   top: 0;
   right: -350px;
   height: 100%;
-  width: 350px;
-  background-color: #fff;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, .2);
+  width: 360px;
+  background-color: var(--surface);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
   transition: right .3s;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
   overflow-y: auto;
   overflow-x: hidden;
@@ -45,15 +46,17 @@
   justify-content: space-between;
   height: 3rem;
   width: 100%;
-  background-color: var(--primary-color);
-  color: var(--color-white);
+  background-color: var(--surface);
+  color: var(--text-color);
   padding: 0 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .drawer-header h2 {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .drawer-header button {
@@ -61,13 +64,13 @@
   height: 1.5rem;
   border-radius: 50%;
   vertical-align: middle;
-  color: var(--color-white);
+  color: var(--text-color);
   transition: background-color .3s ease, transform .3s ease;
 }
 
 .drawer-header button:hover {
-  background-color: var(--hover-color);
-  color: var(--primary-color);
+  background-color: rgba(20, 184, 166, 0.15);
+  color: var(--secondary-color);
   transform: rotate(180deg);
 }
 
@@ -76,9 +79,7 @@
 }
 
 .drawer-body {
-  height: 90%;
-  width: 90%;
-  margin: 1rem;
+  width: 100%;
+  padding: 1rem;
 }
-
 

@@ -142,9 +142,9 @@
 
         <div class="action-row">
           <button class="primary-btn" type="button" (click)="assignBed()">
-            {{ selectedBed?.currentAssignment ? 'Actualizar asignación' : 'Asignar cama' }}
+            {{ selectedBed.currentAssignment ? 'Actualizar asignación' : 'Asignar cama' }}
           </button>
-          <button class="danger-btn" type="button" *ngIf="selectedBed?.currentAssignment" (click)="releaseBed()">
+          <button class="danger-btn" type="button" *ngIf="selectedBed.currentAssignment" (click)="releaseBed()">
             Liberar cama
           </button>
         </div>
@@ -152,7 +152,7 @@
 
       <section class="card" *ngIf="selectedBed">
         <h3>Historial</h3>
-        <div class="history" *ngIf="selectedBed?.history?.length; else noHistory">
+        <div class="history" *ngIf="selectedBed.history.length; else noHistory">
           <div class="history-item" *ngFor="let entry of selectedBed.history | slice:0:6">
             <div>
               <span class="history-type">{{ entry.type }}</span>

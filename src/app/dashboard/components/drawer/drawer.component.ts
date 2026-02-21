@@ -12,6 +12,7 @@ export class DrawerComponent {
 
   public dcInvoice = DrawerContents.INVOICE;
   public dcTransfer = DrawerContents.TRANSFER;
+  public dcPatientView = DrawerContents.PATIENT_VIEW;
   public isDrawerVisible = computed(() => this.drawerParams.isDrawerOpen())
   public bodyToDisplay = computed(() => {
     const value = this.drawerParams.contentToDisplay()
@@ -26,6 +27,7 @@ export class DrawerComponent {
       this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
       this.drawerParams.setToUpdate.set( false )
       this.drawerParams.setInvoiceId.set( '' )
+      this.drawerParams.setPatientId.set( '' )
     }
   }
   

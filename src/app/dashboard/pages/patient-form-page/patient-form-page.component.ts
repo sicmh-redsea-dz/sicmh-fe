@@ -6,6 +6,7 @@ import { filter, map, switchMap, tap } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { FormPatient, Patient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { compressImage } from '../../../shared/utils/image-compressor';
 
 type PatientFormValue = {
   id: string
@@ -29,7 +30,11 @@ export class PatientFormPageComponent implements OnInit {
   public title = 'Registro de Pacientes'
   public actionButtonText = 'Guardar'
   public isEditMode = false
+  public imagePreviewUrl: string | null = null
+  public isImageProcessing = false
+  public hasStoredImage = false
   private patientId: number | null = null
+  private pendingImageDataUrl: string | null = null
   private fb = inject( FormBuilder ).nonNullable
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )
@@ -66,6 +71,7 @@ export class PatientFormPageComponent implements OnInit {
       .subscribe((patient) => {
         if (!patient) return
         this.patchForm(patient)
+        this.loadPatientImage(patient.id)
       })
   }
 
@@ -78,6 +84,45 @@ export class PatientFormPageComponent implements OnInit {
     this.isEditMode
       ? this.handleEditPatient(patient, this.patientId)
       : this.handleCreatePatient(patient)
+  }
+
+  public async handleImageChange(event: Event) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      Swal.fire('Error', 'Selecciona un archivo de imagen válido.', 'error')
+      input.value = ''
+      return
+    }
+
+    this.isImageProcessing = true
+    try {
+      const { dataUrl } = await compressImage(file, {
+        maxDimension: 1024,
+        quality: 0.8,
+        mimeType: 'image/jpeg'
+      })
+      this.pendingImageDataUrl = dataUrl
+      this.imagePreviewUrl = dataUrl
+      this.hasStoredImage = true
+    } catch (err) {
+      Swal.fire('Error', 'No se pudo procesar la imagen.', 'error')
+    } finally {
+      this.isImageProcessing = false
+    }
+  }
+
+  public openImagePreview() {
+    if (!this.imagePreviewUrl) return
+    Swal.fire({
+      title: 'Imagen del paciente',
+      imageUrl: this.imagePreviewUrl,
+      imageAlt: 'Foto del paciente',
+      showConfirmButton: false,
+      showCloseButton: true
+    })
   }
 
   private formatDate( dateString: string | undefined ): string {
@@ -99,6 +144,9 @@ export class PatientFormPageComponent implements OnInit {
     this.title = 'Registro de Pacientes'
     this.actionButtonText = 'Guardar'
     this.patientForm.reset()
+    this.pendingImageDataUrl = null
+    this.imagePreviewUrl = null
+    this.hasStoredImage = false
   }
 
   private patchForm(patient: Patient) {
@@ -114,6 +162,41 @@ export class PatientFormPageComponent implements OnInit {
     })
   }
 
+  private loadPatientImage(patientId: number) {
+    this.patientService.getPatientImage(patientId)
+      .subscribe({
+        next: (dataUrl) => {
+          if (!dataUrl) {
+            this.hasStoredImage = false
+            return
+          }
+          this.imagePreviewUrl = dataUrl
+          this.hasStoredImage = true
+        },
+        error: () => {
+          this.hasStoredImage = false
+        }
+      })
+  }
+
+  private uploadPatientImage(patientId: number, onSuccess: () => void) {
+    if (!this.pendingImageDataUrl) {
+      onSuccess()
+      return
+    }
+
+    this.patientService.uploadPatientImage(patientId, this.pendingImageDataUrl)
+      .subscribe({
+        next: () => {
+          this.pendingImageDataUrl = null
+          onSuccess()
+        },
+        error: (error) => {
+          Swal.fire('Error', error, 'error')
+        }
+      })
+  }
+
   private handleEditPatient( patient: FormPatient, patientId: number | null ) {
     if (patientId === null) return
     this.patientService.editPatient(patient, patientId)
@@ -121,10 +204,12 @@ export class PatientFormPageComponent implements OnInit {
         next: (editedUser) => {
           if( editedUser ) {
             const { patient } = editedUser.data
-            Swal.fire('Success', `${patient.name} ${patient.lastName} has been edited!`, 'success')
-              .then(() => {
-                this.router.navigateByUrl('/dashboard/patients')
-              })
+            this.uploadPatientImage(patient.id, () => {
+              Swal.fire('Success', `${patient.name} ${patient.lastName} has been edited!`, 'success')
+                .then(() => {
+                  this.router.navigateByUrl('/dashboard/patients')
+                })
+            })
           }
         },
         error: ( error ) => {
@@ -139,10 +224,12 @@ export class PatientFormPageComponent implements OnInit {
         next: (addedUser) => {
           if( addedUser ) {
             const { patient } = addedUser?.data
-            Swal.fire('Success', `${patient.name} ${patient.lastName} has been added!`, 'success')
-              .then(() => {
-                this.router.navigateByUrl('/dashboard/patients')
-              })
+            this.uploadPatientImage(patient.id, () => {
+              Swal.fire('Success', `${patient.name} ${patient.lastName} has been added!`, 'success')
+                .then(() => {
+                  this.router.navigateByUrl('/dashboard/patients')
+                })
+            })
           }
         },
         error: (message) => {

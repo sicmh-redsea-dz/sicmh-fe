@@ -4,12 +4,12 @@
   max-height: 78vh;
   margin: 10px auto;
   padding-top: 0;
-  background-color: #f9f9f9;
+  background-color: var(--surface);
   overflow-y: auto;
-  border-radius: 1rem;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  /* background: linear-gradient(135deg, #f9f9f9, #eaf3ff); */
-   background: linear-gradient(135deg, #d7f4ed, #cfd5e5);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, #f9fbff, #eef7f4);
 }
 
 .no-data-container.no-data-content {
@@ -21,8 +21,8 @@
 }
 
 .img-container {
-    width: 320px;
-    height: 320px;
+    width: 200px;
+    height: 200px;
 }
 
 .img-container img {
@@ -48,7 +48,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    bottom: 120px;
+    bottom: 90px;
     position: absolute;
     animation: fade-in 1.5s ease-in
 }
@@ -66,13 +66,12 @@
 
 .txt-container h3 {
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin: .25rem 0;
 }
 
 .txt-container p {
     font-weight: normal;
-    font-size: .75rem;
+    font-size: .8rem;
     margin: .25rem 0;
 }
-

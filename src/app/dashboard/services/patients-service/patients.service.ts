@@ -98,4 +98,24 @@ export class PatientsService {
         })
       )
   }
+
+  public uploadPatientImage(patientId: number, imageDataUrl: string): Observable<boolean> {
+    const url = `${this.baseUrl}/app/patients/${patientId}/image`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.post(url, { image: imageDataUrl }, { headers })
+      .pipe(
+        map(() => true),
+        catchError(( err ) => throwError(() => formatApiError(err)))
+      )
+  }
+
+  public getPatientImage(patientId: number): Observable<string | null> {
+    const url = `${this.baseUrl}/app/patients/${patientId}/image`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.get<{ data: { image?: { dataUrl?: string } } }>(url, { headers })
+      .pipe(
+        map(({ data }) => data.image?.dataUrl ?? null),
+        catchError(( err ) => throwError(() => formatApiError(err)))
+      )
+  }
 } 

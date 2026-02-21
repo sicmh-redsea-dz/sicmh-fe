@@ -3,9 +3,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
 }
 
 .header {
@@ -19,12 +20,12 @@
 .header h1 {
   margin: 0;
   font-size: 1.6rem;
-  color: #1f2a44;
+  color: var(--text-color);
 }
 
 .header p {
   margin: 0.25rem 0 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .link-btn {
@@ -54,12 +55,12 @@
   align-items: center;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .ghost-btn {
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
   border-radius: 6px;
   font-size: 0.75rem;
   padding: 0.4rem 0.75rem;
@@ -67,8 +68,9 @@
 }
 
 .table-wrapper {
-  background: #f9fafb;
-  border-radius: 10px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
   padding: 0.5rem;
   max-height: 60vh;
   overflow-y: auto;
@@ -87,7 +89,7 @@
 }
 
 .table-wrapper tbody tr {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
 }
 
@@ -120,16 +122,16 @@
 }
 
 .card {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
   padding: 1rem;
-  background: #fff;
+  background: var(--surface);
 }
 
 .card h3 {
   margin: 0 0 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-color);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -149,15 +151,15 @@
 
 .form-group label {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 input,
 select,
 textarea {
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
   font-size: 0.8rem;
 }
 
@@ -166,7 +168,7 @@ textarea {
 }
 
 .error-text {
-  color: #dc2626;
+  color: var(--color-red);
   font-size: 0.7rem;
 }
 
@@ -174,7 +176,7 @@ input.ng-invalid.ng-touched,
 select.ng-invalid.ng-touched,
 textarea.ng-invalid.ng-touched,
 .input-invalid {
-  border-color: #dc2626;
+  border-color: var(--color-red);
 }
 
 .primary-btn {
@@ -227,17 +229,17 @@ textarea.ng-invalid.ng-touched,
 }
 
 .history-meta {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .history-actor {
-  color: #111827;
+  color: var(--text-color);
 }
 
 .empty-state {
   padding: 1rem;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .autocomplete-wrapper {

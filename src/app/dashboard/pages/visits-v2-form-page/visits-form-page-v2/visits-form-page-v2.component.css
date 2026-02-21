@@ -3,9 +3,9 @@
   max-width: 1200px;
   max-height: 95vh;
   padding: 2rem;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
   overflow-y: auto;
   position: relative;
 }
@@ -35,12 +35,12 @@
 
 .form-header h1 {
   font-size: 1.5rem;
-  color: #000080;
+  color: var(--text-color);
 }
 
 .form-header p {
   font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .subtle-text {
@@ -50,7 +50,7 @@
   transform: translateY(-50%);
   font-size: .85rem;
   font-weight: bold;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .medical-form {
@@ -74,7 +74,7 @@
 
 .input-group label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   align-self: flex-start;
   margin-top: 0.5rem;
 }
@@ -90,8 +90,8 @@ input[type="time"],
 select {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
 }
 
@@ -106,7 +106,7 @@ select {
   align-items: center;
   text-align: center;
   margin: 0.25rem 0;
-  color: var(--color-gray);
+  color: var(--text-muted);
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -115,7 +115,7 @@ select {
 .fancy-divider::before,
 .fancy-divider::after {
   content: '';
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--border-color);
 }
 
 .fancy-divider::before {
@@ -153,7 +153,7 @@ select {
 }
 
 .divider-vertical {
-  border-left: 1px solid #ddd;
+  border-left: 1px solid var(--border-color);
   height: 100%;
   margin: 0 1rem;
 }
@@ -175,8 +175,8 @@ select {
 .number-input {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   width: fit-content;
   height: 2rem;
@@ -307,15 +307,15 @@ select {
 
 .textarea-group label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .textarea-group textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
   resize: vertical;
   height: 100px;
@@ -327,15 +327,15 @@ select {
 
 .textarea-full label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .textarea-full textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
   resize: vertical;
   height: 150px;
@@ -570,4 +570,3 @@ select.ng-invalid.ng-touched {
   0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
   100% { transform: translateY(-50%) rotate(360deg); }
 }
-

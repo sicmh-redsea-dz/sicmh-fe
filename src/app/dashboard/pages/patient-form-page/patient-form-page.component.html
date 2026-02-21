@@ -120,10 +120,23 @@
 
         <div class="form-group">
           <label>Subir Imagen del Paciente</label>
-          <input  class=""
-                  type="file"
-                  formControlName="image" 
-                  accept="image/*">
+          <div class="image-input">
+            <input  class=""
+                    type="file"
+                    formControlName="image"
+                    accept="image/*"
+                    (change)="handleImageChange($event)">
+            <button
+              type="button"
+              class="icon-btn"
+              *ngIf="hasStoredImage"
+              (click)="openImagePreview()"
+              aria-label="Ver imagen"
+            >
+              <i class="ph ph-eye"></i>
+            </button>
+          </div>
+          <small class="helper-text" *ngIf="isImageProcessing">Procesando imagen...</small>
         </div>
       </div>
     </div>

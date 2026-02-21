@@ -4,8 +4,8 @@
     grid-template-rows: max-content 1fr;
     gap: 1.5rem;
     max-height: 100%;
-    margin-top: 3rem;
-    padding-top: 1rem;
+    margin-top: 2rem;
+    padding-top: 0.5rem;
     overflow-y: hidden;
 }
 
@@ -15,26 +15,28 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
-    background: var(--color-white);
-    border-radius: .5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
-    transition: transform .2s ease, box-shadow .2s ease;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(20, 184, 166, 0.4);
 }
 
 .card-icon {
     width: 2.5rem;
     height: 2.5rem;
-    background: var(--accent);
+    background: rgba(20, 184, 166, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-gray);
+    color: var(--secondary-color);
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
 }
@@ -49,7 +51,7 @@
     font-size: 0.875rem; 
     text-transform: uppercase;
     letter-spacing: 0.025em;
-    color: #666; 
+    color: var(--text-muted);
     margin: 0.25rem 0;
 }
 
@@ -75,10 +77,11 @@
 .calendar {
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border-radius: .5rem;
+    background: var(--surface);
+    border-radius: var(--radius);
     padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 
     grid-column: 4;
     grid-row: 1 / span 2;
@@ -88,7 +91,7 @@
 .calendar h4 {
     margin: 0 0 0.5rem;
     font-size: 1.125rem;
-    color: #333;
+    color: var(--text-color);
     text-align: center;
 }
 
@@ -125,10 +128,11 @@
 }
 
 .patients-table {
-    background: #fff;
-    border-radius: .5rem;
+    background: var(--surface);
+    border-radius: var(--radius);
     padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .5);    
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);    
     grid-column: 1 / span 3;
     grid-row: 2;
     display: flex;
@@ -140,32 +144,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
     margin-bottom: 0.75rem;
 }
 
 .table-header h3 {
     font-size: 0.875rem;
-    color: var(--color-gray);
+    color: var(--text-muted);
 }
 
 .sort-control {
     display: flex;
     align-items: center;
     font-size: 0.875rem;
-    color: var(--color-gray);
+    color: var(--text-muted);
     cursor: pointer;
     user-select: none;
-    border: .5px solid var(--color-gray);
+    border: 1px solid var(--border-color);
     border-radius: 25px;
     padding: 2px 8px;
-    transition: color .3s ease, border .3s ease;
+    transition: color .2s ease, border .2s ease, background-color .2s ease;
 }
 
 .sort-control:hover {
-    color: var(--hover-color);
-    border: .5px solid var(--hover-color);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    background: rgba(20, 184, 166, 0.08);
 }
 
 .sort-control i {
@@ -186,26 +191,26 @@
 .dash-table-container thead th {
     position: sticky;
     top: 0;
-    background: #f5f9fc;
+    background: var(--surface-muted);
     padding: 0.5rem;
     font-size: 12px;
     text-align: left;
-    color: #555;
-    border-bottom: 2px solid #eee;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
 }
   
 .dash-table-container td {
     padding: 0.5rem;
     font-size: 14px;
-    color: #444;
-    border-bottom: 1px solid #f0f0f0;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
 }
   
 .dash-table-container tbody tr:nth-child(odd) {
-    background: #fafafa;
+    background: #fbfcfe;
 }
   
 .dash-table-container tbody tr:hover {
-    background: #f0f8ff;
+    background: #f1f5ff;
 }
   

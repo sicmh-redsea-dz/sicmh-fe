@@ -1,6 +1,9 @@
 <div class="header-container">
   <div class="header-detail">
-    <h2>{{ headerText }}</h2>
+    <div class="header-texts">
+      <h2>{{ headerText }}</h2>
+      <p class="header-subtitle" *ngIf="subHeaderText">{{ subHeaderText }}</p>
+    </div>
     <span class="badge info">{{ itemCounter }}</span>
   </div>
   <div class="table-actions">
@@ -11,18 +14,21 @@
 
     <ng-container *ngIf="showCreateButton">
       <button 
-        *ngIf="btnRouterLink; else drawerTrigger" 
+        *ngIf="btnRouterLink && !disableCreateButton; else createButton"
         class="action-button create" 
         [routerLink]="btnRouterLink"
       >
         <i class="ph-bold ph-plus"></i>
         <span class="btn-txt">Crear Nuevo</span>
       </button>
-  
-      <ng-template 
-        #drawerTrigger
-      >
-        <button class="action-button create" (click)="execDrawerTrigger()">
+
+      <ng-template #createButton>
+        <button
+          class="action-button create"
+          [class.disabled]="disableCreateButton"
+          [disabled]="disableCreateButton"
+          (click)="!disableCreateButton && execDrawerTrigger()"
+        >
           <i class="ph-bold ph-plus"></i>
           <span class="btn-txt">Crear Nuevo</span>
         </button>

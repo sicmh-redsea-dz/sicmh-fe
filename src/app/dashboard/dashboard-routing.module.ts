@@ -272,12 +272,7 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: {
               permissions: ['inventory.read'],
-              headerText: 'Inventario General',
-              subinventoryId: '1',
-              showCreateButton: true,
-              showTransferOpt: true,
-              enableEdit: true,
-              enableDelete: false
+              headerText: 'Inventario General'
             }
           },
           { 
@@ -292,48 +287,9 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: { permissions: ['inventory.update'] }
           },
-          { 
-            path: 'products-sub1', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Emergencia',
-              subinventoryId: '2',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          },
-          { 
-            path: 'products-sub2', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Quirofano',
-              subinventoryId: '3',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          },
-          { 
-            path: 'products-sub3', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Hospitalización',
-              subinventoryId: '4',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          }
+          { path: 'products-sub1', redirectTo: 'products', pathMatch: 'full' },
+          { path: 'products-sub2', redirectTo: 'products', pathMatch: 'full' },
+          { path: 'products-sub3', redirectTo: 'products', pathMatch: 'full' }
         ]
       },
 
