@@ -211,6 +211,10 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.visitForm.invalid) {
+      this.visitForm.markAllAsTouched()
+      return
+    }
     const visit = this.visitForm.value
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )

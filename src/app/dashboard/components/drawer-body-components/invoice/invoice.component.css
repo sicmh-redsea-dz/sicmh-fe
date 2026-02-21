@@ -37,6 +37,17 @@
   background-color: #fff;
 }
 
+.error-text {
+  color: #dc2626;
+  font-size: 0.7rem;
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #dc2626;
+}
+
 .list {
   margin-bottom: .5rem;
 }

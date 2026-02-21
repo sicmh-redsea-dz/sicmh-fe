@@ -353,6 +353,10 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.visitForm.invalid) {
+      this.visitForm.markAllAsTouched()
+      return
+    }
     const visit = this.visitForm.value as FormVisitWithStock
 
     this.caller === 'nv'
@@ -381,11 +385,8 @@ export class VisitsFormPageV2Component implements OnInit {
               })
           }
         },
-        error: ( hasError ) => {
-          if ( !hasError ) {
-
-            Swal.fire('Error', 'Error al generar visita nueva', 'error')
-          }
+        error: ( message ) => {
+          Swal.fire('Error', message, 'error')
         }
       })
   }

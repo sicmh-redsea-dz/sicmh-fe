@@ -37,14 +37,14 @@ export class PatientFormPageComponent implements OnInit {
   private destroyRef = inject( DestroyRef )
   
   public patientForm = this.fb.group({
-    id        : ['', [Validators.required, Validators.maxLength(20)]],
+    id        : ['', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
     firstName : ['', [Validators.required, Validators.minLength(2)]],
     lastName  : ['', [Validators.required, Validators.minLength(2)]],
     birthdate : ['', [Validators.required]],
     gender    : ['', [Validators.required]],
-    phone     : ['', [Validators.required, Validators.maxLength(8)]],
+    phone     : ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
     email     : ['', [Validators.required, Validators.email]],
-    address   : ['', [Validators.required]],
+    address   : ['', [Validators.required, Validators.minLength(5)]],
     image     : [''],
     notes     : ['']
   })
@@ -70,6 +70,10 @@ export class PatientFormPageComponent implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.patientForm.invalid) {
+      this.patientForm.markAllAsTouched()
+      return
+    }
     const patient: PatientFormValue = this.patientForm.getRawValue()
     this.isEditMode
       ? this.handleEditPatient(patient, this.patientId)

@@ -21,7 +21,12 @@
       >
       <label for="toggle-switch" class="toggle-switch"></label>
     </div>
-    <input type="date" formControlName="date">
+    <div>
+      <input type="date" formControlName="date">
+      <small class="error-text" *ngIf="invoiceForm.get('date')?.touched && invoiceForm.get('date')?.hasError('required')">
+        Este campo es obligatorio.
+      </small>
+    </div>
   </div>
 
   <div class="form-group">
@@ -32,6 +37,9 @@
         <option [value]="p.id">{{p.name}}</option>
       }
     </select>
+    <small class="error-text" *ngIf="invoiceForm.get('patient')?.touched && invoiceForm.get('patient')?.hasError('required')">
+      Selecciona un cliente.
+    </small>
   </div>
 
   <div class="form-group">
@@ -42,6 +50,9 @@
         <option [value]="d.id">{{d.name}}</option>
       }
     </select>
+    <small class="error-text" *ngIf="invoiceForm.get('doctor')?.touched && invoiceForm.get('doctor')?.hasError('required')">
+      Selecciona un doctor.
+    </small>
   </div>
 
   <div class="form-group">
@@ -74,6 +85,9 @@
         <option [value]="p.id">{{p.paymentDescription}}</option>
       }
     </select>
+    <small class="error-text" *ngIf="invoiceForm.get('pMethod')?.touched && invoiceForm.get('pMethod')?.hasError('required')">
+      Selecciona un método de pago.
+    </small>
   </div>
 
   <div class="form-group">

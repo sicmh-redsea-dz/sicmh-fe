@@ -15,6 +15,8 @@ import { PermissionsComponent } from './pages/settings-page/permissions/permissi
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
+import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
+import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 
 const routes: Routes = [
   {
@@ -99,6 +101,12 @@ const routes: Routes = [
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['visits.read'], origin: 'oroom' }
+          },
+          { 
+            path: 'rooms', 
+            component: OrRoomsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], title: 'Quirófanos' }
           }
         ]
       },
@@ -150,6 +158,12 @@ const routes: Routes = [
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['visits.read'], origin: 'hospitalization' }
+          },
+          { 
+            path: 'beds', 
+            component: BedsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], module: 'hospitalization', title: 'Camas de hospitalización' }
           }
         ]
       },
@@ -201,6 +215,12 @@ const routes: Routes = [
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['visits.read'], origin: 'emergency' }
+          },
+          { 
+            path: 'beds', 
+            component: BedsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], module: 'emergency', title: 'Camas de emergencia' }
           },
         ]
       },

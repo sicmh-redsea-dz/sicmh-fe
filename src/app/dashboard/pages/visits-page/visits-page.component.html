@@ -7,6 +7,10 @@
   (searchTerm)="onSearchTermChange($event)"
 />
 
+<div class="management-link" *ngIf="managementLink && managementLabel">
+  <a [routerLink]="managementLink">{{ managementLabel }}</a>
+</div>
+
 <section *ngIf="visits.length > 0; else nodata">
   <div class="visit-table-container">
     <table class="visit-table">

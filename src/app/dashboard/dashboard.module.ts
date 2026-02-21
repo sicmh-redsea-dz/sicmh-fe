@@ -23,6 +23,8 @@ import { InventoryPageComponent } from './pages/inventory-page/inventory-page.co
 import { TransferComponent } from './components/drawer-body-components/transfers/transfer.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 import { SharedModule } from '../shared/shared.module';
+import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
+import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 
 
 @NgModule({
@@ -44,7 +46,9 @@ import { SharedModule } from '../shared/shared.module';
     PermissionsComponent,
     InventoryPageComponent,
     TransferComponent,
-    InventoryFormPageComponent
+    InventoryFormPageComponent,
+    BedsManagementPageComponent,
+    OrRoomsManagementPageComponent
   ],
   imports: [
     CommonModule,

@@ -341,6 +341,18 @@ select {
   height: 150px;
 }
 
+.error-text {
+  color: #dc2626;
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+}
+
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: #dc2626;
+}
+
 .submit-btn {
   display: flex;
   align-items: center;
@@ -558,5 +570,4 @@ select {
   0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
   100% { transform: translateY(-50%) rotate(360deg); }
 }
-
 

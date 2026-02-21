@@ -25,7 +25,9 @@
                   placeholder="Identidad del paciente">
            <div class="error-message" *ngIf="patientForm.get('id')?.touched && patientForm.get('id')?.invalid">
             <small *ngIf="patientForm.get('id')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('id')?.errors?.['maxlength']">Máximo 20 caracteres permitidos.</small>
+            <small *ngIf="patientForm.get('id')?.errors?.['minlength'] || patientForm.get('id')?.errors?.['maxlength']">
+              Debe tener 13 caracteres.
+            </small>
           </div>
         </div>
 
@@ -86,7 +88,9 @@
                   placeholder="Número de teléfono">
           <div class="error-message" *ngIf="patientForm.get('phone')?.touched && patientForm.get('phone')?.invalid">
             <small *ngIf="patientForm.get('phone')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('phone')?.errors?.['maxlength']">Máximo 8 dígitos.</small>
+            <small *ngIf="patientForm.get('phone')?.errors?.['minlength'] || patientForm.get('phone')?.errors?.['maxlength']">
+              Debe tener 8 dígitos.
+            </small>
           </div>
         </div>
 
@@ -110,6 +114,7 @@
                   placeholder="Dirección completa">
           <div class="error-message" *ngIf="patientForm.get('address')?.touched && patientForm.get('address')?.invalid">
             <small *ngIf="patientForm.get('address')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="patientForm.get('address')?.errors?.['minlength']">Debe tener al menos 5 caracteres.</small>
           </div>
         </div>
 

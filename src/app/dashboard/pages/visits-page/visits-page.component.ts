@@ -21,6 +21,8 @@ export class VisitsPageComponent implements OnInit {
   public totalRegistries: number = 0
   public visits: SimpleVisit[] = []
   public header: string = 'Consulta Externa'
+  public managementLink: string | null = null
+  public managementLabel: string | null = null
   private authService = inject(AuthService)
   public canCreateVisit = computed(() =>
     this.authService.hasPermission('visits.create')
@@ -60,6 +62,21 @@ export class VisitsPageComponent implements OnInit {
 
     if ( this.urlSegment === 'o-room' )
       this.header = 'quirofano'
+
+    if ( this.urlSegment === 'emergency' ) {
+      this.managementLink = '/dashboard/emergency/beds'
+      this.managementLabel = 'Gestionar camas'
+    }
+
+    if ( this.urlSegment === 'hospitalization' ) {
+      this.managementLink = '/dashboard/hospitalization/beds'
+      this.managementLabel = 'Gestionar camas'
+    }
+
+    if ( this.urlSegment === 'o-room' ) {
+      this.managementLink = '/dashboard/o-room/rooms'
+      this.managementLabel = 'Gestionar quirófanos'
+    }
   }
 
   public getVisits(searchTerm?: string) {

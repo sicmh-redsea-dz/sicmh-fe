@@ -1,0 +1,170 @@
+<div class="management-container">
+  <div class="header">
+    <div>
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle || 'Gestión de camas con trazabilidad.' }}</p>
+    </div>
+    <button class="link-btn" type="button" (click)="goBack()">Volver</button>
+  </div>
+
+  <div class="management-content">
+    <div class="list-panel">
+      <div class="panel-header">
+        <span>Listado de camas</span>
+        <button class="ghost-btn" type="button" (click)="clearSelection()">Nueva cama</button>
+      </div>
+
+      <div class="table-wrapper" *ngIf="beds.length > 0; else empty">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Área</th>
+              <th>Estado</th>
+              <th>Paciente</th>
+              <th>Asignada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bed of beds" (click)="selectBed(bed)" [class.active]="selectedBed?.id === bed.id">
+              <td>{{ bed.code }}</td>
+              <td>{{ bed.area || '-' }}</td>
+              <td>
+                <span class="status" [class]="bed.status">{{ getStatusLabel(bed.status) }}</span>
+              </td>
+              <td>{{ bed.currentAssignment?.patientName || '-' }}</td>
+              <td>{{ bed.currentAssignment?.assignedAt ? (bed.currentAssignment?.assignedAt | date:'short') : '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #empty>
+        <div class="empty-state">
+          No hay camas registradas.
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="detail-panel">
+      <section class="card">
+        <h3>{{ selectedBed ? 'Editar cama' : 'Nueva cama' }}</h3>
+        <form [formGroup]="bedForm" (ngSubmit)="saveBed()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Código</label>
+              <input type="text" formControlName="code" placeholder="Ej. H-101" />
+              <small class="error-text" *ngIf="bedForm.get('code')?.touched && bedForm.get('code')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Área</label>
+              <input type="text" formControlName="area" placeholder="Ej. Medicina interna" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Estado</label>
+              <select formControlName="status">
+                <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+              </select>
+              <small class="error-text" *ngIf="bedForm.get('status')?.touched && bedForm.get('status')?.hasError('required')">
+                Selecciona un estado.
+              </small>
+            </div>
+          </div>
+          <button class="primary-btn" type="submit">
+            {{ selectedBed ? 'Guardar cambios' : 'Crear cama' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="card" *ngIf="selectedBed">
+        <h3>Asignación</h3>
+        <form [formGroup]="assignmentForm">
+          <div class="form-row">
+            <div class="form-group" style="position: relative;">
+              <label>Paciente</label>
+              <div class="autocomplete-wrapper">
+                <input type="text"
+                       placeholder="Buscar paciente..."
+                       [class.input-invalid]="assignmentForm.get('patient')?.touched && assignmentForm.get('patient')?.hasError('required')"
+                       [formControl]="patientSearchControl"
+                       (focus)="showPatDropdown = true"
+                       (blur)="handlePatBlur()" />
+                <div *ngIf="isPatLoading" class="loader"></div>
+              </div>
+              <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
+                <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+                  {{ patient.name }}
+                </li>
+              </ul>
+              <small class="error-text" *ngIf="assignmentForm.get('patient')?.touched && assignmentForm.get('patient')?.hasError('required')">
+                Selecciona un paciente.
+              </small>
+            </div>
+
+            <div class="form-group" style="position: relative;">
+              <label>Médico</label>
+              <div class="autocomplete-wrapper">
+                <input type="text"
+                       placeholder="Buscar médico..."
+                       [formControl]="doctorSearchControl"
+                       (focus)="showDocDropdown = true"
+                       (blur)="handleDocBlur()" />
+                <div *ngIf="isDocLoading" class="loader"></div>
+              </div>
+              <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
+                <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+                  {{ doctor.name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Motivo</label>
+              <input type="text" formControlName="reason" placeholder="Motivo de asignación" />
+            </div>
+            <div class="form-group">
+              <label>Fecha estimada de egreso</label>
+              <input type="date" formControlName="expectedDischarge" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea rows="3" formControlName="notes" placeholder="Observaciones adicionales"></textarea>
+          </div>
+        </form>
+
+        <div class="action-row">
+          <button class="primary-btn" type="button" (click)="assignBed()">
+            {{ selectedBed?.currentAssignment ? 'Actualizar asignación' : 'Asignar cama' }}
+          </button>
+          <button class="danger-btn" type="button" *ngIf="selectedBed?.currentAssignment" (click)="releaseBed()">
+            Liberar cama
+          </button>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="selectedBed">
+        <h3>Historial</h3>
+        <div class="history" *ngIf="selectedBed?.history?.length; else noHistory">
+          <div class="history-item" *ngFor="let entry of selectedBed.history | slice:0:6">
+            <div>
+              <span class="history-type">{{ entry.type }}</span>
+              <span class="history-meta">{{ entry.timestamp | date:'short' }}</span>
+            </div>
+            <span class="history-actor">{{ entry.actor?.name || 'Sistema' }}</span>
+          </div>
+        </div>
+        <ng-template #noHistory>
+          <div class="empty-state">Sin eventos aún.</div>
+        </ng-template>
+      </section>
+    </div>
+  </div>
+</div>

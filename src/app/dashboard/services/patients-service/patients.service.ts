@@ -4,6 +4,7 @@ import { environment } from '../../../../environments/environment'
 import { catchError, map, Observable, throwError } from 'rxjs'
 import { AddedUser, Data, FormPatient, Patient, PatientsResponse } from '../../interface/patients-response.interface'
 import { AuthHeadersService } from '../../../core/http/auth-headers.service'
+import { formatApiError } from '../../../shared/utils/api-error'
 
 interface Delimiters {
   limit: number,
@@ -38,7 +39,7 @@ export class PatientsService {
           return data
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -54,7 +55,7 @@ export class PatientsService {
             return data.patient
           }),
           catchError(( err ) => {
-            return throwError(() => err?.error?.message ?? err?.message)
+            return throwError(() => formatApiError(err))
           })
         )
   }
@@ -66,7 +67,7 @@ export class PatientsService {
 
     return this.http.post<AddedUser>( url, body, { headers } )
       .pipe(
-        catchError(( err ) => throwError(() => err?.error?.message ?? err?.message))
+        catchError(( err ) => throwError(() => formatApiError(err)))
       )
   }
 
@@ -78,7 +79,7 @@ export class PatientsService {
     return this.http.patch<AddedUser>(url, body, {headers})
       .pipe(
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -93,7 +94,7 @@ export class PatientsService {
           return true
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }

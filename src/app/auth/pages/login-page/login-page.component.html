@@ -7,22 +7,34 @@
 
     <span class="form-title">Login</span>
 
-    <div class="wrap-input">
+    <div class="wrap-input" [class.invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
         <span class="label-input">Correo</span>
         <input class="input"
                 type="email"
                 formControlName="email"
                 placeholder="Correo electronico">
         <span class="focus-input"></span>
+        <small class="error-text" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']">
+          Este campo es obligatorio.
+        </small>
+        <small class="error-text" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']">
+          Ingresa un correo válido.
+        </small>
     </div>
 
-    <div class="wrap-input">
+    <div class="wrap-input" [class.invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
     <span class="label-input">Contraseña</span>
     <input class="input"
             type="password"
             formControlName="password"
             placeholder="Ingresa tu contraseña">
     <span class="focus-input"></span>
+    <small class="error-text" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']">
+      Este campo es obligatorio.
+    </small>
+    <small class="error-text" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['minlength']">
+      Debe tener al menos 6 caracteres.
+    </small>
     </div>
 
 

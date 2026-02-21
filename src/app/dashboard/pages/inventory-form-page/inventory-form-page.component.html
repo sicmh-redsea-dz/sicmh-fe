@@ -27,7 +27,7 @@
                   placeholder="Nombre del articulo">
           <div class="error-message" *ngIf="articleForm.get('prodName')?.touched && articleForm.get('prodName')?.invalid">
             <small *ngIf="articleForm.get('prodName')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="articleForm.get('prodName')?.errors?.['minlength']">Debe tener al menos 2 caracteres.</small>
+            <small *ngIf="articleForm.get('prodName')?.errors?.['maxlength']">Máximo 20 caracteres permitidos.</small>
           </div>
         </div>
 
@@ -54,7 +54,7 @@
 
         <div class="form-group">
           <label>Cantidad a ingresar</label>
-          <input  [ngClass]="{'ng-touched': articleForm.get('email')?.touched}" 
+          <input  [ngClass]="{'ng-touched': articleForm.get('prodQty')?.touched}" 
                   type="number" 
                   formControlName="prodQty" 
                   placeholder="Cantidad de articulos a ingresar">

@@ -4,6 +4,7 @@ import { environment } from '../../../../environments/environment';
 import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Article } from '../../interface/article.interface';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 interface Delimiters {
   limit: number,
@@ -44,7 +45,7 @@ export class InventoryService {
           return resp
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -60,7 +61,7 @@ export class InventoryService {
         return resp.data
       }),
       catchError((err) => {
-        return throwError(() => err?.error?.message ?? err?.message)
+        return throwError(() => formatApiError(err))
       })
     )
   }
@@ -76,7 +77,7 @@ export class InventoryService {
     return this.http.post(url, body, { headers }).pipe(
       map((resp: any) => resp),
       catchError((err) => {
-        return throwError(() => err?.error?.message ?? err?.message)
+        return throwError(() => formatApiError(err))
       })
     )
   }
@@ -90,7 +91,7 @@ export class InventoryService {
       .pipe(
         map( resp => resp),
         catchError( err => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
 
       )
@@ -105,7 +106,7 @@ export class InventoryService {
       .pipe(
         map( resp => resp),
         catchError( err => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
 
       )

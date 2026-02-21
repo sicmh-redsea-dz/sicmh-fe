@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { environment } from '../../../../environments/environment';
@@ -44,7 +45,7 @@ export class VisitsService {
           this._listOfStockItems.set( data.stock )
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -64,7 +65,7 @@ export class VisitsService {
           return doctors
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -84,7 +85,7 @@ export class VisitsService {
           return patients
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -107,7 +108,7 @@ export class VisitsService {
           return data
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -125,7 +126,7 @@ export class VisitsService {
           return visit
         }),
         catchError((err) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -142,7 +143,7 @@ export class VisitsService {
           return true
         }),
         catchError((err) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -159,7 +160,7 @@ export class VisitsService {
           return true
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -175,7 +176,7 @@ export class VisitsService {
           return true
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }

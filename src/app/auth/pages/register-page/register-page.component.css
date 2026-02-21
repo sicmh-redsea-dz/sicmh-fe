@@ -19,6 +19,17 @@
   margin-bottom: 1.5rem;
 }
 
+.wrap-input.invalid {
+  border-bottom-color: #dc2626;
+}
+
+.error-text {
+  display: block;
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
 .label-input {
   font-family: Poppins-SemiBold;
   font-size: 14px;
