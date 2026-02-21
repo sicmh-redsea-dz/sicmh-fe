@@ -1,0 +1,149 @@
+<div class="report-container" *ngIf="visit; else loading">
+  <div class="report-header">
+    <div>
+      <h1>Reporte de expediente</h1>
+      <p>{{ visit.visitType }}</p>
+    </div>
+    <div class="report-actions">
+      <button class="btn secondary" [routerLink]="['/dashboard', backRoute]">Regresar</button>
+      <button class="btn primary" type="button" (click)="printReport()">Imprimir</button>
+    </div>
+  </div>
+
+  <div class="report-meta">
+    <div><span>Paciente:</span> {{ visit.patientName }}</div>
+    <div><span>Doctor:</span> {{ visit.docName }}</div>
+    <div><span>Fecha:</span> {{ formattedDate }}</div>
+    <div><span>ID:</span> #{{ visit.id }}</div>
+  </div>
+
+  <div class="section">
+    <h3>Historia clínica</h3>
+    <div class="grid">
+      <div>
+        <label>Motivo de consulta/ingreso</label>
+        <p>{{ visit.expediente?.standard?.chiefComplaint || '-' }}</p>
+      </div>
+      <div>
+        <label>Padecimiento actual</label>
+        <p>{{ visit.expediente?.standard?.currentIllness || '-' }}</p>
+      </div>
+      <div class="full">
+        <label>Exploración física</label>
+        <p>{{ visit.expediente?.standard?.physicalExam || '-' }}</p>
+      </div>
+      <div>
+        <label>Alergias</label>
+        <p>{{ visit.expediente?.standard?.allergies || '-' }}</p>
+      </div>
+      <div>
+        <label>Medicamentos actuales</label>
+        <p>{{ visit.expediente?.standard?.currentMeds || '-' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Signos vitales y antropometría</h3>
+    <div class="grid">
+      <div><label>Presión</label><p>{{ visit.bloodPressure || '-' }}</p></div>
+      <div><label>Temperatura</label><p>{{ visit.temperature || '-' }}</p></div>
+      <div><label>Oxigenación</label><p>{{ visit.oxygenSaturation || '-' }}</p></div>
+      <div><label>Glucometría</label><p>{{ visit.glucoseLevel || '-' }}</p></div>
+      <div><label>Peso</label><p>{{ visit.weight || '-' }}</p></div>
+      <div><label>Altura</label><p>{{ visit.height || '-' }}</p></div>
+      <div><label>IMC</label><p>{{ visit.BMI || '-' }}</p></div>
+      <div><label>% Grasa</label><p>{{ visit.bodyFatPercentage || '-' }}</p></div>
+      <div><label>Grasa visceral</label><p>{{ visit.visceralFat || '-' }}</p></div>
+      <div><label>Edad metabólica</label><p>{{ visit.ageBasedOnWeight || '-' }}</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Antecedentes</h3>
+    <div class="grid">
+      <div><label>Patológicos</label><p>{{ visit.pathologicalHst || '-' }}</p></div>
+      <div><label>Familiares</label><p>{{ visit.familyHst || '-' }}</p></div>
+      <div><label>Quirúrgicos</label><p>{{ visit.surgicalHst || '-' }}</p></div>
+      <div><label>Hábitos</label><p>{{ visit.backgroundHst || '-' }}</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Diagnóstico y tratamiento</h3>
+    <div class="grid">
+      <div class="full">
+        <label>Diagnóstico</label>
+        <p>{{ visit.diagnosis || '-' }}</p>
+      </div>
+      <div class="full">
+        <label>Tratamiento</label>
+        <p>{{ visit.treatment || '-' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="visit.expediente?.module?.followUpPlan || visit.expediente?.module?.referrals">
+    <h3>Seguimiento</h3>
+    <div class="grid">
+      <div class="full">
+        <label>Plan de seguimiento</label>
+        <p>{{ visit.expediente?.module?.followUpPlan || '-' }}</p>
+      </div>
+      <div class="full">
+        <label>Referencias/Interconsultas</label>
+        <p>{{ visit.expediente?.module?.referrals || '-' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="visit.expediente?.module?.triageLevel || visit.expediente?.module?.arrivalMode || visit.expediente?.module?.disposition">
+    <h3>Emergencia</h3>
+    <div class="grid">
+      <div><label>Triage</label><p>{{ visit.expediente?.module?.triageLevel || '-' }}</p></div>
+      <div><label>Modo de llegada</label><p>{{ visit.expediente?.module?.arrivalMode || '-' }}</p></div>
+      <div><label>Destino</label><p>{{ visit.expediente?.module?.disposition || '-' }}</p></div>
+      <div><label>Glasgow</label><p>{{ visit.expediente?.module?.glasgow ?? '-' }}</p></div>
+      <div><label>Escala de dolor</label><p>{{ visit.expediente?.module?.painScale ?? '-' }}</p></div>
+      <div class="full"><label>Mecanismo de lesión</label><p>{{ visit.expediente?.module?.injuryMechanism || '-' }}</p></div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="visit.expediente?.module?.procedure || visit.expediente?.module?.preOpDiagnosis">
+    <h3>Quirófano</h3>
+    <div class="grid">
+      <div><label>Diagnóstico preoperatorio</label><p>{{ visit.expediente?.module?.preOpDiagnosis || '-' }}</p></div>
+      <div><label>Diagnóstico postoperatorio</label><p>{{ visit.expediente?.module?.postOpDiagnosis || '-' }}</p></div>
+      <div class="full"><label>Procedimiento</label><p>{{ visit.expediente?.module?.procedure || '-' }}</p></div>
+      <div><label>Tipo de anestesia</label><p>{{ visit.expediente?.module?.anesthesiaType || '-' }}</p></div>
+      <div><label>Inicio de cirugía</label><p>{{ visit.expediente?.module?.surgeryStart || '-' }}</p></div>
+      <div><label>Fin de cirugía</label><p>{{ visit.expediente?.module?.surgeryEnd || '-' }}</p></div>
+      <div class="full"><label>Hallazgos</label><p>{{ visit.expediente?.module?.findings || '-' }}</p></div>
+      <div class="full"><label>Complicaciones</label><p>{{ visit.expediente?.module?.complications || '-' }}</p></div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="visit.expediente?.module?.admissionDiagnosis || visit.expediente?.module?.service">
+    <h3>Hospitalización</h3>
+    <div class="grid">
+      <div><label>Diagnóstico de ingreso</label><p>{{ visit.expediente?.module?.admissionDiagnosis || '-' }}</p></div>
+      <div><label>Motivo de ingreso</label><p>{{ visit.expediente?.module?.admissionReason || '-' }}</p></div>
+      <div><label>Servicio</label><p>{{ visit.expediente?.module?.service || '-' }}</p></div>
+      <div><label>Cama</label><p>{{ visit.expediente?.module?.bed || '-' }}</p></div>
+      <div class="full"><label>Resumen de evolución</label><p>{{ visit.expediente?.module?.evolutionSummary || '-' }}</p></div>
+      <div class="full"><label>Plan de egreso</label><p>{{ visit.expediente?.module?.dischargePlan || '-' }}</p></div>
+      <div><label>Fecha de egreso</label><p>{{ visit.expediente?.module?.dischargeDate || '-' }}</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Notas</h3>
+    <p>{{ visit.notes || '-' }}</p>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-state">
+    <p>Cargando reporte...</p>
+  </div>
+</ng-template>

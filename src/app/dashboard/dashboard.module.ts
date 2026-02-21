@@ -16,6 +16,7 @@ import { DrawerComponent } from './components/drawer/drawer.component';
 import { InvoiceComponent } from './components/drawer-body-components/invoice/invoice.component';
 import { SettingsPageComponent } from './pages/settings-page/settings-page.component';
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
+import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
@@ -38,6 +39,7 @@ import { SharedModule } from '../shared/shared.module';
     InvoiceComponent,
     SettingsPageComponent,
     VisitsFormPageV2Component,
+    VisitsReportPageComponent,
     MyProfileComponent,
     PermissionsComponent,
     InventoryPageComponent,

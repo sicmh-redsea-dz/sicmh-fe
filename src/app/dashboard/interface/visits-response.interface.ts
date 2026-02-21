@@ -1,3 +1,5 @@
+import { ExpedientePayload } from './expediente.interface'
+
 export interface VisitsN {
   data: DataN;
 }
@@ -79,6 +81,12 @@ export interface FormVisit{
   visceralFat         : number,
   fatPercentage       : number,
   ageAccordingToWeight: number,
+  pathologicalHst?    : string,
+  familyHst?          : string,
+  surgicalHst?        : string,
+  backgroundHst?      : string,
+  expediente?: ExpedientePayload,
+  origin?: string,
 }
 
 export interface SelectedVisitResponse {
@@ -107,4 +115,5 @@ export interface Visit {
   visceralFat:          number;
   fatPercentage:        string;
   ageAccordingToWeight: number;
+  expediente?: ExpedientePayload;
 }

@@ -37,6 +37,7 @@ export class VisitsFormPageV2Component implements OnInit {
   public stockSearchId = 2
   public includeSubinventoryInPayload = true
   public payloadSubinventoryId = 2
+  public backRoute = 'emergency'
   public titleNew = 'Registro de emergencia'
   public subtitleNew = 'Agrega los detalles de emergencia médica.'
   public titleEdit = 'Editar emergencia'
@@ -62,6 +63,50 @@ export class VisitsFormPageV2Component implements OnInit {
     glucometry  : ['', [Validators.required]],
     weight      : ['', [Validators.required]],
     height      : ['', [Validators.required]],
+    BMI         : [''],
+    fatPercentage: [''],
+    visceralFat : [''],
+    ageAccordingToWeight: [''],
+    diagnosis   : ['', [Validators.required]],
+    treatment   : ['', [Validators.required]],
+    pathologicalHst: [''],
+    familyHst   : [''],
+    surgicalHst : [''],
+    backgroundHst: [''],
+    expediente  : this.fb.group({
+      standard: this.fb.group({
+        chiefComplaint: ['', [Validators.required]],
+        currentIllness: ['', [Validators.required]],
+        physicalExam: ['', [Validators.required]],
+        allergies: [''],
+        currentMeds: [''],
+      }),
+      module: this.fb.group({
+        followUpPlan: [''],
+        referrals: [''],
+        triageLevel: [''],
+        arrivalMode: [''],
+        painScale: [''],
+        glasgow: [''],
+        disposition: [''],
+        injuryMechanism: [''],
+        preOpDiagnosis: [''],
+        postOpDiagnosis: [''],
+        procedure: [''],
+        anesthesiaType: [''],
+        surgeryStart: [''],
+        surgeryEnd: [''],
+        findings: [''],
+        complications: [''],
+        admissionDiagnosis: [''],
+        admissionReason: [''],
+        service: [''],
+        bed: [''],
+        evolutionSummary: [''],
+        dischargePlan: [''],
+        dischargeDate: [''],
+      })
+    }),
     stockItems  : this.fb.array([])
   })
 
@@ -103,6 +148,9 @@ export class VisitsFormPageV2Component implements OnInit {
       if (subtitleNew) this.subtitleNew = subtitleNew;
       if (titleEdit) this.titleEdit = titleEdit;
       if (subtitleEdit) this.subtitleEdit = subtitleEdit;
+
+      this.backRoute = this.resolveBackRoute(this.origin)
+      this.applyModuleValidators()
 
       if ( this.stockSearchId ) {
         this.visitsService.searchStockItems( this.stockSearchId )
@@ -204,6 +252,64 @@ export class VisitsFormPageV2Component implements OnInit {
       })
   }
 
+  private resolveBackRoute(origin: string): string {
+    return origin === 'oroom' ? 'o-room' : origin
+  }
+
+  private applyModuleValidators() {
+    const moduleGroup = this.visitForm.get('expediente.module') as FormGroup
+    if (!moduleGroup) return
+
+    const moduleFields = [
+      'followUpPlan',
+      'referrals',
+      'triageLevel',
+      'arrivalMode',
+      'painScale',
+      'glasgow',
+      'disposition',
+      'injuryMechanism',
+      'preOpDiagnosis',
+      'postOpDiagnosis',
+      'procedure',
+      'anesthesiaType',
+      'surgeryStart',
+      'surgeryEnd',
+      'findings',
+      'complications',
+      'admissionDiagnosis',
+      'admissionReason',
+      'service',
+      'bed',
+      'evolutionSummary',
+      'dischargePlan',
+      'dischargeDate',
+    ]
+
+    moduleFields.forEach((field) => {
+      const control = moduleGroup.get(field)
+      if (control) {
+        control.clearValidators()
+        control.updateValueAndValidity({ emitEvent: false })
+      }
+    })
+
+    const requiredByOrigin: Record<string, string[]> = {
+      emergency: ['triageLevel', 'arrivalMode', 'disposition'],
+      oroom: ['preOpDiagnosis', 'postOpDiagnosis', 'procedure', 'anesthesiaType', 'surgeryStart', 'surgeryEnd'],
+      hospitalization: ['admissionDiagnosis', 'admissionReason', 'service', 'bed', 'evolutionSummary']
+    }
+
+    const requiredFields = requiredByOrigin[this.origin] ?? []
+    requiredFields.forEach((field) => {
+      const control = moduleGroup.get(field)
+      if (control) {
+        control.setValidators([Validators.required])
+        control.updateValueAndValidity({ emitEvent: false })
+      }
+    })
+  }
+
   private initializeAutocompleteValues(): void {
     if (this.caller !== 'nv' && this.selectedVisit()) {
       if (this.selectedVisit()?.docName) {
@@ -271,7 +377,7 @@ export class VisitsFormPageV2Component implements OnInit {
           if( visit ) {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
-                this.router.navigateByUrl('/dashboard/visits')
+                this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
           }
         },
@@ -301,8 +407,22 @@ export class VisitsFormPageV2Component implements OnInit {
             temperature: visit.temperature,
             glucometry: visit.glucoseLevel,
             weight: visit.weight,
-            height: visit.height
+            height: visit.height,
+            BMI: visit.BMI,
+            fatPercentage: visit.bodyFatPercentage,
+            visceralFat: visit.visceralFat,
+            ageAccordingToWeight: visit.ageBasedOnWeight,
+            diagnosis: visit.diagnosis,
+            treatment: visit.treatment,
+            pathologicalHst: visit.pathologicalHst,
+            familyHst: visit.familyHst,
+            surgicalHst: visit.surgicalHst,
+            backgroundHst: visit.backgroundHst
           })
+
+          if (visit.expediente) {
+            this.visitForm.get('expediente')?.patchValue(visit.expediente)
+          }
 
           this.initializeAutocompleteValues()
 
@@ -331,13 +451,14 @@ export class VisitsFormPageV2Component implements OnInit {
 
   public handleEditVisit( visit: FormVisit ) {
     visit.date =  visit.date.split('T')[0]
-    this.visitsService.editVisit(this.selectedVisit()?.id!, visit )
+    const payload = { ...visit, origin: this.origin }
+    this.visitsService.editVisit(this.selectedVisit()?.id!, payload )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
             Swal.fire('Success', 'New visit edited!', 'success')
               .then(() => {
-                this.router.navigateByUrl('/dashboard/visits')
+                this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
           }
         },

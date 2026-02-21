@@ -14,6 +14,7 @@ import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
+import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
 
 const routes: Routes = [
   {
@@ -92,6 +93,12 @@ const routes: Routes = [
               titleEdit: 'Editar quirofano',
               subtitleEdit: 'Actualiza los detalles de quirofano.'
             }
+          },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'oroom' }
           }
         ]
       },
@@ -137,6 +144,12 @@ const routes: Routes = [
               titleEdit: 'Editar hospitalización',
               subtitleEdit: 'Actualiza los detalles de hospitalización.'
             }
+          },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'hospitalization' }
           }
         ]
       },
@@ -183,6 +196,12 @@ const routes: Routes = [
               subtitleEdit: 'Actualiza los detalles de emergencia médica.'
             }
           },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'emergency' }
+          },
         ]
       },
 
@@ -207,6 +226,12 @@ const routes: Routes = [
             component: VisitsFormPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['visits.update'] }
+          },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'visits' }
           },
         ]
       },

@@ -1,3 +1,5 @@
+import { ExpedientePayload } from './expediente.interface'
+
 export interface Histories {
     success: boolean
     message: string
@@ -88,4 +90,5 @@ export interface Visit {
     patientName: string
 
     usedInventory : { stockId: number, stockQty: number}[]
+    expediente?: ExpedientePayload | null
 }

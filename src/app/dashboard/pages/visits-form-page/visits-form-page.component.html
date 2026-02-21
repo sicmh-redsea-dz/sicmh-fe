@@ -64,6 +64,53 @@
       </div>
     </div>
 
+    <div formGroupName="expediente">
+      <div class="fancy-divider">
+        <span>Historia clínica</span>
+      </div>
+
+      <div formGroupName="standard">
+        <div class="textareas-row">
+          <div class="textarea-group">
+            <label>Motivo de consulta/ingreso</label>
+            <textarea 
+              formControlName="chiefComplaint"
+              placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
+          </div>
+
+          <div class="textarea-group">
+            <label>Padecimiento actual</label>
+            <textarea 
+              formControlName="currentIllness"
+              placeholder="Resume el padecimiento actual del paciente."></textarea>
+          </div>
+        </div>
+
+        <div class="textarea-full">
+          <label>Exploración física</label>
+          <textarea 
+            formControlName="physicalExam"
+            placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
+        </div>
+
+        <div class="textareas-row">
+          <div class="textarea-group">
+            <label>Alergias</label>
+            <textarea 
+              formControlName="allergies"
+              placeholder="Alergias conocidas del paciente."></textarea>
+          </div>
+
+          <div class="textarea-group">
+            <label>Medicamentos actuales</label>
+            <textarea 
+              formControlName="currentMeds"
+              placeholder="Medicamentos que consume actualmente."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="fancy-divider">
       <span>preclinica</span>
     </div>
@@ -242,10 +289,38 @@
                 placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
     </div>
 
-    <button class="submit-btn" 
-            
-            type="submit">
-      {{actionButtonText}}
-    </button>
+    <div formGroupName="expediente">
+      <div class="fancy-divider">
+        <span>seguimiento</span>
+      </div>
+
+      <div formGroupName="module" class="textareas-row">
+        <div class="textarea-group">
+          <label>Plan de seguimiento</label>
+          <textarea formControlName="followUpPlan"
+                    placeholder="Describe el plan de seguimiento."></textarea>
+        </div>
+
+        <div class="textarea-group">
+          <label>Referencias/Interconsultas</label>
+          <textarea formControlName="referrals"
+                    placeholder="Referencias o interconsultas sugeridas."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="submit-btn" [disabled]="visitForm.invalid" type="submit">
+        {{actionButtonText}}
+      </button>
+      <button 
+        class="secondary-btn"
+        type="button"
+        *ngIf="caller !== 'nv' && selectedVisit()"
+        [routerLink]="['/dashboard', 'visits', 'report', selectedVisit()?.id]"
+      >
+        Ver reporte
+      </button>
+    </div>
   </form>
 </div>
