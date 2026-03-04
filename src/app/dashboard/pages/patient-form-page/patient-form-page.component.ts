@@ -1,8 +1,8 @@
 import { FormBuilder, Validators } from '@angular/forms';
-import { Component, DestroyRef, inject, OnInit, } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { filter, map, switchMap, tap } from 'rxjs';
+import { Subscription, filter, interval, map, switchMap, tap } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { FormPatient, Patient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -27,14 +27,20 @@ type PatientFormValue = {
   styleUrl: './patient-form-page.component.css'
 })
 export class PatientFormPageComponent implements OnInit {
+  @ViewChild('imageInput') private imageInputRef?: ElementRef<HTMLInputElement>
+
   public title = 'Registro de Pacientes'
   public actionButtonText = 'Guardar'
   public isEditMode = false
   public imagePreviewUrl: string | null = null
   public isImageProcessing = false
+  public isQrProcessing = false
   public hasStoredImage = false
+  public selectedImageName: string | null = null
   private patientId: number | null = null
+  private storedImageUrl: string | null = null
   private pendingImageDataUrl: string | null = null
+  private qrPollingSub: Subscription | null = null
   private fb = inject( FormBuilder ).nonNullable
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )
@@ -93,7 +99,7 @@ export class PatientFormPageComponent implements OnInit {
 
     if (!file.type.startsWith('image/')) {
       Swal.fire('Error', 'Selecciona un archivo de imagen válido.', 'error')
-      input.value = ''
+      this.resetImageInput()
       return
     }
 
@@ -106,12 +112,17 @@ export class PatientFormPageComponent implements OnInit {
       })
       this.pendingImageDataUrl = dataUrl
       this.imagePreviewUrl = dataUrl
+      this.selectedImageName = file.name
       this.hasStoredImage = true
     } catch (err) {
       Swal.fire('Error', 'No se pudo procesar la imagen.', 'error')
     } finally {
       this.isImageProcessing = false
     }
+  }
+
+  public triggerImageSelect() {
+    this.imageInputRef?.nativeElement.click()
   }
 
   public openImagePreview() {
@@ -125,6 +136,77 @@ export class PatientFormPageComponent implements OnInit {
     })
   }
 
+  public removeImage() {
+    if (this.pendingImageDataUrl) {
+      this.pendingImageDataUrl = null
+      this.resetImageInput()
+      if (this.storedImageUrl) {
+        this.imagePreviewUrl = this.storedImageUrl
+        this.selectedImageName = 'Imagen guardada'
+        this.hasStoredImage = true
+        return
+      }
+      this.imagePreviewUrl = null
+      this.selectedImageName = null
+      this.hasStoredImage = false
+      return
+    }
+
+    if (this.isEditMode && this.patientId && this.storedImageUrl) {
+      this.patientService.deletePatientImage(this.patientId)
+        .subscribe({
+          next: () => {
+            this.storedImageUrl = null
+            this.imagePreviewUrl = null
+            this.selectedImageName = null
+            this.hasStoredImage = false
+            this.resetImageInput()
+          },
+          error: (error) => {
+            Swal.fire('Error', error, 'error')
+          }
+        })
+      return
+    }
+
+    this.imagePreviewUrl = null
+    this.selectedImageName = null
+    this.hasStoredImage = false
+    this.resetImageInput()
+  }
+
+  public openQrCapture() {
+    if (this.isQrProcessing) return
+    this.isQrProcessing = true
+
+    this.patientService.createImageCaptureSession()
+      .subscribe({
+        next: (session) => {
+          this.isQrProcessing = false
+          Swal.fire({
+            title: 'Escanea el QR',
+            text: 'Usa tu teléfono para tomar la foto.',
+            imageUrl: session.qrDataUrl,
+            imageAlt: 'Código QR',
+            footer: session.captureUrl,
+            showConfirmButton: false,
+            showCloseButton: true,
+            didOpen: () => {
+              this.startQrPolling(session.token)
+            },
+            willClose: () => {
+              this.stopQrPolling()
+              this.clearQrSession(session.token)
+            }
+          })
+        },
+        error: (error) => {
+          this.isQrProcessing = false
+          Swal.fire('Error', error, 'error')
+        }
+      })
+  }
+
   private formatDate( dateString: string | undefined ): string {
     if( !dateString ) return ''
     const date = new Date(dateString);
@@ -136,6 +218,12 @@ export class PatientFormPageComponent implements OnInit {
     this.patientId = Number.isNaN(id) ? null : id
     this.title = 'Editar Paciente'
     this.actionButtonText = 'Actualizar'
+    this.pendingImageDataUrl = null
+    this.storedImageUrl = null
+    this.imagePreviewUrl = null
+    this.selectedImageName = null
+    this.hasStoredImage = false
+    this.resetImageInput()
   }
 
   private setCreateMode() {
@@ -145,8 +233,11 @@ export class PatientFormPageComponent implements OnInit {
     this.actionButtonText = 'Guardar'
     this.patientForm.reset()
     this.pendingImageDataUrl = null
+    this.storedImageUrl = null
     this.imagePreviewUrl = null
+    this.selectedImageName = null
     this.hasStoredImage = false
+    this.resetImageInput()
   }
 
   private patchForm(patient: Patient) {
@@ -167,14 +258,28 @@ export class PatientFormPageComponent implements OnInit {
       .subscribe({
         next: (dataUrl) => {
           if (!dataUrl) {
-            this.hasStoredImage = false
+            this.storedImageUrl = null
+            if (!this.pendingImageDataUrl) {
+              this.imagePreviewUrl = null
+              this.selectedImageName = null
+              this.hasStoredImage = false
+            }
             return
           }
-          this.imagePreviewUrl = dataUrl
+          this.storedImageUrl = dataUrl
+          this.imagePreviewUrl = this.pendingImageDataUrl ?? dataUrl
+          if (!this.pendingImageDataUrl) {
+            this.selectedImageName = 'Imagen guardada'
+          }
           this.hasStoredImage = true
         },
         error: () => {
-          this.hasStoredImage = false
+          this.storedImageUrl = null
+          if (!this.pendingImageDataUrl) {
+            this.imagePreviewUrl = null
+            this.selectedImageName = null
+            this.hasStoredImage = false
+          }
         }
       })
   }
@@ -236,5 +341,52 @@ export class PatientFormPageComponent implements OnInit {
           Swal.fire('Error', message, 'error')
         },
       })
+  }
+
+  private startQrPolling(token: string) {
+    this.stopQrPolling()
+    this.qrPollingSub = interval(2000)
+      .pipe(
+        switchMap(() => this.patientService.getImageCaptureSession(token)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (session) => {
+          if (session.status !== 'uploaded' || !session.image?.dataUrl) return
+          this.applyCapturedImage(session.image.dataUrl, session.image.fileName)
+          Swal.close()
+        },
+        error: () => {
+          this.stopQrPolling()
+        }
+      })
+  }
+
+  private stopQrPolling() {
+    this.qrPollingSub?.unsubscribe()
+    this.qrPollingSub = null
+  }
+
+  private applyCapturedImage(dataUrl: string, fileName?: string) {
+    this.pendingImageDataUrl = dataUrl
+    this.imagePreviewUrl = dataUrl
+    this.selectedImageName = fileName || 'Foto desde QR'
+    this.hasStoredImage = true
+    this.resetImageInput()
+  }
+
+  private clearQrSession(token: string) {
+    this.patientService.deleteImageCaptureSession(token)
+      .subscribe({
+        next: () => undefined,
+        error: () => undefined
+      })
+  }
+
+  private resetImageInput() {
+    this.patientForm.get('image')?.reset()
+    if (this.imageInputRef) {
+      this.imageInputRef.nativeElement.value = ''
+    }
   }
 }

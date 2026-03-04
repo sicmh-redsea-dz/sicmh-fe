@@ -121,11 +121,40 @@
         <div class="form-group">
           <label>Subir Imagen del Paciente</label>
           <div class="image-input">
-            <input  class=""
-                    type="file"
-                    formControlName="image"
-                    accept="image/*"
-                    (change)="handleImageChange($event)">
+            <input
+              #imageInput
+              class="file-input"
+              type="file"
+              formControlName="image"
+              accept="image/*"
+              (change)="handleImageChange($event)"
+            >
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="triggerImageSelect()"
+              aria-label="Subir imagen"
+            >
+              <i class="fa-solid fa-upload"></i>
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="openQrCapture()"
+              aria-label="Subir imagen con QR"
+            >
+              <i class="fa-solid fa-qrcode"></i>
+            </button>
+            <span class="file-name" *ngIf="selectedImageName">{{ selectedImageName }}</span>
+            <button
+              type="button"
+              class="icon-btn icon-btn--danger"
+              *ngIf="hasStoredImage"
+              (click)="removeImage()"
+              aria-label="Quitar imagen"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
             <button
               type="button"
               class="icon-btn"
@@ -137,6 +166,7 @@
             </button>
           </div>
           <small class="helper-text" *ngIf="isImageProcessing">Procesando imagen...</small>
+          <small class="helper-text" *ngIf="isQrProcessing">Generando QR...</small>
         </div>
       </div>
     </div>
