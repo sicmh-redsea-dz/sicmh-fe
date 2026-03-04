@@ -1,4 +1,4 @@
-<form class="transfer-form" [formGroup]="invoiceForm">
+<form class="transfer-form" [formGroup]="invoiceForm" (ngSubmit)="onHandleSubmit()">
     <div class="form-group">
         <label for="subinv">Subinventario</label>
         <select id="subinv" formControlName="subinv">
@@ -7,6 +7,9 @@
             <option value="3">Quirofano</option>
             <option value="4">Hospitalización</option>
         </select>
+        <small class="error-text" *ngIf="invoiceForm.get('subinv')?.touched && invoiceForm.get('subinv')?.hasError('required')">
+          Selecciona un subinventario.
+        </small>
     </div>
     <div class="form-group">
         <label for="qty">Cantidad</label>
@@ -16,6 +19,9 @@
                 <option [value]="q">{{ q }}</option>
             }
         </select>
+        <small class="error-text" *ngIf="invoiceForm.get('qty')?.touched && invoiceForm.get('qty')?.hasError('required')">
+          Selecciona una cantidad.
+        </small>
     </div>
 
     <div class="form-actions">
@@ -29,7 +35,6 @@
         <button 
             class="btn submit"
             type="submit"
-            (click)="onHandleSubmit()"
         >
             Generar
         </button>

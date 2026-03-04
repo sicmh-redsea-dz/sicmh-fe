@@ -73,29 +73,8 @@ export const sidebarItems: SidebarItem[] = [
   {
     label: 'Inventario',
     icon: 'ph-bold ph-warehouse',
-    hasSubmenu: true,
-    subItems: [
-      {
-        label: 'Inventario General',
-        routerLink: 'inventory/products',
-        requiredPermissions: ['inventory.read']
-      },
-      {
-        label: 'Subinv - Emergencia',
-        routerLink: 'inventory/products-sub1',
-        requiredPermissions: ['inventory.read']
-      },
-      {
-        label: 'Subinv - Quirofano',
-        routerLink: 'inventory/products-sub2',
-        requiredPermissions: ['inventory.read']
-      },
-      {
-        label: 'Subinv - Hospitalización',
-        routerLink: 'inventory/products-sub3',
-        requiredPermissions: ['inventory.read']
-      },
-    ],
-    arrowIcon: 'ph-bold ph-caret-down'
+    hasSubmenu: false,
+    routerLink: 'inventory/products',
+    requiredPermissions: ['inventory.read']
   }
 ]

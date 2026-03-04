@@ -3,6 +3,7 @@ import { environment } from '../../../../environments/environment'
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { AuthHeadersService } from '../../../core/http/auth-headers.service';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,7 @@ export class DashboardService {
             return { cardData, visitData }
           }),
           catchError(( err ) => {
-            return throwError(() => err?.error?.message ?? err?.message)
+            return throwError(() => formatApiError(err))
           })
         )
 

@@ -1,0 +1,53 @@
+<div class="patient-view" *ngIf="!isLoading; else loading">
+  <ng-container *ngIf="patient; else empty">
+    <div class="patient-header">
+      <div class="avatar">
+        <img *ngIf="imageUrl; else placeholder" [src]="imageUrl" alt="Foto del paciente">
+        <ng-template #placeholder>
+          <div class="avatar-fallback">
+            <i class="ph ph-user"></i>
+          </div>
+        </ng-template>
+      </div>
+      <div class="patient-meta">
+        <h3>{{ patient.name }} {{ patient.lastName }}</h3>
+        <p>ID: {{ patient.idNumber }}</p>
+      </div>
+    </div>
+
+    <div class="patient-details">
+      <div class="detail-row">
+        <span>Correo</span>
+        <span>{{ patient.email }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Teléfono</span>
+        <span>{{ patient.phone }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Género</span>
+        <span>{{ patient.gender }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Dirección</span>
+        <span>{{ patient.address }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Nacimiento</span>
+        <span>{{ patient.birthDate | formatDate }}</span>
+      </div>
+    </div>
+
+    <button class="edit-link" type="button" (click)="goToEdit()">
+      Ir a editar
+    </button>
+  </ng-container>
+</div>
+
+<ng-template #loading>
+  <div class="state-text">Cargando información...</div>
+</ng-template>
+
+<ng-template #empty>
+  <div class="state-text">No hay información para mostrar.</div>
+</ng-template>

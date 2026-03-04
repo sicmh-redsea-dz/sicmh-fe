@@ -8,10 +8,12 @@ import { Router } from '@angular/router';
 })
 export class CustomHeaderComponent {
   @Input() headerText: string = ''
+  @Input() subHeaderText: string = ''
   @Input() itemCounter: number = 0
   @Input() inputPlaceholder: string = ''
   @Input() btnRouterLink: string = ''
   @Input() showCreateButton: boolean = true
+  @Input() disableCreateButton: boolean = false
   @Input() isDwnldRerportLoading: boolean = false
 
   @Output() searchTerm = new EventEmitter()

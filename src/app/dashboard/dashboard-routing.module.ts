@@ -14,6 +14,9 @@ import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
+import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
+import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
+import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 
 const routes: Routes = [
   {
@@ -92,6 +95,18 @@ const routes: Routes = [
               titleEdit: 'Editar quirofano',
               subtitleEdit: 'Actualiza los detalles de quirofano.'
             }
+          },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'oroom' }
+          },
+          { 
+            path: 'rooms', 
+            component: OrRoomsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], title: 'Quirófanos' }
           }
         ]
       },
@@ -137,6 +152,18 @@ const routes: Routes = [
               titleEdit: 'Editar hospitalización',
               subtitleEdit: 'Actualiza los detalles de hospitalización.'
             }
+          },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'hospitalization' }
+          },
+          { 
+            path: 'beds', 
+            component: BedsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], module: 'hospitalization', title: 'Camas de hospitalización' }
           }
         ]
       },
@@ -183,6 +210,18 @@ const routes: Routes = [
               subtitleEdit: 'Actualiza los detalles de emergencia médica.'
             }
           },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'emergency' }
+          },
+          { 
+            path: 'beds', 
+            component: BedsManagementPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.update'], module: 'emergency', title: 'Camas de emergencia' }
+          },
         ]
       },
 
@@ -208,6 +247,12 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: { permissions: ['visits.update'] }
           },
+          { 
+            path: 'report/:id', 
+            component: VisitsReportPageComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['visits.read'], origin: 'visits' }
+          },
         ]
       },
 
@@ -227,12 +272,7 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: {
               permissions: ['inventory.read'],
-              headerText: 'Inventario General',
-              subinventoryId: '1',
-              showCreateButton: true,
-              showTransferOpt: true,
-              enableEdit: true,
-              enableDelete: false
+              headerText: 'Inventario General'
             }
           },
           { 
@@ -247,48 +287,9 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: { permissions: ['inventory.update'] }
           },
-          { 
-            path: 'products-sub1', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Emergencia',
-              subinventoryId: '2',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          },
-          { 
-            path: 'products-sub2', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Quirofano',
-              subinventoryId: '3',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          },
-          { 
-            path: 'products-sub3', 
-            component: InventoryPageComponent,
-            canActivate: [permissionsGuard],
-            data: {
-              permissions: ['inventory.read'],
-              headerText: 'Subinventario de Hospitalización',
-              subinventoryId: '4',
-              showCreateButton: false,
-              showTransferOpt: false,
-              enableEdit: false,
-              enableDelete: false
-            }
-          }
+          { path: 'products-sub1', redirectTo: 'products', pathMatch: 'full' },
+          { path: 'products-sub2', redirectTo: 'products', pathMatch: 'full' },
+          { path: 'products-sub3', redirectTo: 'products', pathMatch: 'full' }
         ]
       },
 

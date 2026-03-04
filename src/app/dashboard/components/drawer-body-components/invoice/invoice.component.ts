@@ -129,6 +129,10 @@ export class InvoiceComponent implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.invoiceForm.invalid) {
+      this.invoiceForm.markAllAsTouched()
+      return
+    }
     if( this.isDrawerSetToUpd() ) 
       this.completeExistingInvoice()
     else 
@@ -136,7 +140,6 @@ export class InvoiceComponent implements OnInit {
   }
   
   private saveNewInvoice() {
-    if(!this.invoiceForm.valid) return
     this.invoiceService.createInvoice({
       ...this.invoiceForm.value,
       amount: this.invoiceForm.get('amount')?.value
@@ -159,7 +162,6 @@ export class InvoiceComponent implements OnInit {
   }
 
   private completeExistingInvoice() {
-    if(!this.invoiceForm.valid) return
     this.invoiceService.updateInvoice(this.invoiceIdToUpd(), {...this.invoiceForm.value, amount: this.invoiceForm.get('amount')?.value})
       .subscribe({
         next: ( resp ) => {

@@ -9,6 +9,7 @@ export class DrawerService {
   public contentToDisplay = signal<string>( DrawerContents.NONE )
   public setToUpdate = signal<boolean>( false )
   public setInvoiceId = signal<string>('')
+  public setPatientId = signal<string>('')
 
   
   public drawerTexts = signal<{header: string, btnText: string}>({

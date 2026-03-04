@@ -6,6 +6,8 @@ import { Patient } from '../../interface/patients-response.interface';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../auth/services/auth.service';
+import { DrawerService } from '../../services/drawer-service/drawer.service';
+import { DrawerContents } from '../../interface/drawer-content.enum';
 
 @Component({
   selector: 'app-patients',
@@ -30,9 +32,13 @@ export class PatientsPageComponent {
   public canDeletePatient = computed(() =>
     this.authService.hasPermission('patients.delete')
   )
+  public canViewPatient = computed(() =>
+    this.authService.hasPermission('patients.read')
+  )
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
+  private drawerService = inject( DrawerService )
   private searchTermSubject = new Subject<string>()
   private destroyRef = inject(DestroyRef)
   
@@ -98,6 +104,17 @@ export class PatientsPageComponent {
           Swal.fire('Error', err, 'error')
         }
       })
+  }
+
+  public handleViewPatient(patient: Patient) {
+    this.drawerService.isDrawerOpen.set(true)
+    this.drawerService.contentToDisplay.set(DrawerContents.PATIENT_VIEW)
+    this.drawerService.setToUpdate.set(false)
+    this.drawerService.setPatientId.set(patient.id.toString())
+    this.drawerService.drawerTexts.set({
+      header: `${patient.name} ${patient.lastName}`,
+      btnText: ''
+    })
   }
 
   public deleteSelectedPatient(id: number) {

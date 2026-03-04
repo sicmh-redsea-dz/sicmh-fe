@@ -10,35 +10,53 @@
 
     <app-google-button (onClick)="submitWithGoogle($event)"/>
 
-    <div class="wrap-input">
+    <div class="wrap-input" [class.invalid]="myForm.get('name')?.touched && myForm.get('name')?.invalid">
         <span class="label-input">Nombre</span>
         <input class="input"
                type="text"
                formControlName="name"
                placeholder="Ingresa tu nombre">
         <span class="focus-input"></span>
+        <small class="error-text" *ngIf="myForm.get('name')?.touched && myForm.get('name')?.errors?.['required']">
+          Este campo es obligatorio.
+        </small>
+        <small class="error-text" *ngIf="myForm.get('name')?.touched && myForm.get('name')?.errors?.['minlength']">
+          Debe tener al menos 2 caracteres.
+        </small>
     </div>
 
-    <div class="wrap-input">
+    <div class="wrap-input" [class.invalid]="myForm.get('email')?.touched && myForm.get('email')?.invalid">
         <span class="label-input">Correo</span>
         <input class="input"
                type="email"
                formControlName="email"
                placeholder="Correo electrónico">
         <span class="focus-input"></span>
+        <small class="error-text" *ngIf="myForm.get('email')?.touched && myForm.get('email')?.errors?.['required']">
+          Este campo es obligatorio.
+        </small>
+        <small class="error-text" *ngIf="myForm.get('email')?.touched && myForm.get('email')?.errors?.['email']">
+          Ingresa un correo válido.
+        </small>
     </div>
 
-    <div class="wrap-input">
+    <div class="wrap-input" [class.invalid]="myForm.get('password')?.touched && myForm.get('password')?.invalid">
         <span class="label-input">Contraseña</span>
         <input class="input"
                type="password"
                formControlName="password"
                placeholder="Ingrese su contraseña">
         <span class="focus-input"></span>
+        <small class="error-text" *ngIf="myForm.get('password')?.touched && myForm.get('password')?.errors?.['required']">
+          Este campo es obligatorio.
+        </small>
+        <small class="error-text" *ngIf="myForm.get('password')?.touched && myForm.get('password')?.errors?.['minlength']">
+          Debe tener al menos 6 caracteres.
+        </small>
     </div>
 
 
-    <div class="container=btn">
+    <div class="container-btn">
         <div class="wrapper-btn">
             <div class="background-btn"></div>
             <button class="form-btn"

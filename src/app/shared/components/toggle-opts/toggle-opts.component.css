@@ -22,11 +22,11 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  background-color: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   padding: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   z-index: 100;
   opacity: 0;
   pointer-events: none;
@@ -55,7 +55,7 @@
 }
 
 .opts-btns:not(.blocked):hover {
-  background-color: #ededed
+  background-color: #f1f5f9
 }
 
 .opts-btns.delete {
@@ -63,7 +63,7 @@
 }
 
 .opts-btns:hover.delete {
-  background-color: #fae3e3;
+  background-color: #fee2e2;
 }
 
 .opts-btns i {
@@ -71,6 +71,6 @@
 }
 
 .opts-divider {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--border-color);
   margin: 0.25rem 0;
 }

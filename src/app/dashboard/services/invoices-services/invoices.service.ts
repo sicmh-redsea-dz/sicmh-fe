@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { Invoice, InvoiceForm } from '../../interface/invoice-response.interface';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 interface Delimiters {
   limit: number,
@@ -39,7 +40,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -55,7 +56,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -71,7 +72,7 @@ export class InvoicesService {
           return resp
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -88,7 +89,7 @@ export class InvoicesService {
           return true
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -105,7 +106,7 @@ export class InvoicesService {
           return true
         }),
         catchError(( err ) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }
@@ -119,7 +120,7 @@ export class InvoicesService {
       .pipe(
         map(() => true),
         catchError((err) => {
-          return throwError(() => err?.error?.message ?? err?.message)
+          return throwError(() => formatApiError(err))
         })
       )
   }

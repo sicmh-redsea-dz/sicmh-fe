@@ -1,0 +1,181 @@
+<div class="management-container">
+  <div class="header">
+    <div>
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle || 'Gestión de quirófanos con auditoría.' }}</p>
+    </div>
+    <button class="link-btn" type="button" (click)="goBack()">Volver</button>
+  </div>
+
+  <div class="management-content">
+    <div class="list-panel">
+      <div class="panel-header">
+        <span>Listado de quirófanos</span>
+        <button class="ghost-btn" type="button" (click)="clearSelection()">Nuevo quirófano</button>
+      </div>
+
+      <div class="table-wrapper" *ngIf="rooms.length > 0; else empty">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Especialidad</th>
+              <th>Estado</th>
+              <th>Paciente</th>
+              <th>Asignado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let room of rooms" (click)="selectRoom(room)" [class.active]="selectedRoom?.id === room.id">
+              <td>{{ room.code }}</td>
+              <td>{{ room.specialty || '-' }}</td>
+              <td>
+                <span class="status" [class]="room.status">{{ getStatusLabel(room.status) }}</span>
+              </td>
+              <td>{{ room.currentAssignment?.patientName || '-' }}</td>
+              <td>{{ room.currentAssignment?.assignedAt ? (room.currentAssignment?.assignedAt | date:'short') : '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #empty>
+        <div class="empty-state">
+          No hay quirófanos registrados.
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="detail-panel">
+      <section class="card">
+        <h3>{{ selectedRoom ? 'Editar quirófano' : 'Nuevo quirófano' }}</h3>
+        <form [formGroup]="roomForm" (ngSubmit)="saveRoom()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Código</label>
+              <input type="text" formControlName="code" placeholder="Ej. Q-01" />
+              <small class="error-text" *ngIf="roomForm.get('code')?.touched && roomForm.get('code')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Especialidad</label>
+              <input type="text" formControlName="specialty" placeholder="Ej. Cirugía general" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Estado</label>
+              <select formControlName="status">
+                <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+              </select>
+              <small class="error-text" *ngIf="roomForm.get('status')?.touched && roomForm.get('status')?.hasError('required')">
+                Selecciona un estado.
+              </small>
+            </div>
+          </div>
+          <button class="primary-btn" type="submit">
+            {{ selectedRoom ? 'Guardar cambios' : 'Crear quirófano' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="card" *ngIf="selectedRoom">
+        <h3>Asignación</h3>
+        <form [formGroup]="assignmentForm">
+          <div class="form-row">
+            <div class="form-group" style="position: relative;">
+              <label>Paciente</label>
+              <div class="autocomplete-wrapper">
+                <input type="text"
+                       placeholder="Buscar paciente..."
+                       [class.input-invalid]="assignmentForm.get('patient')?.touched && assignmentForm.get('patient')?.hasError('required')"
+                       [formControl]="patientSearchControl"
+                       (focus)="showPatDropdown = true"
+                       (blur)="handlePatBlur()" />
+                <div *ngIf="isPatLoading" class="loader"></div>
+              </div>
+              <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
+                <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+                  {{ patient.name }}
+                </li>
+              </ul>
+              <small class="error-text" *ngIf="assignmentForm.get('patient')?.touched && assignmentForm.get('patient')?.hasError('required')">
+                Selecciona un paciente.
+              </small>
+            </div>
+
+            <div class="form-group" style="position: relative;">
+              <label>Médico</label>
+              <div class="autocomplete-wrapper">
+                <input type="text"
+                       placeholder="Buscar médico..."
+                       [formControl]="doctorSearchControl"
+                       (focus)="showDocDropdown = true"
+                       (blur)="handleDocBlur()" />
+                <div *ngIf="isDocLoading" class="loader"></div>
+              </div>
+              <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
+                <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+                  {{ doctor.name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Procedimiento</label>
+              <input type="text" formControlName="procedure" placeholder="Procedimiento programado" />
+            </div>
+            <div class="form-group">
+              <label>Tipo de anestesia</label>
+              <input type="text" formControlName="anesthesiaType" placeholder="Ej. General" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Inicio</label>
+              <input type="time" formControlName="scheduledStart" />
+            </div>
+            <div class="form-group">
+              <label>Fin</label>
+              <input type="time" formControlName="scheduledEnd" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea rows="3" formControlName="notes" placeholder="Observaciones adicionales"></textarea>
+          </div>
+        </form>
+
+        <div class="action-row">
+          <button class="primary-btn" type="button" (click)="assignRoom()">
+            {{ selectedRoom.currentAssignment ? 'Actualizar asignación' : 'Asignar quirófano' }}
+          </button>
+          <button class="danger-btn" type="button" *ngIf="selectedRoom.currentAssignment" (click)="releaseRoom()">
+            Liberar quirófano
+          </button>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="selectedRoom">
+        <h3>Historial</h3>
+        <div class="history" *ngIf="selectedRoom.history.length; else noHistory">
+          <div class="history-item" *ngFor="let entry of selectedRoom.history | slice:0:6">
+            <div>
+              <span class="history-type">{{ entry.type }}</span>
+              <span class="history-meta">{{ entry.timestamp | date:'short' }}</span>
+            </div>
+            <span class="history-actor">{{ entry.actor?.name || 'Sistema' }}</span>
+          </div>
+        </div>
+        <ng-template #noHistory>
+          <div class="empty-state">Sin eventos aún.</div>
+        </ng-template>
+      </section>
+    </div>
+  </div>
+</div>

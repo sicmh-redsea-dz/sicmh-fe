@@ -32,9 +32,11 @@
           <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts 
-              *ngIf="canEditPatient() || canDeletePatient()"
+              *ngIf="canViewPatient() || canEditPatient() || canDeletePatient()"
+              [showViewOpt]="canViewPatient()"
               [showEditOpt]="canEditPatient()"
               [showDeleteOpt]="canDeletePatient()"
+              (viewEvent)="handleViewPatient(patient)"
               (editEvent)="handleSelectedPatient(patient.id)"
               (deleteEvent)="deleteSelectedPatient( patient.id )"
             />
@@ -57,3 +59,5 @@
 <ng-template #nodata>
   <no-data />
 </ng-template>
+
+<app-drawer />

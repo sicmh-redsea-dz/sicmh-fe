@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 @Component({
   selector: 'app-login-page',
@@ -30,6 +31,10 @@ export class LoginPageComponent {
   }
 
   async submit() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched()
+      return
+    }
     const { email, password } = this.loginForm.value
     
     try {
@@ -43,7 +48,7 @@ export class LoginPageComponent {
   }
 
   private getErrorMessage(err: any): string {
-    const message = err?.error?.message
+    const message = formatApiError(err)
     if ( Array.isArray(message) ) {
       return message.map((item) => item.msg).join(', ')
     }

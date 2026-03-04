@@ -3,9 +3,9 @@
   max-width: 1200px;
   max-height: 95vh;
   padding: 2rem;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
   overflow-y: auto;
   position: relative;
 }
@@ -35,12 +35,12 @@
 
 .form-header h1 {
   font-size: 1.5rem;
-  color: #000080;
+  color: var(--text-color);
 }
 
 .form-header p {
   font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .subtle-text {
@@ -50,7 +50,7 @@
   transform: translateY(-50%);
   font-size: .85rem;
   font-weight: bold;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .medical-form {
@@ -74,7 +74,7 @@
 
 .input-group label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   align-self: flex-start;
   margin-top: 0.5rem;
 }
@@ -84,11 +84,14 @@
 }
 
 input[type="date"],
+input[type="text"],
+input[type="number"],
+input[type="time"],
 select {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
 }
 
@@ -96,6 +99,33 @@ select {
   border: none;
   border-top: 1px solid #ddd;
   margin: .25rem 0;
+}
+
+.fancy-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.fancy-divider::before,
+.fancy-divider::after {
+  content: '';
+  border-top: 1px solid var(--border-color);
+}
+
+.fancy-divider::before {
+  flex: .1;
+  margin-right: 0.5rem;
+}
+
+.fancy-divider::after {
+  flex: .9;
+  margin-left: 0.5rem;
 }
 
 .input-columns {
@@ -123,7 +153,7 @@ select {
 }
 
 .divider-vertical {
-  border-left: 1px solid #ddd;
+  border-left: 1px solid var(--border-color);
   height: 100%;
   margin: 0 1rem;
 }
@@ -145,8 +175,8 @@ select {
 .number-input {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   width: fit-content;
   height: 2rem;
@@ -277,15 +307,15 @@ select {
 
 .textarea-group label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .textarea-group textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
   resize: vertical;
   height: 100px;
@@ -297,18 +327,30 @@ select {
 
 .textarea-full label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .textarea-full textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: .8rem;
   resize: vertical;
   height: 150px;
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+}
+
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: #dc2626;
 }
 
 .submit-btn {
@@ -334,6 +376,42 @@ select {
 
 .submit-btn:disabled {
   background-color: var(--color-light-gray);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.secondary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background-color: #f9fafb;
+  border-radius: .5rem;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px;
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
+
+.secondary-btn:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.inventory-block {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.inventory-block .form-group {
+  width: 100%;
+  max-width: 640px;
 }
 
 @media (max-width: 1024px) {
@@ -492,8 +570,3 @@ select {
   0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
   100% { transform: translateY(-50%) rotate(360deg); }
 }
-
-
-
-
-

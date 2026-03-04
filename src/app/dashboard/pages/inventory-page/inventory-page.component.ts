@@ -1,5 +1,5 @@
 import { Component, DestroyRef, computed, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { InventoryService } from '../../services/inventory-service/inventory.service';
 import Swal from 'sweetalert2';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -32,12 +32,13 @@ export class InventoryPageComponent implements OnInit {
   public drawerParams = inject( DrawerService )
   private readonly searchTermSubject = new Subject<string>()
   private router = inject(Router)
-  private route = inject(ActivatedRoute)
   public bodyContent: Article[] = []
   private readonly invService = inject( InventoryService )
   public headerText: string = 'Inventario General'
+  public subHeaderText: string = 'Fichero: General'
   public subinventoryId: string = '1'
   public showCreateButton: boolean = true
+  public disableCreateButton: boolean = false
   public showTransferOpt: boolean = true
   public enableEdit: boolean = true
   public enableDelete: boolean = false
@@ -53,6 +54,13 @@ export class InventoryPageComponent implements OnInit {
   )
   private destroyRef = inject(DestroyRef)
 
+  public inventoryTabs = [
+    { id: '1', label: 'General', readOnly: false },
+    { id: '2', label: 'Emergencia', readOnly: true },
+    { id: '3', label: 'Quirofano', readOnly: true },
+    { id: '4', label: 'Hospitalización', readOnly: true }
+  ]
+
   constructor() {
     this.searchTermSubject.pipe(
       debounceTime( 700 ),
@@ -64,29 +72,25 @@ export class InventoryPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-      const {
-        headerText,
-        subinventoryId,
-        showCreateButton,
-        showTransferOpt,
-        enableEdit,
-        enableDelete,
-      } = data;
+    this.selectTab(this.inventoryTabs[0])
+  }
 
-      if (headerText) this.headerText = headerText;
-      if (subinventoryId) this.subinventoryId = subinventoryId;
-      if (showCreateButton !== undefined) this.showCreateButton = showCreateButton;
-      if (showTransferOpt !== undefined) this.showTransferOpt = showTransferOpt;
-      if (enableEdit !== undefined) this.enableEdit = enableEdit;
-      if (enableDelete !== undefined) this.enableDelete = enableDelete;
+  public selectTab(tab: { id: string; label: string; readOnly: boolean }) {
+    this.subinventoryId = tab.id
+    this.headerText = 'Inventario General'
+    this.subHeaderText = `Fichero: ${tab.label}`
 
-      this.currentPage = 1
-      this.offset = 0
-      this.getInventoryItems()
-    })
+    const isReadOnly = tab.readOnly
+    this.showCreateButton = true
+    this.disableCreateButton = isReadOnly
+    this.showTransferOpt = !isReadOnly
+    this.enableEdit = !isReadOnly
+    this.enableDelete = false
+
+    this.currentPage = 1
+    this.offset = 0
+    this.searchTerm = ''
+    this.getInventoryItems()
   }
 
   public handleSelectedItem( itemId: number | string ) {

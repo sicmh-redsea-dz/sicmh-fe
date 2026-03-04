@@ -1,7 +1,7 @@
 <div class="container">
   <div class="header-container">
     <button class="back-arrow" 
-            [routerLink]="['/dashboard', 'emergency']">
+            [routerLink]="['/dashboard', backRoute]">
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="form-header">
@@ -21,6 +21,9 @@
         <label>Date</label>
         <input type="date" 
               formControlName="date"/>
+        <small class="error-text" *ngIf="visitForm.get('date')?.touched && visitForm.get('date')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
       </div>
 
       <div class="input-group" style="position: relative;">
@@ -41,6 +44,9 @@
             {{ doctor.name }}
           </li>
         </ul>
+        <small class="error-text" *ngIf="visitForm.get('doctor')?.touched && visitForm.get('doctor')?.hasError('required')">
+          Selecciona un doctor.
+        </small>
       </div>
 
       <div class="input-group" style="position: relative;">
@@ -61,13 +67,73 @@
             {{ patient.name }}
           </li>
         </ul>
+        <small class="error-text" *ngIf="visitForm.get('patient')?.touched && visitForm.get('patient')?.hasError('required')">
+          Selecciona un paciente.
+        </small>
       </div>
     </div>
 
-    <hr class="divider" />
+    <div formGroupName="expediente">
+      <div class="fancy-divider">
+        <span>Historia clínica</span>
+      </div>
+
+      <div formGroupName="standard">
+        <div class="textareas-row">
+          <div class="textarea-group">
+            <label>Motivo de consulta/ingreso</label>
+            <textarea 
+              formControlName="chiefComplaint"
+              placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.chiefComplaint')?.touched && visitForm.get('expediente.standard.chiefComplaint')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
+          </div>
+
+          <div class="textarea-group">
+            <label>Padecimiento actual</label>
+            <textarea 
+              formControlName="currentIllness"
+              placeholder="Resume el padecimiento actual del paciente."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentIllness')?.touched && visitForm.get('expediente.standard.currentIllness')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
+          </div>
+        </div>
+
+        <div class="textarea-full">
+          <label>Exploración física</label>
+          <textarea 
+            formControlName="physicalExam"
+            placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
+          <small class="error-text" *ngIf="visitForm.get('expediente.standard.physicalExam')?.touched && visitForm.get('expediente.standard.physicalExam')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
+        </div>
+
+        <div class="textareas-row">
+          <div class="textarea-group">
+            <label>Alergias</label>
+            <textarea 
+              formControlName="allergies"
+              placeholder="Alergias conocidas del paciente."></textarea>
+          </div>
+
+          <div class="textarea-group">
+            <label>Medicamentos actuales</label>
+            <textarea 
+              formControlName="currentMeds"
+              placeholder="Medicamentos que consume actualmente."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fancy-divider">
+      <span>preclinica</span>
+    </div>
 
     <div class="input-columns">
-      <!-- Columna izquierda (75%) -->
       <div class="left-column">
         <div class="number-input-group">
           <label>Presion</label>
@@ -76,6 +142,12 @@
                   formControlName="pressure" 
                   placeholder="Ej. 120/80 mmHg"/>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('pressure')?.touched && visitForm.get('pressure')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
+          <small class="error-text" *ngIf="visitForm.get('pressure')?.touched && visitForm.get('pressure')?.hasError('invalidPressure')">
+            El formato debe ser ###/###.
+          </small>
         </div>
         <div class="number-input-group">
           <label>Temperatura</label>
@@ -84,10 +156,13 @@
                   formControlName="temperature"
                   placeholder="Ej. 36º"/>
             <div class="button-group">
-              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
-              <button class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('temperature')?.touched && visitForm.get('temperature')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
         <div class="number-input-group">
           <label>Altura</label>
@@ -102,6 +177,9 @@
               </select>
             </div>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('height')?.touched && visitForm.get('height')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
         <div class="number-input-group">
           <label>Glucometria</label>
@@ -110,10 +188,13 @@
                   formControlName="glucometry"
                   placeholder="Ej. 90 mg/dL"/>
             <div class="button-group">
-              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
-              <button class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('glucometry')?.touched && visitForm.get('glucometry')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
         <div class="number-input-group">
           <label>Oxigenacion</label>
@@ -122,10 +203,13 @@
                   formControlName="oxygenation" 
                   placeholder="Ej. 100%"/>
             <div class="button-group">
-              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
-              <button class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('oxygenation')?.touched && visitForm.get('oxygenation')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
         <div class="number-input-group">
           <label>Peso</label>
@@ -140,42 +224,353 @@
               </select>
             </div>
           </div>
+          <small class="error-text" *ngIf="visitForm.get('weight')?.touched && visitForm.get('weight')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
       </div>
 
       <div class="divider-vertical"></div>
-      <!-- Columna derecha (25%) -->
-       <div class="right-column">
-         <div class="form-group">
-           <label>Inventario</label>
-           <select name="stock" (change)="handleChange($event)">
-             <option value="">Selecciona un elemento</option>
-              @for( s of listOfStockItems(); track $index ) {
-                <option [value]="s.id">{{s.productName}}</option>
-              }
-           </select>
-           @if(selectedStockItems.length > 0) {
-             <ul class="list">
-               @for(ss of selectedStockItems; track $index) {
-                 <li>
-                   <span [style]="{width: '50%'}">{{$index+1 +'. '+ ss.productName}}</span>
-                   <div>
-                     <i class="icon arrow fa-solid fa-chevron-left" (click)="decrementQuantity($index)"></i>
-                     <span [style]="{marginRight: '.5rem'}">{{ss.currentQuantity}}</span>
-                     <span [style]="{fontWeight: 'bold'}">/</span>
-                     <span [style]="{marginLeft: '.5rem'}">{{ss.productQuantity}}</span>
-                      <i class="icon arrow fa-solid fa-chevron-right" (click)="incrementQuantity($index)"></i>
-                   </div>
-                   <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
-                 </li>
-               }
-             </ul>
-           }
-         </div>
-       </div>
+      <div class="right-column">
+        <div class="calculated-input-group">
+          <label>IMC</label>
+          <input class="calculated-input"
+                type="text" 
+                formControlName="BMI"
+                placeholder="Ej. 22.86"/>
+        </div>
+
+        <div class="calculated-input-group">
+          <label>% De Grasa</label>
+          <input class="calculated-input"
+                type="text" 
+                formControlName="fatPercentage"
+                placeholder="Ej. 25.8%"/>
+        </div>
+
+        <div class="calculated-input-group">
+          <label>Grasa Visceral</label>
+          <input class="calculated-input" 
+                type="text" 
+                formControlName="visceralFat"
+                placeholder="Ej. 1.07"/>
+        </div>
+
+        <div class="calculated-input-group">
+          <label>Edad Metabólica</label>
+          <input class="calculated-input" 
+                type="text" 
+                formControlName="ageAccordingToWeight"
+                placeholder="Ej. 32"/>
+        </div>
+      </div>
     </div>
 
-    <hr class="divider" />
+    <div class="fancy-divider">
+      <span>Antecedentes</span>
+    </div>
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Patologicos</label>
+        <textarea 
+          formControlName="pathologicalHst"
+          placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
+      </div>
+
+      <div class="textarea-group">
+        <label>Familiares</label>
+        <textarea 
+          formControlName="familyHst"
+          placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
+      </div>
+    </div>
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Quirurgicos</label>
+        <textarea 
+          formControlName="surgicalHst"
+          placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
+      </div>
+
+      <div class="textarea-group">
+        <label>Habitos</label>
+        <textarea 
+          formControlName="backgroundHst"
+          placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
+      </div>
+    </div>
+
+    <div class="fancy-divider">
+      <span>intervencion</span>
+    </div>
+
+    <div class="textareas-row">
+      <div class="textarea-group">
+        <label>Diagnostico</label>
+        <textarea formControlName="diagnosis"
+                  placeholder="Escribe aquí el diagnóstico detallado del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('diagnosis')?.touched && visitForm.get('diagnosis')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
+      </div>
+    
+      <div class="textarea-group">
+        <label>Tratamiento</label>
+        <textarea formControlName="treatment"
+                  placeholder="Describe el plan de tratamiento y medicamentos recomendados."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('treatment')?.touched && visitForm.get('treatment')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
+      </div>
+    </div>
+
+    <div formGroupName="expediente">
+      <div formGroupName="module">
+        <ng-container *ngIf="origin === 'emergency'">
+          <div class="fancy-divider">
+            <span>Emergencia</span>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Triage</label>
+              <select formControlName="triageLevel">
+                <option value="">Selecciona un nivel</option>
+                <option value="Rojo">Rojo</option>
+                <option value="Amarillo">Amarillo</option>
+                <option value="Verde">Verde</option>
+                <option value="Azul">Azul</option>
+              </select>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.triageLevel')?.touched && visitForm.get('expediente.module.triageLevel')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label>Modo de llegada</label>
+              <select formControlName="arrivalMode">
+                <option value="">Selecciona una opción</option>
+                <option value="Ambulancia">Ambulancia</option>
+                <option value="Caminando">Caminando</option>
+                <option value="Traslado">Traslado</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.arrivalMode')?.touched && visitForm.get('expediente.module.arrivalMode')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label>Destino</label>
+              <select formControlName="disposition">
+                <option value="">Selecciona un destino</option>
+                <option value="Alta">Alta</option>
+                <option value="Ingreso">Ingreso</option>
+                <option value="Traslado">Traslado</option>
+                <option value="Defuncion">Defuncion</option>
+              </select>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.disposition')?.touched && visitForm.get('expediente.module.disposition')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+          </div>
+
+          <div class="textareas-row">
+            <div class="textarea-group">
+              <label>Mecanismo de lesión</label>
+              <textarea formControlName="injuryMechanism"
+                        placeholder="Describe el mecanismo de lesión o evento."></textarea>
+            </div>
+
+            <div class="textarea-group">
+              <label>Escala de dolor (0-10)</label>
+              <input type="number" formControlName="painScale" min="0" max="10" />
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Glasgow</label>
+              <input type="number" formControlName="glasgow" min="3" max="15" />
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="origin === 'oroom'">
+          <div class="fancy-divider">
+            <span>Quirofano</span>
+          </div>
+
+          <div class="textareas-row">
+            <div class="textarea-group">
+              <label>Diagnostico preoperatorio</label>
+              <textarea formControlName="preOpDiagnosis"
+                        placeholder="Diagnóstico previo a la cirugía."></textarea>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.preOpDiagnosis')?.touched && visitForm.get('expediente.module.preOpDiagnosis')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+
+            <div class="textarea-group">
+              <label>Diagnostico postoperatorio</label>
+              <textarea formControlName="postOpDiagnosis"
+                        placeholder="Diagnóstico posterior a la cirugía."></textarea>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.postOpDiagnosis')?.touched && visitForm.get('expediente.module.postOpDiagnosis')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+          </div>
+
+          <div class="textarea-full">
+            <label>Procedimiento quirurgico</label>
+            <textarea formControlName="procedure"
+                      placeholder="Describe el procedimiento realizado."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.module.procedure')?.touched && visitForm.get('expediente.module.procedure')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Tipo de anestesia</label>
+              <input type="text" formControlName="anesthesiaType" placeholder="Ej. General" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.anesthesiaType')?.touched && visitForm.get('expediente.module.anesthesiaType')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+            <div class="input-group">
+              <label>Inicio de cirugía</label>
+              <input type="time" formControlName="surgeryStart" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryStart')?.touched && visitForm.get('expediente.module.surgeryStart')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+            <div class="input-group">
+              <label>Fin de cirugía</label>
+              <input type="time" formControlName="surgeryEnd" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryEnd')?.touched && visitForm.get('expediente.module.surgeryEnd')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+          </div>
+
+          <div class="textareas-row">
+            <div class="textarea-group">
+              <label>Hallazgos</label>
+              <textarea formControlName="findings"
+                        placeholder="Hallazgos relevantes durante el procedimiento."></textarea>
+            </div>
+
+            <div class="textarea-group">
+              <label>Complicaciones</label>
+              <textarea formControlName="complications"
+                        placeholder="Complicaciones presentadas."></textarea>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="origin === 'hospitalization'">
+          <div class="fancy-divider">
+            <span>Hospitalización</span>
+          </div>
+
+          <div class="textareas-row">
+            <div class="textarea-group">
+              <label>Diagnostico de ingreso</label>
+              <textarea formControlName="admissionDiagnosis"
+                        placeholder="Diagnóstico principal de ingreso."></textarea>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionDiagnosis')?.touched && visitForm.get('expediente.module.admissionDiagnosis')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+
+            <div class="textarea-group">
+              <label>Motivo de ingreso</label>
+              <textarea formControlName="admissionReason"
+                        placeholder="Motivo clínico del ingreso."></textarea>
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionReason')?.touched && visitForm.get('expediente.module.admissionReason')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Servicio</label>
+              <input type="text" formControlName="service" placeholder="Ej. Medicina interna" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.service')?.touched && visitForm.get('expediente.module.service')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label>Cama</label>
+              <input type="text" formControlName="bed" placeholder="Ej. 12B" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.bed')?.touched && visitForm.get('expediente.module.bed')?.hasError('required')">
+                Este campo es obligatorio.
+              </small>
+            </div>
+          </div>
+
+          <div class="textarea-full">
+            <label>Resumen de evolución</label>
+            <textarea formControlName="evolutionSummary"
+                      placeholder="Resumen de evolución durante la estancia."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.module.evolutionSummary')?.touched && visitForm.get('expediente.module.evolutionSummary')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
+          </div>
+
+          <div class="textareas-row">
+            <div class="textarea-group">
+              <label>Plan de egreso</label>
+              <textarea formControlName="dischargePlan"
+                        placeholder="Indicaciones para el egreso."></textarea>
+            </div>
+
+            <div class="textarea-group">
+              <label>Fecha de egreso</label>
+              <input type="date" formControlName="dischargeDate" />
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="fancy-divider">
+      <span>Inventario</span>
+    </div>
+
+    <div class="inventory-block">
+      <div class="form-group">
+        <label>Inventario</label>
+        <select name="stock" (change)="handleChange($event)">
+          <option value="">Selecciona un elemento</option>
+          @for( s of listOfStockItems(); track $index ) {
+            <option [value]="s.id">{{s.productName}}</option>
+          }
+        </select>
+        @if(selectedStockItems.length > 0) {
+          <ul class="list">
+            @for(ss of selectedStockItems; track $index) {
+              <li>
+                <span [style]="{width: '50%'}">{{$index+1 +'. '+ ss.productName}}</span>
+                <div>
+                  <i class="icon arrow fa-solid fa-chevron-left" (click)="decrementQuantity($index)"></i>
+                  <span [style]="{marginRight: '.5rem'}">{{ss.currentQuantity}}</span>
+                  <span [style]="{fontWeight: 'bold'}">/</span>
+                  <span [style]="{marginLeft: '.5rem'}">{{ss.productQuantity}}</span>
+                  <i class="icon arrow fa-solid fa-chevron-right" (click)="incrementQuantity($index)"></i>
+                </div>
+                <i (click)="removeListItem(ss.id, $index)" class="icon fa-solid fa-x"></i>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
     
     <div class="textarea-full">
       <label>Notas</label>
@@ -183,10 +578,20 @@
                 placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
     </div>
 
-    <button class="submit-btn" 
-            [disabled]="visitForm.invalid" 
-            type="submit">
-      {{actionButtonText}}
-    </button>
+    <div class="form-actions">
+      <button class="submit-btn" 
+              [disabled]="visitForm.invalid" 
+              type="submit">
+        {{actionButtonText}}
+      </button>
+      <button 
+        class="secondary-btn"
+        type="button"
+        *ngIf="caller !== 'nv' && selectedVisit()"
+        [routerLink]="['/dashboard', backRoute, 'report', selectedVisit()?.id]"
+      >
+        Ver reporte
+      </button>
+    </div>
   </form>
 </div>

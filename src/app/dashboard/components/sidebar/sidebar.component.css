@@ -7,9 +7,9 @@
   gap: 20px;
   background-color: var(--primary-color);
   padding: 24px;
-  border-top-right-radius: 30px;
-  border-bottom-right-radius: 30px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.4);
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   transition: all .3s;
 }
 
@@ -26,13 +26,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 25%;
 }
 
 .user-img i {
   font-size: 1.5rem;
-  color: #555;
+  color: #e2e8f0;
 }
 
 .user-details .title,
@@ -66,7 +66,7 @@
   gap: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-white);
+  color: #e2e8f0;
   text-decoration: none;
   padding: 12px 8px;
   border-radius: 8px;
@@ -75,9 +75,13 @@
 
 .menu ul li > a:hover,
 .menu ul li.active > a{
-  background-color: var(--hover-color);
-  color: #000;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
   cursor: pointer;
+}
+
+.menu ul li.active > a {
+  box-shadow: inset 3px 0 0 0 var(--secondary-color);
 }
 
 .menu ul li .icon {
@@ -102,7 +106,7 @@
   margin-left: 20px;
   padding-left: 20px;
   padding-top: 5px;
-  border-left: 1px solid #f6f6f6;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .menu .sub-menu.show {
@@ -117,7 +121,7 @@
 .menu:not(:last-child) {
   padding-bottom: 10px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #f6f6f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .menu-btn {

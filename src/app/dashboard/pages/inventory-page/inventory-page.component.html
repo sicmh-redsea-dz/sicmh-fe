@@ -2,11 +2,25 @@
     [btnRouterLink]="'new-item'"
     [itemCounter]="totalRegistries"
     [headerText]="headerText"
+    [subHeaderText]="subHeaderText"
     [inputPlaceholder]="'Buscar producto...'"
     [isDwnldRerportLoading]="downloadingPdfReport"
     [showCreateButton]="showCreateButton && canCreateInventory()"
+    [disableCreateButton]="disableCreateButton || !canCreateInventory()"
     (searchTerm)="onSearchTermChange($event)"
 />
+
+<div class="inventory-tabs">
+    <button
+        type="button"
+        class="tab-btn"
+        *ngFor="let tab of inventoryTabs"
+        [class.active]="subinventoryId === tab.id"
+        (click)="selectTab(tab)"
+    >
+        {{ tab.label }}
+    </button>
+</div>
 
 <section *ngIf="bodyContent.length > 0; else nodata">
     <div class="inv-table-container">

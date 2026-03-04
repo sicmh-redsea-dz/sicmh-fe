@@ -32,26 +32,39 @@ export class VisitsFormPageComponent implements OnInit {
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
 
   public visitForm: FormGroup = this.fb.group({
-    ageAccordingToWeight: [this.caller !== 'nv' ? this.selectedVisit()?.ageBasedOnWeight: '', [Validators.required]],
-    BMI           : [this.caller !== 'nv' ? this.selectedVisit()?.BMI: '', [Validators.required]],
-    date          : [this.caller !== 'nv' ? '': '', [Validators.required]],
-    diagnosis     : [this.caller !== 'nv' ? this.selectedVisit()?.diagnosis: '', [Validators.required]],
-    doctor        : [this.caller !== 'nv' ? this.selectedVisit()?.staffId : '', [Validators.required]],
-    fatPercentage : [this.caller !== 'nv' ? this.selectedVisit()?.bodyFatPercentage: '', [Validators.required]],
-    glucometry    : [this.caller !== 'nv' ? this.selectedVisit()?.glucoseLevel: '', [Validators.required]],
-    height        : [this.caller !== 'nv' ? this.selectedVisit()?.height: '', [Validators.required]],
-    notes         : [this.caller !== 'nv' ? this.selectedVisit()?.notes: ''],
-    oxygenation   : [this.caller !== 'nv' ? this.selectedVisit()?.oxygenSaturation: '', [Validators.required]],
-    patient       : [this.caller !== 'nv' ? this.selectedVisit()?.patientId: '', [Validators.required]],
-    pressure      : [this.caller !== 'nv' ? this.selectedVisit()?.bloodPressure: '', [Validators.required, pressureValidator()]],
-    temperature   : [this.caller !== 'nv' ? this.selectedVisit()?.temperature: '', [Validators.required]],
-    treatment     : [this.caller !== 'nv' ? this.selectedVisit()?.treatment: '', [Validators.required]],
-    pathologicalHst: [this.caller !== 'nv' ? this.selectedVisit()?.pathologicalHst: ''],
-    familyHst     : [this.caller !== 'nv' ? this.selectedVisit()?.familyHst: ''],
-    surgicalHst   : [this.caller !== 'nv' ? this.selectedVisit()?.surgicalHst: ''],
-    backgroundHst : [this.caller !== 'nv' ? this.selectedVisit()?.backgroundHst: ''],
-    visceralFat   : [this.caller !== 'nv' ? this.selectedVisit()?.visceralFat: '', [Validators.required]],
-    weight        : [this.caller !== 'nv' ? this.selectedVisit()?.weight: '', [Validators.required]],
+    ageAccordingToWeight: ['', [Validators.required]],
+    BMI           : ['', [Validators.required]],
+    date          : ['', [Validators.required]],
+    diagnosis     : ['', [Validators.required]],
+    doctor        : ['', [Validators.required]],
+    fatPercentage : ['', [Validators.required]],
+    glucometry    : ['', [Validators.required]],
+    height        : ['', [Validators.required]],
+    notes         : [''],
+    oxygenation   : ['', [Validators.required]],
+    patient       : ['', [Validators.required]],
+    pressure      : ['', [Validators.required, pressureValidator()]],
+    temperature   : ['', [Validators.required]],
+    treatment     : ['', [Validators.required]],
+    pathologicalHst: [''],
+    familyHst     : [''],
+    surgicalHst   : [''],
+    backgroundHst : [''],
+    visceralFat   : ['', [Validators.required]],
+    weight        : ['', [Validators.required]],
+    expediente    : this.fb.group({
+      standard: this.fb.group({
+        chiefComplaint: ['', [Validators.required]],
+        currentIllness: ['', [Validators.required]],
+        physicalExam: ['', [Validators.required]],
+        allergies: [''],
+        currentMeds: [''],
+      }),
+      module: this.fb.group({
+        followUpPlan: [''],
+        referrals: [''],
+      })
+    })
   })
 
   public doctorSearchControl = new FormControl(this.caller !== 'nv' ? String(this.selectedVisit()?.docName) : '')
@@ -198,6 +211,10 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.visitForm.invalid) {
+      this.visitForm.markAllAsTouched()
+      return
+    }
     const visit = this.visitForm.value
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )
@@ -251,6 +268,10 @@ export class VisitsFormPageComponent implements OnInit {
             weight: visit.weight,
           })
 
+          if (visit.expediente) {
+            this.visitForm.get('expediente')?.patchValue(visit.expediente)
+          }
+
           this.initializeAutocompleteValues()
         },
         error: ( err ) => {
@@ -261,7 +282,8 @@ export class VisitsFormPageComponent implements OnInit {
 
   public handleEditVisit( visit: FormVisit ) {
     visit.date =  visit.date.split('T')[0]
-    this.visitsService.editVisit(this.selectedVisit()?.id!, visit )
+    const payload = { ...visit, origin: 'visits' }
+    this.visitsService.editVisit(this.selectedVisit()?.id!, payload )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {

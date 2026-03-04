@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { formatApiError } from '../../../shared/utils/api-error'
 
 @Component({
   selector: 'app-register-page',
@@ -32,6 +33,10 @@ export class RegisterPageComponent {
   }
 
   async submit() {
+    if (this.myForm.invalid) {
+      this.myForm.markAllAsTouched()
+      return
+    }
     const { email, password } = this.myForm.value
     try {
       const authenticatedUser = await this.authService.signUp(email, password)
@@ -56,7 +61,7 @@ export class RegisterPageComponent {
   }
 
   private getErrorMessage(err: any): string {
-    const message = err?.error?.message
+    const message = formatApiError(err)
     if ( Array.isArray(message) ) {
       return message.map((item) => item.msg).join(', ')
     }

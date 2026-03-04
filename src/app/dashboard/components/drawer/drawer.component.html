@@ -13,6 +13,9 @@
       @else if ( bodyToDisplay() === dcTransfer ) {
         <app-transfer />
       }
+      @else if ( bodyToDisplay() === dcPatientView ) {
+        <app-patient-view />
+      }
       @else {
         <p>There is no available content for this drawer.</p>
       }

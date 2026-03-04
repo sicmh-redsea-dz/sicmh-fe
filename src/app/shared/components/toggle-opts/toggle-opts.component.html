@@ -12,6 +12,16 @@
                 </div>
             }
 
+            @if ( showViewOpt ) {
+                <div 
+                    class="opts-btns"
+                    (click)="execViewEvent()"
+                    (keypress)="execViewEvent()"
+                >
+                    <i class="ph ph-eye"></i> Ver
+                </div>
+            }
+
             @if ( showEditOpt ) {
                 <div 
                     class="opts-btns"
@@ -24,7 +34,7 @@
             }
 
             @if ( showDeleteOpt ) {
-                @if ( showEditOpt ) {
+                @if ( showTransferOpt || showViewOpt || showEditOpt ) {
                     <div class="opts-divider"></div>
                 }
 
