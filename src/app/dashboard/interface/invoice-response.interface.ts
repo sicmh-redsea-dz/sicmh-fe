@@ -23,4 +23,7 @@ export interface InvoiceForm {
   patient: string;
   amount: string;
   service: number[];
+  elderlyDiscount?: number;
+  promCode?: string;
+  discount?: number;
 }

@@ -36,8 +36,12 @@
 .header-container .table-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.header-container .table-actions app-search-bar {
+  margin-right: auto;
 }
 
 /* -- INIT botones de accion -- */

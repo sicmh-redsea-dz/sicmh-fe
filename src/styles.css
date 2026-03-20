@@ -76,6 +76,8 @@ body, html {
   font-family: Poppins-Regular, sans-serif;
   background: var(--app-bg);
   color: var(--text-color);
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 /*---------------------------------------------*/

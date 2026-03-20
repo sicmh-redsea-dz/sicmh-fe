@@ -1,7 +1,16 @@
 <div [ngClass]="{'drawer-overlay': true, 'show': isDrawerVisible()}">
   <div [ngClass]="{'drawer': true, 'open': isDrawerVisible()}">
     <div class="drawer-header">
-      <h2>{{drawerHeader().header}}</h2>
+      <div class="drawer-title">
+        <h2>{{drawerHeader().header}}</h2>
+        <span
+          class="drawer-badge"
+          *ngIf="bodyToDisplay() === dcInvoice && drawerHeader().badge"
+          [class.paid]="drawerHeader().badgeTone === 'paid'"
+        >
+          {{ drawerHeader().badge }}
+        </span>
+      </div>
       <button (click)="setDrawerVisibility()">
         <i class="icon fa-solid fa-x"></i>
       </button>

@@ -12,9 +12,16 @@ export class DrawerService {
   public setPatientId = signal<string>('')
 
   
-  public drawerTexts = signal<{header: string, btnText: string}>({
+  public drawerTexts = signal<{
+    header: string
+    btnText: string
+    badge?: string
+    badgeTone?: 'pending' | 'paid'
+  }>({
     header: '',
-    btnText: ''
+    btnText: '',
+    badge: '',
+    badgeTone: 'pending'
   })
 
   public shouldRefreshInvoices = signal<boolean>(false)

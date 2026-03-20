@@ -9,8 +9,8 @@
     <tbody>
       @for(item of bodyContent; track $index) {
         <tr 
-          (click)="canEdit ? execItemUpdate( item.InvoiceNumber ) : null"
-          [class.readonly]="!canEdit"
+          (click)="canEdit && item.Estado !== 'Pagado' ? execItemUpdate( item.InvoiceNumber ) : null"
+          [class.readonly]="!canEdit || item.Estado === 'Pagado'"
         >
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
