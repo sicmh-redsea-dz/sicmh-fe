@@ -30,6 +30,7 @@ export class BedsManagementPageComponent implements OnInit {
   public beds: BedRecord[] = []
   public selectedBed: BedRecord | null = null
   public backRoute = 'hospitalization'
+  public returnUrl: string | null = null
 
   public bedForm: FormGroup = this.fb.group({
     code: ['', [Validators.required]],
@@ -77,6 +78,12 @@ export class BedsManagementPageComponent implements OnInit {
         this.subtitle = data['subtitle'] ?? ''
         this.backRoute = this.module
         this.loadBeds()
+      })
+
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.returnUrl = params.get('returnUrl')
       })
 
     this.doctorSearchControl.valueChanges.pipe(
@@ -326,6 +333,11 @@ export class BedsManagementPageComponent implements OnInit {
 
   public goBack() {
     this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
+  }
+
+  public goBackToForm() {
+    if (!this.returnUrl) return
+    this.router.navigateByUrl(this.returnUrl)
   }
 
   public getStatusLabel(status: BedStatus) {

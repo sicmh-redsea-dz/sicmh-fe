@@ -1,0 +1,123 @@
+<div class="patient-movements">
+  <header class="page-header">
+    <button class="ghost-btn" type="button" (click)="goBack()">Volver</button>
+    <div class="header-main">
+      <h1>Movimientos y cargos</h1>
+      <p>
+        {{ patientName || 'Paciente' }}
+        <span *ngIf="patientIdNumber">· {{ patientIdNumber }}</span>
+      </p>
+    </div>
+    <span class="station-pill">Estación actual: {{ getStationLabel(currentStation) }}</span>
+  </header>
+  <p class="form-legend">Los campos marcados con <span>*</span> son obligatorios.</p>
+
+  <section class="content-grid">
+    <div class="card">
+      <h3>Registrar movimiento</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="required">Desde</label>
+          <select [(ngModel)]="movementForm.fromStation" [disabled]="true">
+            <option *ngFor="let s of stationOptions" [value]="s.key">{{ s.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="required">Hacia</label>
+          <select [(ngModel)]="movementForm.toStation" required>
+            <option value="">Selecciona destino</option>
+            <option
+              *ngFor="let s of stationOptions"
+              [value]="s.key"
+              [disabled]="s.key === movementForm.fromStation"
+            >
+              {{ s.label }}
+            </option>
+          </select>
+          <small class="error-text" *ngIf="!movementForm.toStation">Selecciona una estación destino.</small>
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="datetime-local" [(ngModel)]="movementForm.occurredAt">
+        </div>
+        <div class="form-group full">
+          <label>Motivo</label>
+          <input type="text" [(ngModel)]="movementForm.reason" placeholder="Motivo del movimiento">
+        </div>
+        <div class="form-group full">
+          <label>Notas</label>
+          <textarea rows="2" [(ngModel)]="movementForm.notes"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Cargo asociado (L.)</label>
+          <input type="number" min="0" step="0.01" [(ngModel)]="movementForm.chargeAmount" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <select [(ngModel)]="movementForm.chargeCategory">
+            <option value="servicio">Servicio</option>
+            <option value="estancia">Estancia</option>
+            <option value="procedimiento">Procedimiento</option>
+            <option value="medicamento">Medicamento</option>
+            <option value="honorarios">Honorarios</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Descripción del cargo</label>
+          <input type="text" [(ngModel)]="movementForm.chargeDescription" placeholder="Se genera automático">
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" type="button" (click)="submitMovement()">Registrar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Registrar cargo manual</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="required">Estación</label>
+          <select [(ngModel)]="manualChargeForm.station" [disabled]="true">
+            <option *ngFor="let s of stationOptions" [value]="s.key">{{ s.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <select [(ngModel)]="manualChargeForm.category">
+            <option value="servicio">Servicio</option>
+            <option value="estancia">Estancia</option>
+            <option value="procedimiento">Procedimiento</option>
+            <option value="medicamento">Medicamento</option>
+            <option value="honorarios">Honorarios</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="manualChargeForm.occurredAt">
+        </div>
+        <div class="form-group full">
+          <label class="required">Descripción</label>
+          <input type="text" [(ngModel)]="manualChargeForm.description" placeholder="Detalle del cargo">
+          <small class="error-text" *ngIf="!manualChargeForm.description.trim()">Agrega una descripción.</small>
+        </div>
+        <div class="form-group">
+          <label>Cantidad</label>
+          <input type="number" min="1" [(ngModel)]="manualChargeForm.quantity">
+        </div>
+        <div class="form-group">
+          <label>Precio unitario</label>
+          <input type="number" min="0" step="0.01" [(ngModel)]="manualChargeForm.unitPrice">
+        </div>
+        <div class="form-group">
+          <label>Total estimado</label>
+          <input type="text" [value]="'L. ' + ((manualChargeForm.quantity || 0) * (manualChargeForm.unitPrice || 0) | number:'1.2-2')" readonly>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" type="button" (click)="submitManualCharge()">Registrar</button>
+      </div>
+    </div>
+  </section>
+</div>

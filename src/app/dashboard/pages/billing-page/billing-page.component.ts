@@ -1,11 +1,11 @@
 import { Component, DestroyRef, computed, effect, inject } from '@angular/core'
+import { Router } from '@angular/router'
 import Swal from 'sweetalert2'
 import { DrawerService } from '../../services/drawer-service/drawer.service'
 import { DrawerContents } from '../../interface/drawer-content.enum'
 import { InvoicesService } from '../../services/invoices-services/invoices.service'
 import { BillingService } from '../../services/billing-service/billing.service'
 import { PatientsService } from '../../services/patients-service/patients.service'
-import { VisitsService } from '../../services/visits-service/visits.service'
 import { BillingLedgerItem, BillingMovement, BillingReport, BillingSummary } from '../../interface/billing.interface'
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
@@ -51,15 +51,15 @@ export class BillingPageComponent {
   public canDeleteInvoice = computed(() =>
     this.authService.hasPermission('invoice.delete')
   )
-  public canManageBilling = computed(() =>
-    this.authService.hasPermission('invoice.update') || this.authService.hasPermission('invoice.create')
+  public canViewInvoice = computed(() =>
+    this.authService.hasPermission('invoice.read')
   )
 
   public drawerParams = inject( DrawerService )
+  private router = inject( Router )
   private invoiceService = inject( InvoicesService )
   private billingService = inject( BillingService )
   private patientsService = inject( PatientsService )
-  private visitsService = inject( VisitsService )
   public bodyContent: Invoice[] = []
   public reportSummary: BillingSummary | null = null
   public reportLedger: BillingLedgerItem[] = []
@@ -84,42 +84,9 @@ export class BillingPageComponent {
     { key: 'pagado', label: 'Pagado' },
     { key: 'pendiente', label: 'Pendiente' }
   ]
-  public movementForm = {
-    patientId: '',
-    fromStation: '',
-    toStation: 'consulta',
-    occurredAt: '',
-    reason: '',
-    notes: '',
-    chargeAmount: 0,
-    chargeCategory: 'otros',
-    chargeDescription: ''
-  }
-  public manualChargeForm = {
-    patientId: '',
-    station: 'consulta',
-    category: 'otros',
-    description: '',
-    quantity: 1,
-    unitPrice: 0,
-    occurredAt: ''
-  }
   private searchTermSubject = new Subject<string>()
-  private movementPatientSearchSubject = new Subject<string>()
-  private manualPatientSearchSubject = new Subject<string>()
   private movementSearchSubject = new Subject<string>()
   private destroyRef = inject(DestroyRef)
-  private patientLookup = new Map<number, PatientOption>()
-  private patientStationMap = new Map<number, { station: string; ts: number }>()
-  private pendingPatientIdFetch = new Set<number>()
-  public movementPatientQuery = ''
-  public manualPatientQuery = ''
-  public movementPatientResults: PatientOption[] = []
-  public manualPatientResults: PatientOption[] = []
-  public movementPatientLoading = false
-  public manualPatientLoading = false
-  public movementPatientOpen = false
-  public manualPatientOpen = false
   public billingView: 'facturas' | 'reportes' = 'facturas'
 
   get isFacturasView(): boolean {
@@ -151,22 +118,6 @@ export class BillingPageComponent {
     ).subscribe(() => {
       this.applyMovementFilter()
     })
-
-    this.movementPatientSearchSubject.pipe(
-      debounceTime(450),
-      distinctUntilChanged(),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((term: string) => {
-      this.searchPatients(term, 'movement')
-    })
-
-    this.manualPatientSearchSubject.pipe(
-      debounceTime(450),
-      distinctUntilChanged(),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((term: string) => {
-      this.searchPatients(term, 'manual')
-    })
     
     effect(() => {
       if (this.drawerParams.shouldRefreshInvoices()) {
@@ -192,80 +143,6 @@ export class BillingPageComponent {
     this.movementSearchSubject.next(term)
   }
 
-  public onMovementPatientInput(term: string) {
-    this.movementPatientQuery = term
-    this.movementForm.patientId = ''
-    this.movementPatientOpen = true
-    this.movementPatientSearchSubject.next(term)
-  }
-
-  public onManualPatientInput(term: string) {
-    this.manualPatientQuery = term
-    this.manualChargeForm.patientId = ''
-    this.manualPatientOpen = true
-    this.manualPatientSearchSubject.next(term)
-  }
-
-  public onMovementPatientFocus() {
-    this.movementPatientOpen = true
-  }
-
-  public onManualPatientFocus() {
-    this.manualPatientOpen = true
-  }
-
-  public onMovementPatientBlur() {
-    window.setTimeout(() => {
-      this.movementPatientOpen = false
-    }, 150)
-  }
-
-  public onManualPatientBlur() {
-    window.setTimeout(() => {
-      this.manualPatientOpen = false
-    }, 150)
-  }
-
-  public selectMovementPatient(patient: PatientOption) {
-    this.movementForm.patientId = String(patient.id)
-    this.movementPatientQuery = this.formatPatientLabel(patient)
-    this.movementPatientResults = []
-    this.movementPatientOpen = false
-    const station = this.getPatientCurrentStation(patient.id)
-    this.movementForm.fromStation = station
-    this.movementForm.toStation = ''
-    this.cachePatients([patient])
-  }
-
-  public selectManualPatient(patient: PatientOption) {
-    this.manualChargeForm.patientId = String(patient.id)
-    this.manualPatientQuery = this.formatPatientLabel(patient)
-    this.manualPatientResults = []
-    this.manualPatientOpen = false
-    const station = this.getPatientCurrentStation(patient.id)
-    this.manualChargeForm.station = station
-    this.cachePatients([patient])
-  }
-
-  public clearMovementPatient() {
-    this.movementForm.patientId = ''
-    this.movementPatientQuery = ''
-    this.movementPatientResults = []
-    this.movementPatientLoading = false
-    this.movementPatientOpen = false
-    this.movementForm.fromStation = ''
-    this.movementForm.toStation = ''
-  }
-
-  public clearManualPatient() {
-    this.manualChargeForm.patientId = ''
-    this.manualPatientQuery = ''
-    this.manualPatientResults = []
-    this.manualPatientLoading = false
-    this.manualPatientOpen = false
-    this.manualChargeForm.station = 'consulta'
-  }
-
   public onPageChange( page: number ) {
     this.currentPage = page
     this.offset = ( this.currentPage - 1 ) * this.limit
@@ -276,14 +153,16 @@ export class BillingPageComponent {
   public bootstrapInvoiceDrawerToUpd(invoiceId: string) {
     if (!this.canEditInvoice()) return
     const targetInvoice = this.bodyContent.find((item) => item.InvoiceNumber === invoiceId)
-    if (targetInvoice?.Estado === 'Pagado') {
-      Swal.fire('Aviso', 'La factura ya está pagada y no se puede editar.', 'info')
+    const status = (targetInvoice?.Estado ?? '').toString().toLowerCase()
+    if (status !== 'pendiente') {
+      Swal.fire('Aviso', 'Solo se pueden editar facturas pendientes.', 'info')
       return
     }
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
     this.drawerParams.setToUpdate.set( true )
     this.drawerParams.setInvoiceId.set( invoiceId )
+    this.drawerParams.viewOnly.set(false)
     this.drawerParams.drawerTexts.update( state => ({
       ...state,
       header: 'completar factura',
@@ -295,11 +174,17 @@ export class BillingPageComponent {
     if (!this.canCreateInvoice()) return
     this.drawerParams.isDrawerOpen.set( true )
     this.drawerParams.contentToDisplay.set( DrawerContents.INVOICE )
+    this.drawerParams.viewOnly.set(false)
     this.drawerParams.drawerTexts.update( state => ({
         ...state,
         header: 'generar factura',
         btnText: 'Generar'
     }))
+  }
+
+  public viewInvoice(invoiceId: string) {
+    if (!this.canViewInvoice()) return
+    this.router.navigateByUrl(`/dashboard/income/billings/view/${invoiceId}`)
   }
 
   public getInvoices( term?: string ) {
@@ -327,34 +212,27 @@ export class BillingPageComponent {
   public deleteSelectedInvoice(invoiceId: string) {
     if (!this.canDeleteInvoice()) return
     Swal.fire({
-      title: `Are you sure you want to delete this element [${invoiceId}]?`,
-      text: 'This action is irreversible. Proceed with caution.',
-      icon: 'question',
+      title: `¿Anular factura ${invoiceId}?`,
+      text: 'La factura quedará anulada y se generará una nueva para continuidad.',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, proceed',
-      cancelButtonText: 'Cancel'
+      confirmButtonText: 'Si, anular',
+      cancelButtonText: 'Cancelar'
     }).then(( result ) => {
       if ( result.isConfirmed ) {
-        this.deleteInvoice( invoiceId )
-        Swal.fire({
-          title: 'Action Confirmed',
-          text: 'You have successfully accepted the action.',
-          icon: 'success'
-        })
+        this.annulInvoice( invoiceId )
       }
-      else if ( result.dismiss === Swal.DismissReason.cancel ) Swal.fire({
-        title: 'Action Canceled',
-        text: 'No changes were made.',
-        icon: 'info'
-      })
     })
   }
 
-  private deleteInvoice(id: string) {
-    this.invoiceService.deleteInvoice(id)
+  private annulInvoice(id: string) {
+    this.invoiceService.annulInvoice(id)
       .subscribe({
         next: ( result ) => {
-          if( result ) this.drawerParams.triggerInvoiceRefresh()
+          if( result ) {
+            Swal.fire('Listo', 'Factura anulada.', 'success')
+            this.drawerParams.triggerInvoiceRefresh()
+          }
         },
         error: ( err ) => {
           Swal.fire('Error', err, 'error')
@@ -416,7 +294,6 @@ export class BillingPageComponent {
           this.reportSummary = report.summary
           this.reportLedger = report.ledger
           this.reportMovements = report.movements
-          this.refreshPatientStations(report.movements)
           this.applyMovementFilter()
         },
         error: (message) => {
@@ -500,107 +377,6 @@ export class BillingPageComponent {
     URL.revokeObjectURL(url)
   }
 
-  public submitMovement() {
-    if (!this.canEditInvoice()) {
-      Swal.fire('Acceso denegado', 'No tienes permisos para registrar movimientos.', 'error')
-      return
-    }
-    const patientId = Number(this.movementForm.patientId)
-    if (!patientId || !this.movementForm.toStation) {
-      Swal.fire('Error', 'Selecciona paciente y estación destino.', 'error')
-      return
-    }
-    if (this.movementForm.fromStation && this.movementForm.toStation === this.movementForm.fromStation) {
-      Swal.fire('Error', 'La estación destino debe ser distinta a la estación actual.', 'error')
-      return
-    }
-    const patientName = this.getPatientName(patientId)
-    const chargeAmount = Number(this.movementForm.chargeAmount) || 0
-    const chargeDescription =
-      this.movementForm.chargeDescription?.trim() ||
-      `Movimiento a ${this.getMovementStationLabel(this.movementForm.toStation)}`
-    this.billingService.createMovement({
-      patientId,
-      patientName,
-      fromStation: this.movementForm.fromStation || undefined,
-      toStation: this.movementForm.toStation,
-      occurredAt: this.movementForm.occurredAt || undefined,
-      reason: this.movementForm.reason || undefined,
-      notes: this.movementForm.notes || undefined,
-      charge: chargeAmount > 0 ? {
-        station: this.movementForm.toStation,
-        category: this.movementForm.chargeCategory || 'otros',
-        description: chargeDescription,
-        quantity: 1,
-        unitPrice: chargeAmount
-      } : undefined
-    })
-      .subscribe({
-        next: () => {
-          Swal.fire('Listo', 'Movimiento registrado.', 'success')
-          this.movementForm = {
-            patientId: '',
-            fromStation: '',
-            toStation: 'consulta',
-            occurredAt: '',
-            reason: '',
-            notes: '',
-            chargeAmount: 0,
-            chargeCategory: 'otros',
-            chargeDescription: ''
-          }
-          this.clearMovementPatient()
-          this.loadReport()
-        },
-        error: (message) => {
-          Swal.fire('Error', message, 'error')
-        }
-      })
-  }
-
-  public submitManualCharge() {
-    if (!this.canCreateInvoice()) {
-      Swal.fire('Acceso denegado', 'No tienes permisos para registrar cargos manuales.', 'error')
-      return
-    }
-    const patientId = Number(this.manualChargeForm.patientId)
-    if (!patientId || !this.manualChargeForm.description.trim()) {
-      Swal.fire('Error', 'Selecciona paciente y agrega una descripción.', 'error')
-      return
-    }
-    const patientName = this.getPatientName(patientId)
-    this.billingService.createManualCharge({
-      patientId,
-      patientName,
-      station: this.manualChargeForm.station,
-      category: this.manualChargeForm.category,
-      description: this.manualChargeForm.description.trim(),
-      quantity: Number(this.manualChargeForm.quantity) || 1,
-      unitPrice: Number(this.manualChargeForm.unitPrice) || 0,
-      occurredAt: this.manualChargeForm.occurredAt || undefined,
-      status: 'Pendiente'
-    })
-      .subscribe({
-        next: () => {
-          Swal.fire('Listo', 'Cargo registrado.', 'success')
-          this.manualChargeForm = {
-            patientId: '',
-            station: 'consulta',
-            category: 'otros',
-            description: '',
-            quantity: 1,
-            unitPrice: 0,
-            occurredAt: formatNewDate(new Date())
-          }
-          this.clearManualPatient()
-          this.loadReport()
-        },
-        error: (message) => {
-          Swal.fire('Error', message, 'error')
-        }
-      })
-  }
-
   public getSummaryTotal(value: number | undefined) {
     return Number(value ?? 0).toFixed(2)
   }
@@ -620,7 +396,6 @@ export class BillingPageComponent {
             name: `${p.name} ${p.lastName}`.trim(),
             idNumber: p.idNumber
           })) ?? []
-          this.cachePatients(this.patientsOptions)
         },
         error: (message) => {
           console.warn('patients load error', message)
@@ -636,7 +411,6 @@ export class BillingPageComponent {
     this.reportFilters.patientIds = []
     this.reportFilters.station = 'all'
     this.reportFilters.status = 'all'
-    this.manualChargeForm.occurredAt = this.reportFilters.to
   }
 
   private resolveQuickRange(term: string) {
@@ -651,27 +425,6 @@ export class BillingPageComponent {
       return { from: formatNewDate(start), to: formatNewDate(today) }
     }
     return { from: this.reportFilters.from, to: this.reportFilters.to }
-  }
-
-  private getPatientName(id: number) {
-    return this.patientLookup.get(id)?.name ?? `Paciente ${id}`
-  }
-
-  private refreshPatientStations(movements: BillingMovement[]) {
-    this.patientStationMap.clear()
-    movements.forEach((mv) => {
-      const station = mv.toStation || mv.fromStation
-      if (!station) return
-      const ts = new Date(mv.occurredAt).getTime() || 0
-      const current = this.patientStationMap.get(mv.patientId)
-      if (!current || ts >= current.ts) {
-        this.patientStationMap.set(mv.patientId, { station, ts })
-      }
-    })
-  }
-
-  private getPatientCurrentStation(patientId: number) {
-    return this.patientStationMap.get(patientId)?.station ?? 'consulta'
   }
 
   private applyMovementFilter() {
@@ -693,60 +446,6 @@ export class BillingPageComponent {
         .join(' ')
         .toLowerCase()
       return haystack.includes(term)
-    })
-  }
-
-  public formatPatientLabel(patient: PatientOption) {
-    const idSuffix = patient.idNumber ? ` · ${patient.idNumber}` : ''
-    return `${patient.name}${idSuffix}`
-  }
-
-  private resolveIdNumber(patient: any) {
-    const idNumber =
-      patient?.idNumber ??
-      patient?.identificacion ??
-      patient?.Identificacion ??
-      patient?.identidad ??
-      patient?.identityNumber ??
-      patient?.identificationNumber ??
-      patient?.identification ??
-      patient?.cedula
-    return idNumber ? String(idNumber) : undefined
-  }
-
-  private hydratePatientIdentifiers(target: 'movement' | 'manual') {
-    const current = target === 'movement'
-      ? this.movementPatientResults
-      : this.manualPatientResults
-    current.forEach((item) => {
-      if (!item?.id || item.idNumber || this.pendingPatientIdFetch.has(item.id)) return
-      this.pendingPatientIdFetch.add(item.id)
-      this.patientsService.getPatient(item.id).subscribe({
-        next: (patient) => {
-          const idNumber = this.resolveIdNumber(patient)
-          if (!idNumber) return
-          const list = target === 'movement'
-            ? this.movementPatientResults
-            : this.manualPatientResults
-          const exists = list.some((p) => p.id === item.id)
-          if (!exists) return
-          const updated = list.map((p) =>
-            p.id === item.id ? { ...p, idNumber } : p
-          )
-          if (target === 'movement') {
-            this.movementPatientResults = updated
-          } else {
-            this.manualPatientResults = updated
-          }
-          this.cachePatients(updated)
-        },
-        error: () => {
-          this.pendingPatientIdFetch.delete(item.id)
-        },
-        complete: () => {
-          this.pendingPatientIdFetch.delete(item.id)
-        }
-      })
     })
   }
 
@@ -773,74 +472,5 @@ export class BillingPageComponent {
     if (key.includes('invent')) return 'inventory'
     if (key.includes('fact')) return 'invoice'
     return 'system'
-  }
-
-  private searchPatients(term: string, target: 'movement' | 'manual') {
-    const cleanTerm = term.trim()
-    if (!cleanTerm || cleanTerm.length < 2) {
-      if (target === 'movement') {
-        this.movementPatientResults = []
-        this.movementPatientLoading = false
-      } else {
-        this.manualPatientResults = []
-        this.manualPatientLoading = false
-      }
-      return
-    }
-
-    if (target === 'movement') {
-      this.movementPatientLoading = true
-      this.visitsService.searchPatients(cleanTerm)
-        .pipe(
-          finalize(() => {
-            this.movementPatientLoading = false
-          })
-        )
-        .subscribe({
-          next: (patients) => {
-            const results = (patients ?? []).map((p: any) => ({
-              id: p.id,
-              name: p.name ?? `${p.name || ''} ${p.lastName || ''}`.trim(),
-              idNumber: this.resolveIdNumber(p)
-            }))
-            this.movementPatientResults = results
-            this.cachePatients(results)
-            this.hydratePatientIdentifiers('movement')
-          },
-          error: () => {
-            this.movementPatientResults = []
-          }
-        })
-      return
-    }
-
-    this.manualPatientLoading = true
-    this.patientsService.getPatients({ limit: 12, offset: 0, term: cleanTerm })
-      .pipe(
-        finalize(() => {
-          this.manualPatientLoading = false
-        })
-      )
-      .subscribe({
-        next: (data) => {
-          const results = data?.patients?.map((p) => ({
-            id: p.id,
-            name: `${p.name} ${p.lastName}`.trim(),
-            idNumber: this.resolveIdNumber(p)
-          })) ?? []
-          this.manualPatientResults = results
-          this.cachePatients(results)
-          this.hydratePatientIdentifiers('manual')
-        },
-        error: () => {
-          this.manualPatientResults = []
-        }
-      })
-  }
-
-  private cachePatients(list: PatientOption[]) {
-    list.forEach((patient) => {
-      this.patientLookup.set(patient.id, patient)
-    })
   }
 }

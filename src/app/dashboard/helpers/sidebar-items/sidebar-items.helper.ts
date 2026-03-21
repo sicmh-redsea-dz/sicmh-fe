@@ -25,15 +25,17 @@ export const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['dashboard.view']
   },
   {
+    label: 'Pacientes',
+    icon: 'ph-bold ph-user-plus',
+    hasSubmenu: false,
+    routerLink: 'patients',
+    requiredPermissions: ['patients.read']
+  },
+  {
     label: 'Atención Medica',
-    icon: 'ph-bold ph-user',
+    icon: 'ph-bold ph-stethoscope',
     hasSubmenu: true,
     subItems: [
-      {
-        label: 'Pacientes',
-        routerLink: 'patients',
-        requiredPermissions: ['patients.read']
-      },
       {
         label: 'Consulta Externa',
         routerLink:'visits',

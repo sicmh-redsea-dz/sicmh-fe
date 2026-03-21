@@ -19,15 +19,16 @@
         </div>
       </div>
       <div class="meta-field date-field">
-        <label>Fecha</label>
+        <label class="required">Fecha</label>
         <input type="date" formControlName="date" [disabled]="isReadOnly">
-        <small class="error-text" *ngIf="invoiceForm.get('date')?.touched && invoiceForm.get('date')?.hasError('required')">
+        <small class="error-text" *ngIf="invoiceForm.get('date')?.invalid && (invoiceForm.get('date')?.touched || invoiceForm.get('date')?.dirty)">
           Este campo es obligatorio.
         </small>
       </div>
     </div>
-    <small class="read-only" *ngIf="isReadOnly">Factura pagada. Solo lectura.</small>
+    <small class="read-only" *ngIf="isReadOnly">Factura en modo solo lectura.</small>
   </header>
+  <p class="form-legend">Los campos marcados con <span>*</span> son obligatorios.</p>
 
   <section class="form-section">
     <div class="section-head">
@@ -36,7 +37,7 @@
     </div>
     <div class="section-body">
       <div class="form-group search-group">
-        <label>Paciente</label>
+        <label class="required">Paciente</label>
         <div class="search-box">
           <input
             type="text"
@@ -76,7 +77,7 @@
           </div>
         </div>
         <input type="hidden" formControlName="patient">
-        <small class="error-text" *ngIf="invoiceForm.get('patient')?.touched && invoiceForm.get('patient')?.hasError('required')">
+        <small class="error-text" *ngIf="invoiceForm.get('patient')?.invalid && (invoiceForm.get('patient')?.touched || invoiceForm.get('patient')?.dirty)">
           Selecciona un cliente.
         </small>
       </div>
@@ -90,7 +91,7 @@
     </div>
     <div class="section-body">
       <div class="form-group search-group">
-        <label>Doctor</label>
+        <label class="required">Doctor</label>
         <div class="search-box">
           <input
             type="text"
@@ -130,7 +131,7 @@
           </div>
         </div>
         <input type="hidden" formControlName="doctor">
-        <small class="error-text" *ngIf="invoiceForm.get('doctor')?.touched && invoiceForm.get('doctor')?.hasError('required')">
+        <small class="error-text" *ngIf="invoiceForm.get('doctor')?.invalid && (invoiceForm.get('doctor')?.touched || invoiceForm.get('doctor')?.dirty)">
           Selecciona un doctor.
         </small>
       </div>
@@ -140,18 +141,9 @@
   <section class="form-section">
     <div class="section-head">
       <h3>Servicios</h3>
-      <p>Agrega consultas, procedimientos o insumos.</p>
+      <p>Cargos generados desde movimientos, inventario y registros manuales.</p>
     </div>
     <div class="section-body">
-      <div class="form-group">
-        <label>Servicio</label>
-        <select name="services" (change)="handleChange($event)" [disabled]="isReadOnly">
-          <option value="">Selecciona un servicio</option>
-          @for(s of options.services; track $index) {
-            <option [value]="s.id">{{s.serviceName}}</option>
-          }
-        </select>
-      </div>
       @if(selectedServices.length > 0) {
         <div class="service-list">
           @for(ss of selectedServices; track $index) {
@@ -162,14 +154,13 @@
               </div>
               <div class="service-meta">
                 <span class="service-price">L. {{ ss.price | number:'1.2-2' }}</span>
-                @if(ss.id) {
-                  <button class="icon-btn" type="button" (click)="removeListItem(ss.id, $index)">
-                    <i class="icon fa-solid fa-x"></i>
-                  </button>
-                }
               </div>
             </div>
           }
+        </div>
+      } @else {
+        <div class="empty-state">
+          Sin cargos asociados todavía.
         </div>
       }
     </div>
@@ -209,14 +200,14 @@
     </div>
     <div class="section-body">
       <div class="form-group">
-        <label>Tipo de pago</label>
+        <label class="required">Tipo de pago</label>
         <select formControlName="pMethod" name="pMethod" [disabled]="isReadOnly">
           <option value="">Selecciona un metodo de pago</option>
           @for(p of options.pMethods; track $index) {
             <option [value]="p.id">{{p.paymentDescription}}</option>
           }
         </select>
-        <small class="error-text" *ngIf="invoiceForm.get('pMethod')?.touched && invoiceForm.get('pMethod')?.hasError('required')">
+        <small class="error-text" *ngIf="invoiceForm.get('pMethod')?.invalid && (invoiceForm.get('pMethod')?.touched || invoiceForm.get('pMethod')?.dirty)">
           Selecciona un método de pago.
         </small>
       </div>
@@ -249,7 +240,7 @@
   <section class="form-section">
     <div class="section-head">
       <h3>Detalle de factura</h3>
-      <p>Se genera automáticamente con los servicios seleccionados.</p>
+      <p>Se genera automáticamente con los cargos registrados.</p>
     </div>
     <div class="section-body form-grid">
       <div class="form-group">

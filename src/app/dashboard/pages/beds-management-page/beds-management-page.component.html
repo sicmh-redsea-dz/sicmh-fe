@@ -4,7 +4,10 @@
       <h1>{{ title }}</h1>
       <p>{{ subtitle || 'Gestión de camas con trazabilidad.' }}</p>
     </div>
-    <button class="link-btn" type="button" (click)="goBack()">Volver</button>
+    <div class="header-actions">
+      <button class="ghost-btn" type="button" *ngIf="returnUrl" (click)="goBackToForm()">Volver al formulario</button>
+      <button class="link-btn" type="button" (click)="goBack()">Volver</button>
+    </div>
   </div>
 
   <div class="management-content">

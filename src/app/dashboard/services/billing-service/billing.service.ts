@@ -4,7 +4,7 @@ import { catchError, map, Observable, throwError } from 'rxjs'
 import { environment } from '../../../../environments/environment'
 import { AuthHeadersService } from '../../../core/http/auth-headers.service'
 import { formatApiError } from '../../../shared/utils/api-error'
-import { BillingReport } from '../../interface/billing.interface'
+import { BillingInvoiceSnapshot, BillingReport } from '../../interface/billing.interface'
 
 export interface BillingReportFilters {
   from?: string
@@ -106,6 +106,16 @@ export class BillingService {
     return this.http.post<any>(url, payload, { headers })
       .pipe(
         map((resp) => resp.data),
+        catchError((err) => throwError(() => formatApiError(err)))
+      )
+  }
+
+  public getInvoiceSnapshot(invoiceNumber: string): Observable<BillingInvoiceSnapshot> {
+    const url = `${this.baseUrl}/app/billing/invoice/${invoiceNumber}`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.get<any>(url, { headers })
+      .pipe(
+        map(({ data }) => data as BillingInvoiceSnapshot),
         catchError((err) => throwError(() => formatApiError(err)))
       )
   }

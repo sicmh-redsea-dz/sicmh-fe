@@ -4,7 +4,17 @@
 
 .opts {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+}
+
+.opts::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: -0.5rem;
+  right: -0.5rem;
+  height: 0.6rem;
 }
 
 .opts-toggle {
@@ -20,22 +30,36 @@
 
 .opts-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.35rem);
   right: 0;
   background-color: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.5rem;
   box-shadow: var(--shadow-sm);
-  z-index: 100;
+  z-index: 200;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transform: translateY(0);
+  transition: opacity 0.2s ease, visibility 0.2s ease;
   min-width: 120px;
 }
 
-.opts-toggle:hover .opts-menu {
+.opts-menu::before {
+  content: '';
+  position: absolute;
+  top: -0.4rem;
+  left: 0;
+  right: 0;
+  height: 0.4rem;
+}
+
+.opts:hover .opts-menu,
+.opts:focus-within .opts-menu,
+.opts-menu:hover {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 

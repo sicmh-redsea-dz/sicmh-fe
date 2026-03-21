@@ -4,6 +4,31 @@ export interface BillingReport {
   movements: BillingMovement[]
 }
 
+export interface BillingInvoiceSnapshot {
+  invoice: {
+    id: number
+    invoiceNumber: string
+    patientId: number
+    patientName: string
+    doctorName: string
+    date: string
+    status: string
+    visitType?: string | null
+    amount: number
+    discounts: {
+      elderlyPercent: number
+      promoPercent: number
+      promoCode?: string
+    }
+  }
+  summary: {
+    subtotal: number
+    discountAmount: number
+    total: number
+  }
+  charges: BillingLedgerItem[]
+}
+
 export interface BillingSummary {
   range: { from: string; to: string }
   totals: {

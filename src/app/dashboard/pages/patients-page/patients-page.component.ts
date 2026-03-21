@@ -35,6 +35,9 @@ export class PatientsPageComponent {
   public canViewPatient = computed(() =>
     this.authService.hasPermission('patients.read')
   )
+  public canManageBilling = computed(() =>
+    this.authService.hasAnyPermission(['invoice.update', 'invoice.create'])
+  )
   
   private router = inject(Router)
   private patientService: PatientsService = inject( PatientsService )
@@ -115,6 +118,10 @@ export class PatientsPageComponent {
       header: `${patient.name} ${patient.lastName}`,
       btnText: ''
     })
+  }
+
+  public handlePatientMovements(patient: Patient) {
+    this.router.navigateByUrl(`dashboard/patients/${patient.id}/movements`)
   }
 
   public deleteSelectedPatient(id: number) {

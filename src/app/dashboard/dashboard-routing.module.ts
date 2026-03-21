@@ -17,6 +17,8 @@ import { InventoryFormPageComponent } from './pages/inventory-form-page/inventor
 import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
 import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
+import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
+import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
 
 const routes: Routes = [
   {
@@ -44,6 +46,12 @@ const routes: Routes = [
             component: PatientFormPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['patients.create'] }
+          },
+          { 
+            path: ':id/movements',
+            component: PatientMovementsPageComponent,
+            canActivate: [permissionsGuard],
+            data: { anyPermissions: ['invoice.update', 'invoice.create'] }
           },
           { 
             path: ':id', 
@@ -259,6 +267,12 @@ const routes: Routes = [
       { 
         path: 'income/billings', 
         component: BillingPageComponent,
+        canActivate: [permissionsGuard],
+        data: { permissions: ['invoice.read'] }
+      },
+      { 
+        path: 'income/billings/view/:invoiceNumber',
+        component: InvoicePreviewPageComponent,
         canActivate: [permissionsGuard],
         data: { permissions: ['invoice.read'] }
       },

@@ -26,6 +26,8 @@ import { SharedModule } from '../shared/shared.module';
 import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 import { PatientViewComponent } from './components/drawer-body-components/patient-view/patient-view.component';
+import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
+import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
 
 
 @NgModule({
@@ -50,7 +52,9 @@ import { PatientViewComponent } from './components/drawer-body-components/patien
     InventoryFormPageComponent,
     BedsManagementPageComponent,
     OrRoomsManagementPageComponent,
-    PatientViewComponent
+    PatientViewComponent,
+    InvoicePreviewPageComponent,
+    PatientMovementsPageComponent
   ],
   imports: [
     CommonModule,

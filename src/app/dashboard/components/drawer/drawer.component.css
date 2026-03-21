@@ -91,6 +91,12 @@
   border-color: #86efac;
 }
 
+.drawer-badge.canceled {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5f5;
+}
+
 .drawer-header button {
   width: 1.5rem;
   height: 1.5rem;

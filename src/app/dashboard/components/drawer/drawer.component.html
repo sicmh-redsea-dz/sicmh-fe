@@ -7,6 +7,7 @@
           class="drawer-badge"
           *ngIf="bodyToDisplay() === dcInvoice && drawerHeader().badge"
           [class.paid]="drawerHeader().badgeTone === 'paid'"
+          [class.canceled]="drawerHeader().badgeTone === 'canceled'"
         >
           {{ drawerHeader().badge }}
         </span>

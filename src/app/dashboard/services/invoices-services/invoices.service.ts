@@ -125,6 +125,18 @@ export class InvoicesService {
       )
   }
 
+  public annulInvoice(id: string): Observable<boolean> {
+    const url: string = `${this.baseUrl}/app/invoice/${id}/annul`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.patch(url, {}, { headers })
+      .pipe(
+        map(() => true),
+        catchError((err) => {
+          return throwError(() => formatApiError(err))
+        })
+      )
+  }
+
   public downloadPDFReport( term: string ): Observable<any> {
     const url: string = `${this.baseUrl}/app/invoice/generate-pdf/${term}`
 

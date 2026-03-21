@@ -57,6 +57,11 @@
   background-color: inherit;
 }
 
+.badge.canceled {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
 td .opts {
   display: flex;
   align-items: center;

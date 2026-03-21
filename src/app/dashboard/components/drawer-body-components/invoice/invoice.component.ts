@@ -4,11 +4,13 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { InvoicesService } from '../../../services/invoices-services/invoices.service'
+import { BillingService } from '../../../services/billing-service/billing.service'
 import { DrawerService } from '../../../services/drawer-service/drawer.service'
 import { DrawerContents } from '../../../interface/drawer-content.enum'
 import { formatIncomingData, formatNewDate } from '../../../../shared/utils/date-formatters'
 import { VisitsService } from '../../../services/visits-service/visits.service'
 import { PatientsService } from '../../../services/patients-service/patients.service'
+import { BillingLedgerItem, BillingInvoiceSnapshot } from '../../../interface/billing.interface'
 
 interface Options {
   doctors: any[]
@@ -37,12 +39,14 @@ export class InvoiceComponent implements OnInit {
   private fb = inject(FormBuilder)
   private drawerParams = inject(DrawerService)
   private invoiceService = inject(InvoicesService)
+  private billingService = inject(BillingService)
   private visitsService = inject(VisitsService)
   private patientsService = inject(PatientsService)
   private destroyRef = inject(DestroyRef)
 
   public invoiceIdToUpd = computed(() => this.drawerParams.setInvoiceId())
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
+  public isViewOnly = computed(() => this.drawerParams.viewOnly())
   public drawerTexts = computed(() => this.drawerParams.drawerTexts())
 
   public invoiceStatus: string = 'Pendiente'
@@ -50,6 +54,8 @@ export class InvoiceComponent implements OnInit {
 
   public selectedServices: any[] = []
   public options: Options = { doctors: [], services: [], pMethods: [] }
+  public chargeItems: BillingLedgerItem[] = []
+  public chargeSnapshot: BillingInvoiceSnapshot | null = null
 
   public patientQuery = ''
   public doctorQuery = ''
@@ -146,6 +152,7 @@ export class InvoiceComponent implements OnInit {
       .subscribe({
         next: ({ data }) => {
           this.setDataInForm(data)
+          this.loadInvoiceSnapshot(invoiceId)
         },
         error: (message) => {
           Swal.fire('Error', message, 'error')
@@ -153,13 +160,54 @@ export class InvoiceComponent implements OnInit {
       })
   }
 
+  private loadInvoiceSnapshot(invoiceNumber: string) {
+    if (!invoiceNumber) return
+    this.billingService.getInvoiceSnapshot(invoiceNumber)
+      .subscribe({
+        next: (snapshot) => {
+          this.chargeSnapshot = snapshot
+          this.chargeItems = snapshot?.charges ?? []
+          this.selectedServices = this.chargeItems.map((item) => ({
+            id: item.id,
+            description: item.description,
+            desc: this.buildChargeMeta(item),
+            price: item.total
+          }))
+          this.loadMutableData()
+        },
+        error: () => {
+          this.chargeSnapshot = null
+          this.chargeItems = []
+          this.selectedServices = []
+          this.loadMutableData()
+        }
+      })
+  }
+
+  private buildChargeMeta(item: BillingLedgerItem) {
+    const parts: string[] = []
+    if (item.category) parts.push(item.category)
+    if (item.station) parts.push(this.formatStation(item.station))
+    if (item.quantity) parts.push(`x${item.quantity}`)
+    if (item.unitPrice) parts.push(`L. ${Number(item.unitPrice || 0).toFixed(2)}`)
+    return parts.filter(Boolean).join(' · ')
+  }
+
+  private formatStation(key?: string) {
+    if (!key) return ''
+    const normalized = key.toLowerCase()
+    if (normalized.includes('emer')) return 'Emergencia'
+    if (normalized.includes('hosp')) return 'Hospitalización'
+    if (normalized.includes('quiro')) return 'Quirófano'
+    if (normalized.includes('consult')) return 'Consulta'
+    return key
+  }
+
   private setDataInForm(data: Record<string, any>) {
     const {
-      visitType,
       patientId,
       doctorId,
       date,
-      amount,
       status,
       elderlyDiscount,
       promoCode,
@@ -167,9 +215,10 @@ export class InvoiceComponent implements OnInit {
     } = data
 
     this.invoiceStatus = status ?? 'Pendiente'
-    this.setReadOnly(this.invoiceStatus === 'Pagado')
+    const normalizedStatus = (this.invoiceStatus || '').toString().toLowerCase()
+    this.setReadOnly(this.isViewOnly() || normalizedStatus !== 'pendiente')
     this.updateDrawerBadge(this.invoiceStatus)
-    if (this.invoiceStatus === 'Pagado') {
+    if (this.isReadOnly) {
       this.drawerParams.drawerTexts.update(state => ({
         ...state,
         header: 'ver factura',
@@ -189,24 +238,7 @@ export class InvoiceComponent implements OnInit {
     this.resolveDoctorLabel(doctorId)
 
     this.selectedServices = []
-
-    if (amount > 0) {
-      this.selectedServices.push({ price: amount, desc: 'Cargo asociado' })
-    }
-
-    if (visitType) {
-      const updId = visitType === 'Emergencia' ? 2 : 1
-      const selectedItem = this.options.services.find((item) => item.id === updId)
-      if (selectedItem) {
-        this.selectedServices.push({
-          description: selectedItem.serviceName,
-          id: selectedItem.id,
-          price: selectedItem.servicePrice,
-          desc: selectedItem.serviceDescription
-        })
-      }
-    }
-
+    this.chargeItems = []
     this.loadMutableData()
   }
 
@@ -373,31 +405,6 @@ export class InvoiceComponent implements OnInit {
       })
   }
 
-  public handleChange(event: any) {
-    if (this.isReadOnly) return
-    const name = event.target.name
-    const value = event.target.value
-    const key = name as keyof Options
-    const selectedOption: any[] = this.options[key] ?? []
-    const selectedItem = selectedOption.find((item) => item.id === parseInt(value))
-    if (!selectedItem) return
-    if (this.selectedServices.find((item) => item.id === parseInt(value))) return
-    this.selectedServices.push({
-      description: selectedItem.serviceName,
-      id: selectedItem.id,
-      price: selectedItem.servicePrice,
-      desc: selectedItem.serviceDescription
-    })
-    this.loadMutableData()
-  }
-
-  public removeListItem(id: string, idx: number) {
-    if (this.isReadOnly) return
-    this.selectedServices = this.selectedServices.filter((item) => item.id !== id)
-    this.serviceArray.removeAt(idx)
-    this.loadMutableData()
-  }
-
   public onHandleCancel() {
     this.invoiceForm.reset()
     this.patientQuery = ''
@@ -405,17 +412,21 @@ export class InvoiceComponent implements OnInit {
     this.patientResults = []
     this.doctorResults = []
     this.selectedServices = []
+    this.chargeItems = []
+    this.chargeSnapshot = null
     this.invoiceStatus = 'Pendiente'
     this.setReadOnly(false)
     this.drawerParams.isDrawerOpen.set(false)
     this.drawerParams.contentToDisplay.set(DrawerContents.NONE)
     this.drawerParams.setToUpdate.set(false)
     this.drawerParams.setInvoiceId.set('')
+    this.drawerParams.viewOnly.set(false)
   }
 
   private updateDrawerBadge(status: string) {
     const label = status || 'Pendiente'
-    const tone = label.toLowerCase() === 'pagado' ? 'paid' : 'pending'
+    const normalized = label.toLowerCase()
+    const tone = normalized.includes('pag') ? 'paid' : normalized.includes('anul') ? 'canceled' : 'pending'
     this.drawerParams.drawerTexts.update(state => ({
       ...state,
       badge: label,
@@ -493,11 +504,9 @@ export class InvoiceComponent implements OnInit {
     let concatDescriptions = ''
     this.serviceArray.clear()
 
-    this.selectedServices.forEach((item, idx) => {
-      subtotal += Number(item.price) || 0
-      concatDescriptions += `${idx + 1}. ${item.desc}.\n`
-      if (item.id)
-        this.serviceArray.push(this.fb.control(item.id, []))
+    this.chargeItems.forEach((item, idx) => {
+      subtotal += Number(item.total) || 0
+      concatDescriptions += `${idx + 1}. ${item.description}.\n`
     })
 
     const elderlyEnabled = !!this.invoiceForm.get('elderlyDiscount')?.value

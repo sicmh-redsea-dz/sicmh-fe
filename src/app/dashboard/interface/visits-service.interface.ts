@@ -22,6 +22,7 @@ export interface SimpleVisit {
     lastVisitDate: Date
     diagnosis:     null | string
     state?:        string
+    invoiceNumber?: string
     originStation?: string
     currentStation?: string
     movedTo?: string

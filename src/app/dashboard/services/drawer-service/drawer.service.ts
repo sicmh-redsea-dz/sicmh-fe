@@ -8,6 +8,7 @@ export class DrawerService {
   public isDrawerOpen = signal<boolean>( false )
   public contentToDisplay = signal<string>( DrawerContents.NONE )
   public setToUpdate = signal<boolean>( false )
+  public viewOnly = signal<boolean>( false )
   public setInvoiceId = signal<string>('')
   public setPatientId = signal<string>('')
 
@@ -16,7 +17,7 @@ export class DrawerService {
     header: string
     btnText: string
     badge?: string
-    badgeTone?: 'pending' | 'paid'
+    badgeTone?: 'pending' | 'paid' | 'canceled'
   }>({
     header: '',
     btnText: '',
