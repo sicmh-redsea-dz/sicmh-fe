@@ -1,7 +1,8 @@
 import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
+import { BedsService } from '../../../services/beds-service/beds.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
 import { Stock } from '../../../interface/visits-service.interface'
@@ -11,6 +12,7 @@ import { formatNewDate, formatIncomingData } from '../../../../shared/utils/date
 import { ShortPatient } from '../../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../../helpers/visits-form/visits-form-page.helper';
+import { BedRecord, BedModule } from '../../../interface/bed-management.interface';
 
 type StockItemPayload = {
   id: number
@@ -45,6 +47,7 @@ export class VisitsFormPageV2Component implements OnInit {
   private router = inject( Router )
   private fb = inject( FormBuilder )
   public visitsService = inject( VisitsService )
+  private bedsService = inject( BedsService )
   private route = inject( ActivatedRoute )
   private destroyRef = inject( DestroyRef )
 
@@ -112,18 +115,28 @@ export class VisitsFormPageV2Component implements OnInit {
 
   public doctorSearchControl = new FormControl()
   public patientSearchControl = new FormControl()
+  public bedSearchControl = new FormControl('')
 
   public selectedDoctor: Doctor | null = null
   public selectedPatient: ShortPatient | null = null
+  public selectedBed: BedRecord | null = null
 
   public searchDocResults: Doctor[] = []
   public searchPatResults: ShortPatient[] = []
+  public bedResults: BedRecord[] = []
+  public availableBeds: BedRecord[] = []
+  public allBeds: BedRecord[] = []
 
   public isDocLoading: boolean = false
   public isPatLoading: boolean = false
+  public isBedLoading: boolean = false
 
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
+  public showBedDropdown: boolean = false
+
+  private bedModule: BedModule | null = null
+  private shouldRestoreDraft = false
 
   ngOnInit(): void {
     this.route.data
@@ -151,6 +164,10 @@ export class VisitsFormPageV2Component implements OnInit {
 
       this.backRoute = this.resolveBackRoute(this.origin)
       this.applyModuleValidators()
+      this.bedModule = this.origin === 'hospitalization' ? 'hospitalization' : null
+      if (this.bedModule) {
+        this.loadBeds()
+      }
 
       if ( this.stockSearchId ) {
         this.visitsService.searchStockItems( this.stockSearchId )
@@ -218,6 +235,14 @@ export class VisitsFormPageV2Component implements OnInit {
       }
     })
 
+    this.bedSearchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((term) => {
+      this.handleBedSearch(String(term ?? ''))
+    })
+
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe( params => {
@@ -226,6 +251,12 @@ export class VisitsFormPageV2Component implements OnInit {
         this.handleSelectedVisit( +id )
       })
 
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.shouldRestoreDraft = params.get('draft') === '1'
+        this.restoreDraftIfNeeded()
+      })
 
     this.route.url
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -240,6 +271,8 @@ export class VisitsFormPageV2Component implements OnInit {
           this.visitForm.reset()
           this.doctorSearchControl.reset()
           this.patientSearchControl.reset()
+          this.bedSearchControl.reset()
+          this.selectedBed = null
           this.selectedStockItems = []
           this.stockItemsArray.clear()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
@@ -249,6 +282,7 @@ export class VisitsFormPageV2Component implements OnInit {
           this.subtitle = this.subtitleEdit
           this.actionButtonText = 'Actualizar'
         }
+        this.restoreDraftIfNeeded()
       })
   }
 
@@ -304,9 +338,106 @@ export class VisitsFormPageV2Component implements OnInit {
     requiredFields.forEach((field) => {
       const control = moduleGroup.get(field)
       if (control) {
-        control.setValidators([Validators.required])
+        const validators: ValidatorFn[] = [Validators.required]
+        if (field === 'bed') {
+          validators.push(this.bedSelectionValidator())
+        }
+        control.setValidators(validators)
         control.updateValueAndValidity({ emitEvent: false })
       }
+    })
+  }
+
+  private bedSelectionValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      if (!control.value) return null
+      if (!this.selectedBed) return { invalidBed: true }
+      if (this.selectedBed.code !== control.value) return { invalidBed: true }
+      return null
+    }
+  }
+
+  private loadBeds() {
+    if (!this.bedModule) return
+    this.isBedLoading = true
+    this.bedsService.getBeds(this.bedModule)
+      .subscribe({
+        next: (beds) => {
+          this.allBeds = beds
+          this.availableBeds = beds.filter((bed) => bed.status === 'available')
+          this.isBedLoading = false
+          this.syncBedFromForm()
+        },
+        error: (err) => {
+          this.isBedLoading = false
+          console.error('beds load error', err)
+        }
+      })
+  }
+
+  private syncBedFromForm() {
+    const bedValue = this.visitForm.get('expediente.module.bed')?.value
+    if (!bedValue) return
+    const match = this.allBeds.find((bed) => bed.code === bedValue)
+    if (match) {
+      this.selectedBed = match
+      this.bedSearchControl.setValue(match.code, { emitEvent: false })
+    }
+  }
+
+  private handleBedSearch(term: string) {
+    const cleanTerm = term.trim().toLowerCase()
+    if (!cleanTerm) {
+      this.bedResults = []
+      this.showBedDropdown = false
+      if (this.selectedBed) {
+        this.selectedBed = null
+        this.visitForm.get('expediente.module.bed')?.setValue('', { emitEvent: false })
+        this.visitForm.get('expediente.module.bed')?.updateValueAndValidity({ emitEvent: false })
+      }
+      return
+    }
+    if (this.selectedBed && this.selectedBed.code !== term) {
+      this.selectedBed = null
+      this.visitForm.get('expediente.module.bed')?.setValue('', { emitEvent: false })
+    }
+    this.bedResults = this.availableBeds.filter((bed) => {
+      const haystack = `${bed.code} ${bed.area ?? ''}`.toLowerCase()
+      return haystack.includes(cleanTerm)
+    })
+    this.showBedDropdown = true
+  }
+
+  public selectBed(bed: BedRecord) {
+    this.selectedBed = bed
+    this.visitForm.get('expediente.module.bed')?.setValue(bed.code)
+    this.visitForm.get('expediente.module.bed')?.updateValueAndValidity({ emitEvent: false })
+    this.visitForm.get('expediente.module.bed')?.markAsTouched()
+    this.bedSearchControl.setValue(bed.code, { emitEvent: false })
+    this.bedResults = []
+    this.showBedDropdown = false
+  }
+
+  public handleBedBlur() {
+    setTimeout(() => {
+      this.showBedDropdown = false
+      this.visitForm.get('expediente.module.bed')?.markAsTouched()
+    }, 200)
+  }
+
+  public get showCreateBed(): boolean {
+    const term = (this.bedSearchControl.value ?? '').toString().trim()
+    return !!this.bedModule && term.length > 1 && this.bedResults.length === 0
+  }
+
+  public goToBedsManagement() {
+    if (!this.bedModule) return
+    this.saveDraft()
+    const returnUrl = this.router.url.includes('?')
+      ? `${this.router.url}&draft=1`
+      : `${this.router.url}?draft=1`
+    this.router.navigate(['/dashboard', this.bedModule, 'beds'], {
+      queryParams: { returnUrl }
     })
   }
 
@@ -381,6 +512,7 @@ export class VisitsFormPageV2Component implements OnInit {
           if( visit ) {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
+                this.clearDraft()
                 this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
           }
@@ -424,6 +556,7 @@ export class VisitsFormPageV2Component implements OnInit {
           if (visit.expediente) {
             this.visitForm.get('expediente')?.patchValue(visit.expediente)
           }
+          this.syncBedFromForm()
 
           this.initializeAutocompleteValues()
 
@@ -450,15 +583,25 @@ export class VisitsFormPageV2Component implements OnInit {
       })
   }
 
-  public handleEditVisit( visit: FormVisit ) {
+  public handleEditVisit( visit: FormVisitWithStock ) {
     visit.date =  visit.date.split('T')[0]
-    const payload = { ...visit, origin: this.origin }
-    this.visitsService.editVisit(this.selectedVisit()?.id!, payload )
+    const payload: FormVisitWithStock = this.includeSubinventoryInPayload
+      ? {
+        ...visit,
+        stockItems: visit.stockItems?.map(item => ({
+          ...item,
+          subinventoryId: this.payloadSubinventoryId
+        })) ?? []
+      }
+      : visit
+    const payloadWithOrigin = { ...payload, origin: this.origin }
+    this.visitsService.editVisit(this.selectedVisit()?.id!, payloadWithOrigin )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
             Swal.fire('Success', 'New visit edited!', 'success')
               .then(() => {
+                this.clearDraft()
                 this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
           }
@@ -530,6 +673,63 @@ export class VisitsFormPageV2Component implements OnInit {
         )
       )
     })
+  }
+
+  private getDraftKey() {
+    return `visitDraft:${this.origin}:${this.caller || 'nv'}`
+  }
+
+  private saveDraft() {
+    const payload = {
+      form: this.visitForm.getRawValue(),
+      selectedDoctor: this.selectedDoctor,
+      selectedPatient: this.selectedPatient,
+      doctorSearch: this.doctorSearchControl.value,
+      patientSearch: this.patientSearchControl.value,
+      selectedStockItems: this.selectedStockItems,
+      bedSearch: this.bedSearchControl.value,
+      selectedBedCode: this.selectedBed?.code ?? ''
+    }
+    sessionStorage.setItem(this.getDraftKey(), JSON.stringify(payload))
+  }
+
+  private restoreDraftIfNeeded() {
+    if (!this.shouldRestoreDraft) return
+    if (!this.caller) return
+    const raw = sessionStorage.getItem(this.getDraftKey())
+    if (!raw) return
+    try {
+      const payload = JSON.parse(raw)
+      if (payload?.form) {
+        this.visitForm.patchValue(payload.form)
+      }
+      this.selectedDoctor = payload?.selectedDoctor ?? null
+      this.selectedPatient = payload?.selectedPatient ?? null
+      if (payload?.doctorSearch) {
+        this.doctorSearchControl.setValue(payload.doctorSearch, { emitEvent: false })
+      }
+      if (payload?.patientSearch) {
+        this.patientSearchControl.setValue(payload.patientSearch, { emitEvent: false })
+      }
+      this.selectedStockItems = payload?.selectedStockItems ?? []
+      this.loadDataOfStockArray()
+      if (payload?.bedSearch) {
+        this.bedSearchControl.setValue(payload.bedSearch, { emitEvent: false })
+      }
+      if (payload?.selectedBedCode) {
+        const match = this.allBeds.find((bed) => bed.code === payload.selectedBedCode)
+        if (match) {
+          this.selectBed(match)
+        }
+      }
+    } catch (err) {
+      console.warn('No se pudo restaurar el borrador', err)
+    }
+  }
+
+  private clearDraft() {
+    sessionStorage.removeItem(this.getDraftKey())
+    this.shouldRestoreDraft = false
   }
 
 }

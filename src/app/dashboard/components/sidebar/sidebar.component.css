@@ -1,5 +1,7 @@
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
   width: 256px;
   height: 100vh;
   display: flex;
@@ -11,6 +13,8 @@
   border-bottom-right-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   transition: all .3s;
+  overflow: visible;
+  z-index: 30;
 }
 
 .sidebar .head {
@@ -52,6 +56,11 @@
 
 .nav {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  padding-right: 4px;
+  overscroll-behavior: contain;
 }
 
 .menu ul li {
@@ -116,6 +125,10 @@
 .menu .sub-menu li a {
   padding: 10px 8px;
   font-size: 12px;
+}
+
+.menu.account {
+  margin-top: auto;
 }
 
 .menu:not(:last-child) {
@@ -213,14 +226,65 @@
   visibility: visible;
 }
 
+.sidebar.active .menu > ul > li.has-submenu:hover > a .text,
+.sidebar.active .menu > ul > li.has-submenu:focus-within > a .text {
+  opacity: 0;
+  visibility: hidden;
+  left: 70px;
+}
+
 .sidebar.active .menu .sub-menu {
   position: absolute;
   top: 0;
-  left: 20px;
+  left: 52px;
   width: 200px;
   border-radius: 20px;
   padding: 10px 20px;
-  border: 1px solid #f6f6f6;
-  background-color: #fff;
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1);
+  margin-left: 0;
+  border-left: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #0b0f1a;
+  box-shadow: 0 14px 26px rgba(6, 10, 18, 0.35);
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.sidebar.active .menu .sub-menu::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 18px;
+  width: 12px;
+  height: 12px;
+  background-color: #0b0f1a;
+  transform: rotate(45deg);
+  box-shadow: -2px 2px 6px rgba(6, 10, 18, 0.35);
+}
+
+.sidebar.active .menu .sub-menu li a {
+  color: #e2e8f0;
+}
+
+.sidebar.active .menu .sub-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.sidebar.active .nav,
+.sidebar.active .menu {
+  overflow: visible;
+}
+
+.sidebar.active .menu > ul > li:hover > .sub-menu,
+.sidebar.active .menu > ul > li:focus-within > .sub-menu,
+.sidebar.active .menu > ul > li.active > .sub-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
 }

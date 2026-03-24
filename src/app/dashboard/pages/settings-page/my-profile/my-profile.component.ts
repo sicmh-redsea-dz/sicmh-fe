@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms';
-import Swal from 'sweetalert2';
+import { Component, OnInit, inject } from '@angular/core'
+import { FormBuilder, Validators } from '@angular/forms'
+import Swal from 'sweetalert2'
+import { AuthService } from '../../../../auth/services/auth.service'
+import { ThemeService } from '../../../../shared/services/theme.service'
+import { SettingsService } from '../../../services/settings-service/settings.service'
+import { SettingsUser, UserProfile } from '../../../interface/settings.interface'
 
 @Component({
   selector: 'app-my-profile',
@@ -9,18 +13,31 @@ import Swal from 'sweetalert2';
 })
 export class MyProfileComponent implements OnInit {
   
-  profileForm!: FormGroup;
-  userImageUrl: string | null = null;
+  private fb = inject(FormBuilder)
+  private authService = inject(AuthService)
+  private settingsService = inject(SettingsService)
+  private themeService = inject(ThemeService)
 
-  constructor(private fb: FormBuilder) {}
+  public profileForm = this.fb.group({
+    name: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    phone: [''],
+    identification: [''],
+    department: [''],
+    position: [''],
+    theme: ['light']
+  })
+
+  public userImageUrl: string | null = null
+  public saving = false
+  public rolesLabel = ''
 
   ngOnInit(): void {
-    this.profileForm = this.fb.group({
-      username: [''],
-      email: [''],
-      language: ['es'],
-      theme: ['light']
-    });
+    const current = this.authService.currentUser()
+    if (current) {
+      this.rolesLabel = current.roles?.[0] ?? ''
+    }
+    this.loadProfile()
   }
 
   onAvatarChange(event: Event): void {
@@ -37,13 +54,81 @@ export class MyProfileComponent implements OnInit {
   }
 
   saveProfile(): void {
-    Swal.fire('Éxito', 'Cambios guardados con éxito', 'success');
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched()
+      return
+    }
+
+    const payload = {
+      name: this.profileForm.get('name')?.value || '',
+      email: this.profileForm.get('email')?.value || '',
+      profile: {
+        phone: this.profileForm.get('phone')?.value || '',
+        identification: this.profileForm.get('identification')?.value || '',
+        department: this.profileForm.get('department')?.value || '',
+        position: this.profileForm.get('position')?.value || '',
+        theme: this.profileForm.get('theme')?.value || 'light',
+        avatarDataUrl: this.userImageUrl || undefined
+      } as UserProfile
+    }
+
+    this.saving = true
+    this.settingsService.updateProfile(payload)
+      .subscribe({
+        next: (user) => {
+          this.authService.updateCurrentUser({
+            name: user.name,
+            email: user.email,
+            profile: user.profile
+          })
+          if (user.profile?.theme) {
+            this.themeService.syncWithPreference(user.profile.theme)
+          }
+          Swal.fire('Éxito', 'Cambios guardados con éxito', 'success')
+        },
+        error: (err) => Swal.fire('Error', err, 'error'),
+        complete: () => {
+          this.saving = false
+        }
+      })
   }
 
   toggleTheme(): void {
-    const current = this.profileForm.get('theme')?.value;
-    const next = current === 'dark' ? 'light' : 'dark';
-    this.profileForm.patchValue({ theme: next });
+    const next = this.themeService.toggleTheme()
+    this.profileForm.patchValue({ theme: next })
+    this.settingsService.updateProfile({ profile: { theme: next } })
+      .subscribe({
+        next: (user) => {
+          this.authService.updateCurrentUser({ profile: user.profile })
+        },
+        error: (err) => {
+          Swal.fire('Error', err, 'error')
+        }
+      })
   }
   
+  private loadProfile() {
+    this.settingsService.getProfile()
+      .subscribe({
+        next: (resp) => {
+          const user = resp.user as SettingsUser
+          this.rolesLabel = user.roleName || this.rolesLabel
+          this.profileForm.patchValue({
+            name: user.name,
+            email: user.email,
+            phone: user.profile?.phone || '',
+            identification: user.profile?.identification || '',
+            department: user.profile?.department || '',
+            position: user.profile?.position || '',
+            theme: user.profile?.theme || 'light'
+          })
+          if (user.profile?.avatarDataUrl) {
+            this.userImageUrl = user.profile.avatarDataUrl
+          }
+          if (user.profile?.theme) {
+            this.themeService.syncWithPreference(user.profile.theme)
+          }
+        }
+      })
+  }
 }

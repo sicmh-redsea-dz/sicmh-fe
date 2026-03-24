@@ -1,0 +1,90 @@
+<div class="invoice-preview">
+  <header class="preview-header">
+    <button class="ghost-btn" type="button" (click)="goBack()">Volver</button>
+    <div class="header-title">
+      <h1>Factura #{{ invoiceNumber }}</h1>
+      <span class="status-badge" [class]="getStatusClass(snapshot?.invoice?.status)">
+        {{ snapshot?.invoice?.status || 'Pendiente' }}
+      </span>
+    </div>
+    <button class="primary-btn" type="button" (click)="printInvoice()">Imprimir</button>
+  </header>
+
+  <section class="preview-card" *ngIf="snapshot; else loadingState">
+    <div class="info-grid">
+      <div>
+        <span class="label">Paciente</span>
+        <strong>{{ snapshot.invoice.patientName }}</strong>
+      </div>
+      <div>
+        <span class="label">Doctor</span>
+        <strong>{{ snapshot.invoice.doctorName || '-' }}</strong>
+      </div>
+      <div>
+        <span class="label">Fecha</span>
+        <strong>{{ formattedDate }}</strong>
+      </div>
+      <div>
+        <span class="label">Tipo de visita</span>
+        <strong>{{ snapshot.invoice.visitType || '-' }}</strong>
+      </div>
+    </div>
+
+    <div class="charges-table">
+      <div class="table-header">
+        <h3>Detalle de cargos</h3>
+        <span>{{ snapshot.charges.length }} cargos</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estación</th>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of snapshot.charges">
+              <td>{{ item.occurredAt }}</td>
+              <td>{{ getStationLabel(item.station) }}</td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.description }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>L. {{ item.unitPrice | number:'1.2-2' }}</td>
+              <td class="amount">L. {{ item.total | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="!snapshot.charges.length">
+              <td colspan="7">Sin cargos registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="totals">
+      <div>
+        <span>Subtotal</span>
+        <strong>L. {{ snapshot.summary.subtotal | number:'1.2-2' }}</strong>
+      </div>
+      <div>
+        <span>Descuento</span>
+        <strong>- L. {{ snapshot.summary.discountAmount | number:'1.2-2' }}</strong>
+      </div>
+      <div class="total">
+        <span>Total</span>
+        <strong>L. {{ snapshot.summary.total | number:'1.2-2' }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #loadingState>
+    <div class="loading-state">
+      {{ loading ? 'Cargando factura...' : 'No se encontró la factura.' }}
+    </div>
+  </ng-template>
+</div>

@@ -15,19 +15,20 @@
         autocomplete="off"
         [formGroup]="visitForm"
         (ngSubmit)="onHandleSubmit()">
+    <p class="form-legend">Los campos marcados con <span>*</span> son obligatorios.</p>
 
     <div class="input-row">
       <div class="input-group date-group">
-        <label>Date</label>
+        <label class="required">Date</label>
         <input type="date" 
               formControlName="date"/>
-        <small class="error-text" *ngIf="visitForm.get('date')?.touched && visitForm.get('date')?.hasError('required')">
+        <small class="error-text" *ngIf="visitForm.get('date')?.invalid && (visitForm.get('date')?.touched || visitForm.get('date')?.dirty)">
           Este campo es obligatorio.
         </small>
       </div>
 
       <div class="input-group" style="position: relative;">
-        <label>Doctor</label>
+        <label class="required">Doctor</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
@@ -44,13 +45,13 @@
             {{ doctor.name }}
           </li>
         </ul>
-        <small class="error-text" *ngIf="visitForm.get('doctor')?.touched && visitForm.get('doctor')?.hasError('required')">
+        <small class="error-text" *ngIf="visitForm.get('doctor')?.invalid && (visitForm.get('doctor')?.touched || visitForm.get('doctor')?.dirty)">
           Selecciona un doctor.
         </small>
       </div>
 
       <div class="input-group" style="position: relative;">
-        <label>Paciente</label>
+        <label class="required">Paciente</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
@@ -67,7 +68,7 @@
             {{ patient.name }}
           </li>
         </ul>
-        <small class="error-text" *ngIf="visitForm.get('patient')?.touched && visitForm.get('patient')?.hasError('required')">
+        <small class="error-text" *ngIf="visitForm.get('patient')?.invalid && (visitForm.get('patient')?.touched || visitForm.get('patient')?.dirty)">
           Selecciona un paciente.
         </small>
       </div>
@@ -81,32 +82,32 @@
       <div formGroupName="standard">
         <div class="textareas-row">
           <div class="textarea-group">
-            <label>Motivo de consulta/ingreso</label>
+            <label class="required">Motivo de consulta/ingreso</label>
             <textarea 
               formControlName="chiefComplaint"
               placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
-            <small class="error-text" *ngIf="visitForm.get('expediente.standard.chiefComplaint')?.touched && visitForm.get('expediente.standard.chiefComplaint')?.hasError('required')">
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.chiefComplaint')?.invalid && (visitForm.get('expediente.standard.chiefComplaint')?.touched || visitForm.get('expediente.standard.chiefComplaint')?.dirty)">
               Este campo es obligatorio.
             </small>
           </div>
 
           <div class="textarea-group">
-            <label>Padecimiento actual</label>
+            <label class="required">Padecimiento actual</label>
             <textarea 
               formControlName="currentIllness"
               placeholder="Resume el padecimiento actual del paciente."></textarea>
-            <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentIllness')?.touched && visitForm.get('expediente.standard.currentIllness')?.hasError('required')">
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentIllness')?.invalid && (visitForm.get('expediente.standard.currentIllness')?.touched || visitForm.get('expediente.standard.currentIllness')?.dirty)">
               Este campo es obligatorio.
             </small>
           </div>
         </div>
 
         <div class="textarea-full">
-          <label>Exploración física</label>
+          <label class="required">Exploración física</label>
           <textarea 
             formControlName="physicalExam"
             placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
-          <small class="error-text" *ngIf="visitForm.get('expediente.standard.physicalExam')?.touched && visitForm.get('expediente.standard.physicalExam')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('expediente.standard.physicalExam')?.invalid && (visitForm.get('expediente.standard.physicalExam')?.touched || visitForm.get('expediente.standard.physicalExam')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
@@ -136,21 +137,21 @@
     <div class="input-columns">
       <div class="left-column">
         <div class="number-input-group">
-          <label>Presion</label>
+          <label class="required">Presion</label>
           <div class="number-input">
             <input type="text" 
                   formControlName="pressure" 
                   placeholder="Ej. 120/80 mmHg"/>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('pressure')?.touched && visitForm.get('pressure')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('pressure')?.invalid && (visitForm.get('pressure')?.touched || visitForm.get('pressure')?.dirty) && visitForm.get('pressure')?.hasError('required')">
             Este campo es obligatorio.
           </small>
-          <small class="error-text" *ngIf="visitForm.get('pressure')?.touched && visitForm.get('pressure')?.hasError('invalidPressure')">
+          <small class="error-text" *ngIf="visitForm.get('pressure')?.invalid && (visitForm.get('pressure')?.touched || visitForm.get('pressure')?.dirty) && visitForm.get('pressure')?.hasError('invalidPressure')">
             El formato debe ser ###/###.
           </small>
         </div>
         <div class="number-input-group">
-          <label>Temperatura</label>
+          <label class="required">Temperatura</label>
           <div class="number-input">
             <input type="number" 
                   formControlName="temperature"
@@ -160,12 +161,12 @@
               <button type="button" class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('temperature')?.touched && visitForm.get('temperature')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('temperature')?.invalid && (visitForm.get('temperature')?.touched || visitForm.get('temperature')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
         <div class="number-input-group">
-          <label>Altura</label>
+          <label class="required">Altura</label>
           <div class="number-input">
             <input type="number" 
                   formControlName="height" 
@@ -177,12 +178,12 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('height')?.touched && visitForm.get('height')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('height')?.invalid && (visitForm.get('height')?.touched || visitForm.get('height')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
         <div class="number-input-group">
-          <label>Glucometria</label>
+          <label class="required">Glucometria</label>
           <div class="number-input">
             <input type="number"
                   formControlName="glucometry"
@@ -192,12 +193,12 @@
               <button type="button" class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('glucometry')?.touched && visitForm.get('glucometry')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('glucometry')?.invalid && (visitForm.get('glucometry')?.touched || visitForm.get('glucometry')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
         <div class="number-input-group">
-          <label>Oxigenacion</label>
+          <label class="required">Oxigenacion</label>
           <div class="number-input">
             <input type="number"
                   formControlName="oxygenation" 
@@ -207,12 +208,12 @@
               <button type="button" class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('oxygenation')?.touched && visitForm.get('oxygenation')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('oxygenation')?.invalid && (visitForm.get('oxygenation')?.touched || visitForm.get('oxygenation')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
         <div class="number-input-group">
-          <label>Peso</label>
+          <label class="required">Peso</label>
           <div class="number-input">
             <input type="number" 
                   formControlName="weight"
@@ -224,7 +225,7 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('weight')?.touched && visitForm.get('weight')?.hasError('required')">
+          <small class="error-text" *ngIf="visitForm.get('weight')?.invalid && (visitForm.get('weight')?.touched || visitForm.get('weight')?.dirty)">
             Este campo es obligatorio.
           </small>
         </div>
@@ -308,19 +309,19 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Diagnostico</label>
+        <label class="required">Diagnostico</label>
         <textarea formControlName="diagnosis"
                   placeholder="Escribe aquí el diagnóstico detallado del paciente."></textarea>
-        <small class="error-text" *ngIf="visitForm.get('diagnosis')?.touched && visitForm.get('diagnosis')?.hasError('required')">
+        <small class="error-text" *ngIf="visitForm.get('diagnosis')?.invalid && (visitForm.get('diagnosis')?.touched || visitForm.get('diagnosis')?.dirty)">
           Este campo es obligatorio.
         </small>
       </div>
     
       <div class="textarea-group">
-        <label>Tratamiento</label>
+        <label class="required">Tratamiento</label>
         <textarea formControlName="treatment"
                   placeholder="Describe el plan de tratamiento y medicamentos recomendados."></textarea>
-        <small class="error-text" *ngIf="visitForm.get('treatment')?.touched && visitForm.get('treatment')?.hasError('required')">
+        <small class="error-text" *ngIf="visitForm.get('treatment')?.invalid && (visitForm.get('treatment')?.touched || visitForm.get('treatment')?.dirty)">
           Este campo es obligatorio.
         </small>
       </div>
@@ -335,7 +336,7 @@
 
           <div class="input-row">
             <div class="input-group">
-              <label>Triage</label>
+              <label class="required">Triage</label>
               <select formControlName="triageLevel">
                 <option value="">Selecciona un nivel</option>
                 <option value="Rojo">Rojo</option>
@@ -343,13 +344,13 @@
                 <option value="Verde">Verde</option>
                 <option value="Azul">Azul</option>
               </select>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.triageLevel')?.touched && visitForm.get('expediente.module.triageLevel')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.triageLevel')?.invalid && (visitForm.get('expediente.module.triageLevel')?.touched || visitForm.get('expediente.module.triageLevel')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
 
             <div class="input-group">
-              <label>Modo de llegada</label>
+              <label class="required">Modo de llegada</label>
               <select formControlName="arrivalMode">
                 <option value="">Selecciona una opción</option>
                 <option value="Ambulancia">Ambulancia</option>
@@ -357,13 +358,13 @@
                 <option value="Traslado">Traslado</option>
                 <option value="Otro">Otro</option>
               </select>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.arrivalMode')?.touched && visitForm.get('expediente.module.arrivalMode')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.arrivalMode')?.invalid && (visitForm.get('expediente.module.arrivalMode')?.touched || visitForm.get('expediente.module.arrivalMode')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
 
             <div class="input-group">
-              <label>Destino</label>
+              <label class="required">Destino</label>
               <select formControlName="disposition">
                 <option value="">Selecciona un destino</option>
                 <option value="Alta">Alta</option>
@@ -371,7 +372,7 @@
                 <option value="Traslado">Traslado</option>
                 <option value="Defuncion">Defuncion</option>
               </select>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.disposition')?.touched && visitForm.get('expediente.module.disposition')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.disposition')?.invalid && (visitForm.get('expediente.module.disposition')?.touched || visitForm.get('expediente.module.disposition')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
@@ -405,52 +406,52 @@
 
           <div class="textareas-row">
             <div class="textarea-group">
-              <label>Diagnostico preoperatorio</label>
+              <label class="required">Diagnostico preoperatorio</label>
               <textarea formControlName="preOpDiagnosis"
                         placeholder="Diagnóstico previo a la cirugía."></textarea>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.preOpDiagnosis')?.touched && visitForm.get('expediente.module.preOpDiagnosis')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.preOpDiagnosis')?.invalid && (visitForm.get('expediente.module.preOpDiagnosis')?.touched || visitForm.get('expediente.module.preOpDiagnosis')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
 
             <div class="textarea-group">
-              <label>Diagnostico postoperatorio</label>
+              <label class="required">Diagnostico postoperatorio</label>
               <textarea formControlName="postOpDiagnosis"
                         placeholder="Diagnóstico posterior a la cirugía."></textarea>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.postOpDiagnosis')?.touched && visitForm.get('expediente.module.postOpDiagnosis')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.postOpDiagnosis')?.invalid && (visitForm.get('expediente.module.postOpDiagnosis')?.touched || visitForm.get('expediente.module.postOpDiagnosis')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
           </div>
 
           <div class="textarea-full">
-            <label>Procedimiento quirurgico</label>
+            <label class="required">Procedimiento quirurgico</label>
             <textarea formControlName="procedure"
                       placeholder="Describe el procedimiento realizado."></textarea>
-            <small class="error-text" *ngIf="visitForm.get('expediente.module.procedure')?.touched && visitForm.get('expediente.module.procedure')?.hasError('required')">
+            <small class="error-text" *ngIf="visitForm.get('expediente.module.procedure')?.invalid && (visitForm.get('expediente.module.procedure')?.touched || visitForm.get('expediente.module.procedure')?.dirty)">
               Este campo es obligatorio.
             </small>
           </div>
 
           <div class="input-row">
             <div class="input-group">
-              <label>Tipo de anestesia</label>
+              <label class="required">Tipo de anestesia</label>
               <input type="text" formControlName="anesthesiaType" placeholder="Ej. General" />
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.anesthesiaType')?.touched && visitForm.get('expediente.module.anesthesiaType')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.anesthesiaType')?.invalid && (visitForm.get('expediente.module.anesthesiaType')?.touched || visitForm.get('expediente.module.anesthesiaType')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
             <div class="input-group">
-              <label>Inicio de cirugía</label>
+              <label class="required">Inicio de cirugía</label>
               <input type="time" formControlName="surgeryStart" />
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryStart')?.touched && visitForm.get('expediente.module.surgeryStart')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryStart')?.invalid && (visitForm.get('expediente.module.surgeryStart')?.touched || visitForm.get('expediente.module.surgeryStart')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
             <div class="input-group">
-              <label>Fin de cirugía</label>
+              <label class="required">Fin de cirugía</label>
               <input type="time" formControlName="surgeryEnd" />
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryEnd')?.touched && visitForm.get('expediente.module.surgeryEnd')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryEnd')?.invalid && (visitForm.get('expediente.module.surgeryEnd')?.touched || visitForm.get('expediente.module.surgeryEnd')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
@@ -478,19 +479,19 @@
 
           <div class="textareas-row">
             <div class="textarea-group">
-              <label>Diagnostico de ingreso</label>
+              <label class="required">Diagnostico de ingreso</label>
               <textarea formControlName="admissionDiagnosis"
                         placeholder="Diagnóstico principal de ingreso."></textarea>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionDiagnosis')?.touched && visitForm.get('expediente.module.admissionDiagnosis')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionDiagnosis')?.invalid && (visitForm.get('expediente.module.admissionDiagnosis')?.touched || visitForm.get('expediente.module.admissionDiagnosis')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
 
             <div class="textarea-group">
-              <label>Motivo de ingreso</label>
+              <label class="required">Motivo de ingreso</label>
               <textarea formControlName="admissionReason"
                         placeholder="Motivo clínico del ingreso."></textarea>
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionReason')?.touched && visitForm.get('expediente.module.admissionReason')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionReason')?.invalid && (visitForm.get('expediente.module.admissionReason')?.touched || visitForm.get('expediente.module.admissionReason')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
@@ -498,27 +499,45 @@
 
           <div class="input-row">
             <div class="input-group">
-              <label>Servicio</label>
+              <label class="required">Servicio</label>
               <input type="text" formControlName="service" placeholder="Ej. Medicina interna" />
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.service')?.touched && visitForm.get('expediente.module.service')?.hasError('required')">
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.service')?.invalid && (visitForm.get('expediente.module.service')?.touched || visitForm.get('expediente.module.service')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
 
             <div class="input-group">
-              <label>Cama</label>
-              <input type="text" formControlName="bed" placeholder="Ej. 12B" />
-              <small class="error-text" *ngIf="visitForm.get('expediente.module.bed')?.touched && visitForm.get('expediente.module.bed')?.hasError('required')">
-                Este campo es obligatorio.
+              <label>Cama *</label>
+              <div class="autocomplete-wrapper">
+                <input
+                  type="text"
+                  placeholder="Buscar cama disponible..."
+                  [formControl]="bedSearchControl"
+                  (focus)="showBedDropdown = true"
+                  (blur)="handleBedBlur()"
+                />
+                <div *ngIf="isBedLoading" class="loader"></div>
+              </div>
+              <ul class="dropdown-list" *ngIf="showBedDropdown && bedResults.length > 0">
+                <li *ngFor="let bed of bedResults" (mousedown)="selectBed(bed)">
+                  {{ bed.code }} <span *ngIf="bed.area">· {{ bed.area }}</span>
+                </li>
+              </ul>
+              <input type="hidden" formControlName="bed" />
+              <small class="error-text" *ngIf="visitForm.get('expediente.module.bed')?.invalid && (visitForm.get('expediente.module.bed')?.touched || visitForm.get('expediente.module.bed')?.dirty)">
+                Selecciona una cama disponible.
               </small>
+              <button class="ghost-btn" type="button" *ngIf="showCreateBed" (click)="goToBedsManagement()">
+                Crear cama
+              </button>
             </div>
           </div>
 
           <div class="textarea-full">
-            <label>Resumen de evolución</label>
+            <label class="required">Resumen de evolución</label>
             <textarea formControlName="evolutionSummary"
                       placeholder="Resumen de evolución durante la estancia."></textarea>
-            <small class="error-text" *ngIf="visitForm.get('expediente.module.evolutionSummary')?.touched && visitForm.get('expediente.module.evolutionSummary')?.hasError('required')">
+            <small class="error-text" *ngIf="visitForm.get('expediente.module.evolutionSummary')?.invalid && (visitForm.get('expediente.module.evolutionSummary')?.touched || visitForm.get('expediente.module.evolutionSummary')?.dirty)">
               Este campo es obligatorio.
             </small>
           </div>

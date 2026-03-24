@@ -9,21 +9,24 @@
     <tbody>
       @for(item of bodyContent; track $index) {
         <tr 
-          (click)="canEdit ? execItemUpdate( item.InvoiceNumber ) : null"
-          [class.readonly]="!canEdit"
+          (click)="handleRowClick(item)"
+          [class.readonly]="!canEdit || item.Estado !== 'Pendiente'"
         >
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
           <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
-          <td><span [className]="'badge ' + (item.Estado === 'Pagado' ? 'active' : 'warning')">{{ item.Estado }}</span></td>
+          <td><span [className]="'badge ' + getStatusClass(item.Estado)">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts
-              *ngIf="canEdit || canDelete"
-              [isEditBlocked]="!canEdit || item.Estado === 'Pagado'"
+              *ngIf="canView || canEdit || canDelete"
+              [isEditBlocked]="!canEdit || item.Estado !== 'Pendiente'"
+              [showViewOpt]="canView"
               [showEditOpt]="canEdit"
               [showDeleteOpt]="canDelete"
+              [deleteLabel]="deleteLabel"
+              (viewEvent)="execItemView( item.InvoiceNumber )"
               (editEvent)="execItemUpdate( item.InvoiceNumber )"
               (deleteEvent)="execItemDeletion( item.InvoiceNumber )"
             />

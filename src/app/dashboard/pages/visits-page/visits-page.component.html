@@ -22,15 +22,13 @@
           <th>Doctor</th>
           <th>Ultima Visita</th>
           <th>Diagnostico</th>
+          <th>Movimiento</th>
           <th></th>
         </tr>
       </thead>
       <tbody style="background-color: white;">
         <tr 
-          [ngClass]="{
-            'pending': visit.state === 'Pendiente',
-            'payed': visit.state === 'Pagado'
-          }"
+          [ngClass]="getRowClass(visit)"
           (click)="handleSelectedVisit(visit.id)" 
           *ngFor="let visit of dataToRender(); let idx = index"
         >
@@ -46,6 +44,14 @@
                   {{visit.diagnosis}}
                 </span>
             </div>
+          </td>
+          <td class="movement-cell">
+            <span class="badge move" [class.has-tooltip]="showMovementTooltip(visit)">
+              <span class="movement-text">{{ getMovementShortLabel(visit) }}</span>
+              <span class="movement-tooltip" *ngIf="showMovementTooltip(visit)">
+                {{ getMovementFullLabel(visit) }}
+              </span>
+            </span>
           </td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts 

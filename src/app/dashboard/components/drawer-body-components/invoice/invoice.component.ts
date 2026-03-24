@@ -1,16 +1,33 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { InvoicesService } from '../../../services/invoices-services/invoices.service';
-import Swal from 'sweetalert2';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DrawerService } from '../../../services/drawer-service/drawer.service';
-import { DrawerContents } from '../../../interface/drawer-content.enum';
-import { formatIncomingData, formatNewDate } from '../../../../shared/utils/date-formatters';
+import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core'
+import Swal from 'sweetalert2'
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { InvoicesService } from '../../../services/invoices-services/invoices.service'
+import { BillingService } from '../../../services/billing-service/billing.service'
+import { DrawerService } from '../../../services/drawer-service/drawer.service'
+import { DrawerContents } from '../../../interface/drawer-content.enum'
+import { formatIncomingData, formatNewDate } from '../../../../shared/utils/date-formatters'
+import { VisitsService } from '../../../services/visits-service/visits.service'
+import { PatientsService } from '../../../services/patients-service/patients.service'
+import { BillingLedgerItem, BillingInvoiceSnapshot } from '../../../interface/billing.interface'
 
 interface Options {
-  patients: any[]
-  doctors : any[]
+  doctors: any[]
   services: any[]
   pMethods: any[]
+}
+
+type PatientOption = {
+  id: number
+  name: string
+  idNumber?: string
+}
+
+type DoctorOption = {
+  id: number
+  name: string
+  specialty?: string
 }
 
 @Component({
@@ -19,30 +36,66 @@ interface Options {
   styleUrl: './invoice.component.css'
 })
 export class InvoiceComponent implements OnInit {
-  private fb = inject( FormBuilder )
-  private drawerParams = inject( DrawerService )
-  private invoiceService = inject( InvoicesService )
+  private fb = inject(FormBuilder)
+  private drawerParams = inject(DrawerService)
+  private invoiceService = inject(InvoicesService)
+  private billingService = inject(BillingService)
+  private visitsService = inject(VisitsService)
+  private patientsService = inject(PatientsService)
+  private destroyRef = inject(DestroyRef)
 
   public invoiceIdToUpd = computed(() => this.drawerParams.setInvoiceId())
   public isDrawerSetToUpd = computed(() => this.drawerParams.setToUpdate())
+  public isViewOnly = computed(() => this.drawerParams.viewOnly())
   public drawerTexts = computed(() => this.drawerParams.drawerTexts())
 
+  public invoiceStatus: string = 'Pendiente'
+  public isReadOnly = false
+
   public selectedServices: any[] = []
+  public options: Options = { doctors: [], services: [], pMethods: [] }
+  public chargeItems: BillingLedgerItem[] = []
+  public chargeSnapshot: BillingInvoiceSnapshot | null = null
+
+  public patientQuery = ''
+  public doctorQuery = ''
+  public patientResults: PatientOption[] = []
+  public doctorResults: DoctorOption[] = []
+  public patientLoading = false
+  public doctorLoading = false
+  public patientOpen = false
+  public doctorOpen = false
+  private patientSearchSubject = new Subject<string>()
+  private doctorSearchSubject = new Subject<string>()
+
+  public subtotalAmount = 0
+  public discountAmount = 0
+  public totalAmount = 0
+
   public invoiceForm: FormGroup = this.fb.group({
-    patient     : ['', [Validators.required]],
-    doctor      : ['', [Validators.required]],
-    service     : this.fb.array([], []),
-    date        : ['', [Validators.required]],
-    pMethod     : ['', [Validators.required]],
-    amount      : [{value: '', disabled: true}],
-    description : [{value: '', disabled: true}],
+    patient: ['', [Validators.required]],
+    doctor: ['', [Validators.required]],
+    service: this.fb.array([], []),
+    date: ['', [Validators.required]],
+    pMethod: ['', [Validators.required]],
+    amount: [{ value: '', disabled: true }],
+    description: [{ value: '', disabled: true }],
+    elderlyDiscount: [false],
+    elderlyDiscountPercent: [0],
+    promCode: [''],
+    discount: [0]
   })
-  public options: Options = {patients: [], doctors: [], services: [], pMethods: []}
 
   ngOnInit(): void {
+    this.setupSearchStreams()
+    this.setupDiscountWatchers()
+
     this.getInvoiceData()
       .then(() => {
         if (!this.isDrawerSetToUpd()) {
+          this.setReadOnly(false)
+          this.invoiceStatus = 'Pendiente'
+          this.updateDrawerBadge(this.invoiceStatus)
           this.invoiceForm.get('date')!.setValue(formatNewDate(new Date()))
         } else {
           this.getPendingInvoice(this.invoiceIdToUpd())
@@ -51,17 +104,39 @@ export class InvoiceComponent implements OnInit {
   }
 
   get serviceArray(): FormArray {
-    return this.invoiceForm.get('service') as FormArray;
+    return this.invoiceForm.get('service') as FormArray
+  }
+
+  private setupSearchStreams() {
+    this.patientSearchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((term) => this.searchPatients(term))
+
+    this.doctorSearchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((term) => this.searchDoctors(term))
+  }
+
+  private setupDiscountWatchers() {
+    const fields = ['elderlyDiscount', 'elderlyDiscountPercent', 'promCode', 'discount']
+    fields.forEach((field) => {
+      this.invoiceForm.get(field)?.valueChanges
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadMutableData())
+    })
   }
 
   public getInvoiceData(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.invoiceService.getDataForInvoice().subscribe({
         next: (resp) => {
-          this.options.doctors = resp.data.doctors
-          this.options.patients = resp.data.patients
-          this.options.services = resp.data.services
-          this.options.pMethods = resp.data.paymentMethods
+          this.options.doctors = resp.data.doctors ?? []
+          this.options.services = resp.data.services ?? []
+          this.options.pMethods = resp.data.paymentMethods ?? []
           resolve()
         },
         error: (message) => {
@@ -76,77 +151,315 @@ export class InvoiceComponent implements OnInit {
     this.invoiceService.getOneInvoice(invoiceId)
       .subscribe({
         next: ({ data }) => {
-          this.setDataInForm( data )
+          this.setDataInForm(data)
+          this.loadInvoiceSnapshot(invoiceId)
         },
-        error: ( message ) => {
+        error: (message) => {
           Swal.fire('Error', message, 'error')
         }
       })
   }
 
+  private loadInvoiceSnapshot(invoiceNumber: string) {
+    if (!invoiceNumber) return
+    this.billingService.getInvoiceSnapshot(invoiceNumber)
+      .subscribe({
+        next: (snapshot) => {
+          this.chargeSnapshot = snapshot
+          this.chargeItems = snapshot?.charges ?? []
+          this.selectedServices = this.chargeItems.map((item) => ({
+            id: item.id,
+            description: item.description,
+            desc: this.buildChargeMeta(item),
+            price: item.total
+          }))
+          this.loadMutableData()
+        },
+        error: () => {
+          this.chargeSnapshot = null
+          this.chargeItems = []
+          this.selectedServices = []
+          this.loadMutableData()
+        }
+      })
+  }
+
+  private buildChargeMeta(item: BillingLedgerItem) {
+    const parts: string[] = []
+    if (item.category) parts.push(item.category)
+    if (item.station) parts.push(this.formatStation(item.station))
+    if (item.quantity) parts.push(`x${item.quantity}`)
+    if (item.unitPrice) parts.push(`L. ${Number(item.unitPrice || 0).toFixed(2)}`)
+    return parts.filter(Boolean).join(' · ')
+  }
+
+  private formatStation(key?: string) {
+    if (!key) return ''
+    const normalized = key.toLowerCase()
+    if (normalized.includes('emer')) return 'Emergencia'
+    if (normalized.includes('hosp')) return 'Hospitalización'
+    if (normalized.includes('quiro')) return 'Quirófano'
+    if (normalized.includes('consult')) return 'Consulta'
+    return key
+  }
+
   private setDataInForm(data: Record<string, any>) {
-    const { visitType, patientId, doctorId, date, amount } = data
-    this.invoiceForm.get('patient')!.setValue( patientId )
-    this.invoiceForm.get('doctor')!.setValue( doctorId )
-    this.invoiceForm.get('date')!.setValue( formatIncomingData( date ) )
-    if( amount > 0 ) {
-      this.selectedServices.push({price: amount, desc: 'Material Medico'})
-      this.loadMutableData()
-    }
-    
-    if ( visitType ) {
-      const updId = visitType === 'Emergencia' ? 2 : 1
-      const selectedItem = this.options.services.find( item => item.id === updId )
-      
-      this.selectedServices.push({description: selectedItem.serviceName, id: selectedItem.id, price: selectedItem.servicePrice, desc: selectedItem.serviceDescription})
-      this.loadMutableData()
-    }
-  }
+    const {
+      patientId,
+      doctorId,
+      date,
+      status,
+      elderlyDiscount,
+      promoCode,
+      promoDiscount
+    } = data
 
-  public handleChange(event: any) {
-    const name = event.target.name
-    const value = event.target.value
-    const key = name as keyof Options
-    const selectedOption: any[] = this.options[key] ?? []
-    const selectedItem = selectedOption.find((item) => item.id === parseInt(value))
-    if(this.selectedServices.find((item) => item.id === parseInt(value))) return
-    this.selectedServices.push({description: selectedItem.serviceName, id: selectedItem.id, price: selectedItem.servicePrice, desc: selectedItem.serviceDescription})
+    this.invoiceStatus = status ?? 'Pendiente'
+    const normalizedStatus = (this.invoiceStatus || '').toString().toLowerCase()
+    this.setReadOnly(this.isViewOnly() || normalizedStatus !== 'pendiente')
+    this.updateDrawerBadge(this.invoiceStatus)
+    if (this.isReadOnly) {
+      this.drawerParams.drawerTexts.update(state => ({
+        ...state,
+        header: 'ver factura',
+        btnText: 'Cerrar'
+      }))
+    }
+
+    this.invoiceForm.get('patient')!.setValue(patientId)
+    this.invoiceForm.get('doctor')!.setValue(doctorId)
+    this.invoiceForm.get('date')!.setValue(formatIncomingData(date))
+    this.invoiceForm.get('elderlyDiscount')!.setValue(!!elderlyDiscount, { emitEvent: false })
+    this.invoiceForm.get('elderlyDiscountPercent')!.setValue(Number(elderlyDiscount ?? 0), { emitEvent: false })
+    this.invoiceForm.get('promCode')!.setValue(promoCode ?? '', { emitEvent: false })
+    this.invoiceForm.get('discount')!.setValue(Number(promoDiscount ?? 0), { emitEvent: false })
+
+    this.resolvePatientLabel(patientId)
+    this.resolveDoctorLabel(doctorId)
+
+    this.selectedServices = []
+    this.chargeItems = []
     this.loadMutableData()
   }
 
-  public removeListItem(id: string, idx: number) {
-    this.selectedServices = this.selectedServices.filter((item) => item.id !== id)
-    this.serviceArray.removeAt(idx)
-    this.loadMutableData()
+  private setReadOnly(value: boolean) {
+    this.isReadOnly = value
+    if (value) {
+      this.invoiceForm.disable({ emitEvent: false })
+    } else {
+      this.invoiceForm.enable({ emitEvent: false })
+    }
+    this.invoiceForm.get('amount')?.disable({ emitEvent: false })
+    this.invoiceForm.get('description')?.disable({ emitEvent: false })
+  }
+
+  private resolvePatientLabel(patientId: number) {
+    if (!patientId) return
+    this.patientsService.getPatient(patientId)
+      .subscribe({
+        next: (patient) => {
+          if (!patient) return
+          const idSuffix = patient.idNumber ? ` · ${patient.idNumber}` : ''
+          this.patientQuery = `${patient.name} ${patient.lastName}`.trim() + idSuffix
+        },
+        error: () => {
+          this.patientQuery = `Paciente ${patientId}`
+        }
+      })
+  }
+
+  private resolveDoctorLabel(doctorId: number) {
+    if (!doctorId) return
+    const found = this.options.doctors.find((doc) => doc.id === doctorId)
+    if (found) {
+      this.doctorQuery = found.name
+      return
+    }
+    this.doctorQuery = `Doctor ${doctorId}`
+  }
+
+  public onPatientInput(term: string) {
+    if (this.isReadOnly) return
+    this.patientQuery = term
+    this.invoiceForm.get('patient')?.setValue('')
+    this.patientOpen = true
+    this.patientSearchSubject.next(term)
+  }
+
+  public onDoctorInput(term: string) {
+    if (this.isReadOnly) return
+    this.doctorQuery = term
+    this.invoiceForm.get('doctor')?.setValue('')
+    this.doctorOpen = true
+    this.doctorSearchSubject.next(term)
+  }
+
+  public onPatientFocus() {
+    if (this.isReadOnly) return
+    this.patientOpen = true
+  }
+
+  public onDoctorFocus() {
+    if (this.isReadOnly) return
+    this.doctorOpen = true
+  }
+
+  public onPatientBlur() {
+    window.setTimeout(() => {
+      this.patientOpen = false
+      this.invoiceForm.get('patient')?.markAsTouched()
+    }, 150)
+  }
+
+  public onDoctorBlur() {
+    window.setTimeout(() => {
+      this.doctorOpen = false
+      this.invoiceForm.get('doctor')?.markAsTouched()
+    }, 150)
+  }
+
+  public selectPatient(patient: PatientOption) {
+    this.invoiceForm.get('patient')?.setValue(patient.id)
+    const idSuffix = patient.idNumber ? ` · ${patient.idNumber}` : ''
+    this.patientQuery = `${patient.name}`.trim() + idSuffix
+    this.patientResults = []
+    this.patientOpen = false
+  }
+
+  public selectDoctor(doctor: DoctorOption) {
+    this.invoiceForm.get('doctor')?.setValue(doctor.id)
+    this.doctorQuery = doctor.name
+    this.doctorResults = []
+    this.doctorOpen = false
+  }
+
+  public clearPatient() {
+    if (this.isReadOnly) return
+    this.invoiceForm.get('patient')?.setValue('')
+    this.patientQuery = ''
+    this.patientResults = []
+    this.patientLoading = false
+    this.patientOpen = false
+  }
+
+  public clearDoctor() {
+    if (this.isReadOnly) return
+    this.invoiceForm.get('doctor')?.setValue('')
+    this.doctorQuery = ''
+    this.doctorResults = []
+    this.doctorLoading = false
+    this.doctorOpen = false
+  }
+
+  private searchPatients(term: string) {
+    const cleanTerm = term.trim()
+    if (!cleanTerm || cleanTerm.length < 2) {
+      this.patientResults = []
+      this.patientLoading = false
+      return
+    }
+
+    this.patientLoading = true
+    this.patientsService.getPatients({ limit: 12, offset: 0, term: cleanTerm })
+      .pipe(finalize(() => {
+        this.patientLoading = false
+      }))
+      .subscribe({
+        next: (data) => {
+          this.patientResults = data?.patients?.map((p) => ({
+            id: p.id,
+            name: `${p.name} ${p.lastName}`.trim(),
+            idNumber: p.idNumber
+          })) ?? []
+        },
+        error: () => {
+          this.patientResults = []
+        }
+      })
+  }
+
+  private searchDoctors(term: string) {
+    const cleanTerm = term.trim()
+    if (!cleanTerm || cleanTerm.length < 2) {
+      this.doctorResults = []
+      this.doctorLoading = false
+      return
+    }
+
+    this.doctorLoading = true
+    this.visitsService.searchDoctors(cleanTerm)
+      .pipe(finalize(() => {
+        this.doctorLoading = false
+      }))
+      .subscribe({
+        next: (doctors) => {
+          this.doctorResults = doctors?.map((doc: any) => ({
+            id: doc.id,
+            name: doc.name,
+            specialty: doc.specialty
+          })) ?? []
+        },
+        error: () => {
+          this.doctorResults = []
+        }
+      })
   }
 
   public onHandleCancel() {
     this.invoiceForm.reset()
-    this.drawerParams.isDrawerOpen.set( false )
-    this.drawerParams.contentToDisplay.set( DrawerContents.NONE )
-    this.drawerParams.setToUpdate.set( false )
-    this.drawerParams.setInvoiceId.set( '' )
+    this.patientQuery = ''
+    this.doctorQuery = ''
+    this.patientResults = []
+    this.doctorResults = []
+    this.selectedServices = []
+    this.chargeItems = []
+    this.chargeSnapshot = null
+    this.invoiceStatus = 'Pendiente'
+    this.setReadOnly(false)
+    this.drawerParams.isDrawerOpen.set(false)
+    this.drawerParams.contentToDisplay.set(DrawerContents.NONE)
+    this.drawerParams.setToUpdate.set(false)
+    this.drawerParams.setInvoiceId.set('')
+    this.drawerParams.viewOnly.set(false)
+  }
+
+  private updateDrawerBadge(status: string) {
+    const label = status || 'Pendiente'
+    const normalized = label.toLowerCase()
+    const tone = normalized.includes('pag') ? 'paid' : normalized.includes('anul') ? 'canceled' : 'pending'
+    this.drawerParams.drawerTexts.update(state => ({
+      ...state,
+      badge: label,
+      badgeTone: tone
+    }))
   }
 
   public onHandleSubmit() {
+    if (this.isReadOnly) return
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched()
       return
     }
-    if( this.isDrawerSetToUpd() ) 
+    if (this.isDrawerSetToUpd())
       this.completeExistingInvoice()
-    else 
+    else
       this.saveNewInvoice()
   }
-  
+
   private saveNewInvoice() {
-    this.invoiceService.createInvoice({
-      ...this.invoiceForm.value,
+    const raw = this.invoiceForm.getRawValue()
+    const elderlyPercent = raw.elderlyDiscount ? Number(raw.elderlyDiscountPercent || 0) : 0
+    const payload = {
+      ...raw,
+      elderlyDiscount: elderlyPercent,
       amount: this.invoiceForm.get('amount')?.value
-    })
+    }
+    delete (payload as any).elderlyDiscountPercent
+
+    this.invoiceService.createInvoice(payload)
       .subscribe({
-        next: ( invoice ) => {
-          if( invoice ) {
+        next: (invoice) => {
+          if (invoice) {
             Swal.fire('Success', 'New invoice added!', 'success')
               .then(() => {
                 this.drawerParams.triggerInvoiceRefresh()
@@ -154,17 +467,25 @@ export class InvoiceComponent implements OnInit {
               })
           }
         },
-        error: ( message ) => {
+        error: (message) => {
           Swal.fire('Error', message, 'error')
         }
       })
-
   }
 
   private completeExistingInvoice() {
-    this.invoiceService.updateInvoice(this.invoiceIdToUpd(), {...this.invoiceForm.value, amount: this.invoiceForm.get('amount')?.value})
+    const raw = this.invoiceForm.getRawValue()
+    const elderlyPercent = raw.elderlyDiscount ? Number(raw.elderlyDiscountPercent || 0) : 0
+    const payload = {
+      ...raw,
+      elderlyDiscount: elderlyPercent,
+      amount: this.invoiceForm.get('amount')?.value
+    }
+    delete (payload as any).elderlyDiscountPercent
+
+    this.invoiceService.updateInvoice(this.invoiceIdToUpd(), payload)
       .subscribe({
-        next: ( resp ) => {
+        next: (resp) => {
           Swal.fire('Success', 'Invoice updated!', 'success')
             .then(() => {
               this.drawerParams.triggerInvoiceRefresh()
@@ -172,23 +493,46 @@ export class InvoiceComponent implements OnInit {
             })
           return resp
         },
-        error: ( message ) => {
+        error: (message) => {
           Swal.fire('Error', message, 'error')
         }
       })
   }
 
   private loadMutableData() {
-    let totalAmount: number = 0
-    let concatDescriptions: string = ''
-    this.serviceArray.clear();
-    this.selectedServices.forEach((item, idx) => {
-      totalAmount += parseFloat(item.price)
-      concatDescriptions += `${idx+1}. ${item.desc}.\n`
-      if( item.id ) 
-        this.serviceArray.push(this.fb.control(item.id, []))
+    let subtotal = 0
+    let concatDescriptions = ''
+    this.serviceArray.clear()
+
+    this.chargeItems.forEach((item, idx) => {
+      subtotal += Number(item.total) || 0
+      concatDescriptions += `${idx + 1}. ${item.description}.\n`
     })
-    this.invoiceForm.get('amount')?.setValue(totalAmount.toFixed(2))
-    this.invoiceForm.get('description')?.setValue(concatDescriptions)
+
+    const elderlyEnabled = !!this.invoiceForm.get('elderlyDiscount')?.value
+    const elderlyPercent = elderlyEnabled
+      ? Number(this.invoiceForm.get('elderlyDiscountPercent')?.value || 0)
+      : 0
+    const promoPercent = Number(this.invoiceForm.get('discount')?.value || 0)
+    const promoCode = (this.invoiceForm.get('promCode')?.value || '').trim()
+
+    const totalPercent = Math.min(100, Math.max(0, elderlyPercent + promoPercent))
+    const discountAmount = subtotal * (totalPercent / 100)
+    const totalAmount = Math.max(0, subtotal - discountAmount)
+
+    if (elderlyEnabled && elderlyPercent > 0) {
+      concatDescriptions += `Descuento tercera edad (${elderlyPercent}%).\n`
+    }
+    if (promoPercent > 0) {
+      const label = promoCode ? `Descuento corporativo (${promoCode})` : 'Descuento corporativo'
+      concatDescriptions += `${label} (${promoPercent}%).\n`
+    }
+
+    this.subtotalAmount = subtotal
+    this.discountAmount = discountAmount
+    this.totalAmount = totalAmount
+
+    this.invoiceForm.get('amount')?.setValue(totalAmount.toFixed(2), { emitEvent: false })
+    this.invoiceForm.get('description')?.setValue(concatDescriptions.trim(), { emitEvent: false })
   }
 }

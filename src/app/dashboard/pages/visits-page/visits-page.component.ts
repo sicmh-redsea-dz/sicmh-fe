@@ -125,6 +125,106 @@ export class VisitsPageComponent implements OnInit {
     return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
   }
 
+  public getStationLabel(key?: string) {
+    if (!key) return '—'
+    const normalized = this.normalizeStationKey(key)
+    if (normalized === 'emergencia') return 'Emergencia'
+    if (normalized === 'hospitalizacion') return 'Hospitalización'
+    if (normalized === 'quirofano') return 'Quirófano'
+    if (normalized === 'consulta') return 'Consulta'
+    return key.toString()
+  }
+
+  private normalizeStationKey(value?: string) {
+    const normalized = value ? value.toString().trim().toLowerCase() : ''
+    if (!normalized) return ''
+    if (normalized.includes('emer')) return 'emergencia'
+    if (normalized.includes('hosp')) return 'hospitalizacion'
+    if (normalized.includes('quiro')) return 'quirofano'
+    if (normalized.includes('consult')) return 'consulta'
+    return normalized
+  }
+
+  private getReportStationKey() {
+    if (this.urlSegment === 'emergency') return 'emergencia'
+    if (this.urlSegment === 'hospitalization') return 'hospitalizacion'
+    if (this.urlSegment === 'o-room') return 'quirofano'
+    return 'consulta'
+  }
+
+  private getMovementPathKeys(visit: SimpleVisit): string[] {
+    const rawTrail = (visit as any).movementTrail || (visit as any).movementPath || (visit as any).movementHistory
+    if (Array.isArray(rawTrail)) {
+      return rawTrail
+        .map((value) => this.normalizeStationKey(value))
+        .filter(Boolean)
+    }
+    if (typeof rawTrail === 'string') {
+      return rawTrail
+        .split(/->|→|,/)
+        .map((value) => this.normalizeStationKey(value))
+        .filter(Boolean)
+    }
+
+    const path: string[] = []
+    const pushUnique = (value?: string) => {
+      const key = this.normalizeStationKey(value)
+      if (!key) return
+      if (!path.length || path[path.length - 1] !== key) {
+        path.push(key)
+      }
+    }
+
+    pushUnique(visit.originStation || visit.visitType)
+    pushUnique(visit.movementFrom)
+    pushUnique(visit.movementTo)
+    pushUnique(visit.currentStation || visit.movedTo)
+    return path
+  }
+
+  private getMovementAfterReportKeys(visit: SimpleVisit): string[] {
+    const path = this.getMovementPathKeys(visit)
+    if (!path.length) return []
+    const reportKey = this.getReportStationKey()
+    const reportIndex = path.lastIndexOf(reportKey)
+    if (reportIndex === -1) return []
+    return path.slice(reportIndex + 1)
+  }
+
+  public getMovementShortLabel(visit: SimpleVisit) {
+    const after = this.getMovementAfterReportKeys(visit)
+    if (!after.length) return '-'
+    const labels = after.slice(0, 2).map((value) => this.getStationLabel(value))
+    return labels.join(' → ')
+  }
+
+  public getMovementFullLabel(visit: SimpleVisit) {
+    const path = this.getMovementPathKeys(visit)
+    if (!path.length) return '-'
+    return path.map((value) => this.getStationLabel(value)).join(' → ')
+  }
+
+  public showMovementTooltip(visit: SimpleVisit) {
+    const path = this.getMovementPathKeys(visit)
+    if (path.length <= 2) return false
+    return this.getMovementShortLabel(visit) !== '-'
+  }
+
+  private getCurrentStationKey(visit: SimpleVisit) {
+    return this.normalizeStationKey(
+      visit.currentStation || visit.movementTo || visit.movedTo || visit.originStation || visit.visitType
+    )
+  }
+
+  public getRowClass(visit: SimpleVisit) {
+    const reportKey = this.getReportStationKey()
+    const currentKey = this.getCurrentStationKey(visit)
+    if (reportKey && currentKey && reportKey !== currentKey) return 'moved'
+    if (visit.state === 'Pendiente') return 'pending'
+    if (visit.state === 'Pagado') return 'payed'
+    return ''
+  }
+
   public deleteSelectedVisit(id: number) {
     if (!this.canDeleteVisit()) return
     Swal.fire({

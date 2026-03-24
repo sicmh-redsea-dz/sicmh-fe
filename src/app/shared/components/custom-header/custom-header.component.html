@@ -37,7 +37,7 @@
 
     <div 
       class="download-wrap"
-      *ngIf="showDonwloadBtn"
+      *ngIf="displayDownloadBtn"
       [class.loading]="isDwnldRerportLoading"
     >
       <button 
@@ -75,6 +75,7 @@
       </div>
     </div>
 
+    <ng-content select="[header-action]"></ng-content>
 
   </div>
 </div>

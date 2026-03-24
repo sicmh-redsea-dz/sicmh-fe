@@ -45,11 +45,21 @@
   align-items: center;
   justify-content: space-between;
   height: 3rem;
+  min-height: 3rem;
+  flex: 0 0 3rem;
   width: 100%;
   background-color: var(--surface);
   color: var(--text-color);
   padding: 0 1rem;
   border-bottom: 1px solid var(--border-color);
+  gap: 0.5rem;
+}
+
+.drawer-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .drawer-header h2 {
@@ -57,6 +67,34 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f3cd8a;
+  font-weight: 600;
+}
+
+.drawer-badge.paid {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.drawer-badge.canceled {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5f5;
 }
 
 .drawer-header button {
@@ -82,4 +120,3 @@
   width: 100%;
   padding: 1rem;
 }
-

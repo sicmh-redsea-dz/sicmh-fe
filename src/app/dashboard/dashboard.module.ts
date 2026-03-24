@@ -19,6 +19,7 @@ import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-fo
 import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
+import { StaffManagementComponent } from './pages/settings-page/staff-management/staff-management.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { TransferComponent } from './components/drawer-body-components/transfers/transfer.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
@@ -26,6 +27,8 @@ import { SharedModule } from '../shared/shared.module';
 import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 import { PatientViewComponent } from './components/drawer-body-components/patient-view/patient-view.component';
+import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
+import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
 
 
 @NgModule({
@@ -45,12 +48,15 @@ import { PatientViewComponent } from './components/drawer-body-components/patien
     VisitsReportPageComponent,
     MyProfileComponent,
     PermissionsComponent,
+    StaffManagementComponent,
     InventoryPageComponent,
     TransferComponent,
     InventoryFormPageComponent,
     BedsManagementPageComponent,
     OrRoomsManagementPageComponent,
-    PatientViewComponent
+    PatientViewComponent,
+    InvoicePreviewPageComponent,
+    PatientMovementsPageComponent
   ],
   imports: [
     CommonModule,

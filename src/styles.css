@@ -44,10 +44,24 @@
   --text-color: #0f172a;
   --text-muted: #6b7280;
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 12px 24px rgba(15, 23, 42, 0.12);
+  --shadow-md: 0 10px 22px rgba(15, 23, 42, 0.1);
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
+}
+
+:root[data-theme='dark'] {
+  --app-bg: #0b1220;
+  --surface: #0f172a;
+  --surface-muted: #111827;
+  --border-color: #1f2937;
+  --text-color: #e2e8f0;
+  --text-muted: #94a3b8;
+  --container-background: #0f172a;
+  --color-gray: #cbd5f5;
+  --color-light-gray: #475569;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 22px rgba(0, 0, 0, 0.4);
 }
 
 @media print {
@@ -76,6 +90,8 @@ body, html {
   font-family: Poppins-Regular, sans-serif;
   background: var(--app-bg);
   color: var(--text-color);
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 /*---------------------------------------------*/

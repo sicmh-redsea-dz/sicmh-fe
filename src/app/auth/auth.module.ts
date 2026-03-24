@@ -7,6 +7,7 @@ import { RegisterPageComponent } from './pages/register-page/register-page.compo
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GoogleButtonComponent } from './component/google-button/google-button.component';
+import { ForcePasswordPageComponent } from './pages/force-password-page/force-password-page.component';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { GoogleButtonComponent } from './component/google-button/google-button.c
     RegisterPageComponent,
     AuthLayoutComponent,
     GoogleButtonComponent,
+    ForcePasswordPageComponent,
   ],
   imports: [
     CommonModule,

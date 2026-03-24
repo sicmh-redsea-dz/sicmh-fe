@@ -28,6 +28,7 @@ export class DrawerComponent {
       this.drawerParams.setToUpdate.set( false )
       this.drawerParams.setInvoiceId.set( '' )
       this.drawerParams.setPatientId.set( '' )
+      this.drawerParams.viewOnly.set( false )
     }
   }
   

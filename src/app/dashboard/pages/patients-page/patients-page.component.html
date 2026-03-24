@@ -34,9 +34,11 @@
             <toggle-opts 
               *ngIf="canViewPatient() || canEditPatient() || canDeletePatient()"
               [showViewOpt]="canViewPatient()"
+              [showMovementsOpt]="canManageBilling()"
               [showEditOpt]="canEditPatient()"
               [showDeleteOpt]="canDeletePatient()"
               (viewEvent)="handleViewPatient(patient)"
+              (movementsEvent)="handlePatientMovements(patient)"
               (editEvent)="handleSelectedPatient(patient.id)"
               (deleteEvent)="deleteSelectedPatient( patient.id )"
             />

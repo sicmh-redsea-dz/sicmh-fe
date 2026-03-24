@@ -22,6 +22,16 @@
                 </div>
             }
 
+            @if ( showMovementsOpt ) {
+                <div
+                    class="opts-btns"
+                    (click)="execMovementsEvent()"
+                    (keypress)="execMovementsEvent()"
+                >
+                    <i class="ph ph-arrows-left-right"></i> Movimientos
+                </div>
+            }
+
             @if ( showEditOpt ) {
                 <div 
                     class="opts-btns"
@@ -34,7 +44,7 @@
             }
 
             @if ( showDeleteOpt ) {
-                @if ( showTransferOpt || showViewOpt || showEditOpt ) {
+                @if ( showTransferOpt || showViewOpt || showMovementsOpt || showEditOpt ) {
                     <div class="opts-divider"></div>
                 }
 
@@ -43,7 +53,7 @@
                     (click)="execDeleteEvent()"
                     (keypress)="execDeleteEvent()"
                 >
-                    <i class="ph ph-trash-simple"></i> Eliminar
+                    <i class="ph ph-trash-simple"></i> {{ deleteLabel }}
                 </div>
             }
         </div>

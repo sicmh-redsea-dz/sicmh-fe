@@ -12,11 +12,14 @@ import { SettingsPageComponent } from './pages/settings-page/settings-page.compo
 import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-form-page-v2/visits-form-page-v2.component';
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
+import { StaffManagementComponent } from './pages/settings-page/staff-management/staff-management.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
 import { BedsManagementPageComponent } from './pages/beds-management-page/beds-management-page.component';
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
+import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
+import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
 
 const routes: Routes = [
   {
@@ -44,6 +47,12 @@ const routes: Routes = [
             component: PatientFormPageComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['patients.create'] }
+          },
+          { 
+            path: ':id/movements',
+            component: PatientMovementsPageComponent,
+            canActivate: [permissionsGuard],
+            data: { anyPermissions: ['invoice.update', 'invoice.create'] }
           },
           { 
             path: ':id', 
@@ -262,6 +271,12 @@ const routes: Routes = [
         canActivate: [permissionsGuard],
         data: { permissions: ['invoice.read'] }
       },
+      { 
+        path: 'income/billings/view/:invoiceNumber',
+        component: InvoicePreviewPageComponent,
+        canActivate: [permissionsGuard],
+        data: { permissions: ['invoice.read'] }
+      },
 
       { 
         path: 'inventory',
@@ -302,6 +317,12 @@ const routes: Routes = [
           { 
             path: 'permissions', 
             component: PermissionsComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['settings.permissions.manage'] }
+          },
+          { 
+            path: 'staff', 
+            component: StaffManagementComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['settings.permissions.manage'] }
           },

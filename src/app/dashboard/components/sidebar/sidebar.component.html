@@ -22,7 +22,7 @@
       <p class="title">Principal</p>
       <ul>
         <li *ngFor="let item of items(); let idx = index" 
-          [class]="toggledStates[idx] ? 'active' : ' '">
+          [ngClass]="{ active: toggledStates[idx], 'has-submenu': item.hasSubmenu }">
           <a [routerLink]="item.routerLink" 
             (click)="toggleItem(idx)">
             <i [class]="'icon ' + item.icon"></i>
@@ -35,7 +35,7 @@
               *ngFor="let subitem of item.subItems; let i = index">
               <a [routerLink]="subitem.routerLink">
                 <span class="text" 
-                    [style.color]="toggledSidebar ? '#000' : '#fff'">
+                    [style.color]="toggledSidebar ? '#fff' : '#fff'">
                   {{subitem.label}}
                 </span>
               </a>
@@ -45,7 +45,7 @@
       </ul>
     </div>
   </div>
-  <div class="menu">
+  <div class="menu account">
     <p class="title">Cuenta</p>
     <ul>
       <li>

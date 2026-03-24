@@ -15,6 +15,7 @@ export class CustomHeaderComponent {
   @Input() showCreateButton: boolean = true
   @Input() disableCreateButton: boolean = false
   @Input() isDwnldRerportLoading: boolean = false
+  @Input() showDownloadBtnOverride: boolean | null = null
 
   @Output() searchTerm = new EventEmitter()
   @Output() btnDrawerTrigger = new EventEmitter()
@@ -31,6 +32,12 @@ export class CustomHeaderComponent {
       this.showDonwloadBtn = true
     else
       this.showDonwloadBtn = false
+  }
+
+  get displayDownloadBtn(): boolean {
+    return this.showDownloadBtnOverride === null
+      ? this.showDonwloadBtn
+      : this.showDownloadBtnOverride
   }
 
   public execSearchTerm(term: string) {

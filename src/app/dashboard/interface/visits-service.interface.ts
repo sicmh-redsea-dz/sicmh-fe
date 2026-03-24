@@ -22,6 +22,15 @@ export interface SimpleVisit {
     lastVisitDate: Date
     diagnosis:     null | string
     state?:        string
+    invoiceNumber?: string
+    originStation?: string
+    currentStation?: string
+    movedTo?: string
+    movementFrom?: string
+    movementTo?: string
+    movementAt?: string
+    movementTrail?: string[]
+    visitType?: string
 }
 
 export interface Staff {
