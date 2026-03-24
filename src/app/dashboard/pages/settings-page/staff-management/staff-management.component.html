@@ -1,0 +1,81 @@
+<div class="staff-page">
+  <div class="page-header">
+    <div>
+      <h2>Personal médico</h2>
+      <p>Matricula doctores, enfermeros y administradores. Se enviará una contraseña temporal por correo.</p>
+    </div>
+  </div>
+
+  <div class="staff-grid">
+    <section class="card form-card">
+      <div class="card-header">
+        <div>
+          <h3>Registrar nuevo usuario</h3>
+          <span>Completa la información básica del personal.</span>
+        </div>
+      </div>
+
+      <form [formGroup]="staffForm" class="form-grid">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" formControlName="name" placeholder="Nombre y apellido">
+        </div>
+        <div class="form-group">
+          <label>Correo</label>
+          <input type="email" formControlName="email" placeholder="correo@clinica.com">
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select formControlName="roleId">
+            <option value="" disabled>Selecciona un rol</option>
+            <option *ngFor="let role of roles" [value]="role.id">
+              {{ role.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" formControlName="phone" placeholder="+504 9999-9999">
+        </div>
+        <div class="form-group">
+          <label>Identificación</label>
+          <input type="text" formControlName="identification" placeholder="DNI / RTN">
+        </div>
+        <div class="form-group">
+          <label>Departamento</label>
+          <input type="text" formControlName="department" placeholder="Área o unidad">
+        </div>
+        <div class="form-group">
+          <label>Cargo</label>
+          <input type="text" formControlName="position" placeholder="Puesto dentro del hospital">
+        </div>
+      </form>
+
+      <div class="form-actions">
+        <button class="primary-btn" type="button" (click)="submit()" [disabled]="submitting">
+          {{ submitting ? 'Creando...' : 'Registrar usuario' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="card-header">
+        <div>
+          <h3>Equipo registrado</h3>
+          <span>{{ users.length }} usuarios en el sistema</span>
+        </div>
+      </div>
+
+      <div class="list">
+        <div class="list-item" *ngFor="let user of users">
+          <div>
+            <strong>{{ user.name | lowercase }}</strong>
+            <small>{{ user.email | lowercase }}</small>
+          </div>
+          <span class="role-pill">{{ user.roleName || 'Sin rol' }}</span>
+        </div>
+        <div class="empty" *ngIf="!users.length">Aún no hay usuarios registrados.</div>
+      </div>
+    </section>
+  </div>
+</div>

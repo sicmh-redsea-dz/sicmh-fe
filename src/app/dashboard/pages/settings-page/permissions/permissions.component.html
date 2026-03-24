@@ -1,68 +1,181 @@
-<h3>Roles and Capabilities</h3>
-    <table class="info-table">
-        <thead>
-            <tr>
-            <th>Name</th>
-            <th>Admin</th>
-            <th>Doctor</th>
-            <th>Nurse</th>
-            <th>Receptionist</th>
-            <th>Attendant</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <td>Dereck</td>
-            <td>
-                <div class="toggle-container">
-                <input 
-                    class="input-toggle" 
-                    type="checkbox"
-                    id="toggle-switch1"
-                    defaultChecked>
-                <label for="toggle-switch1" class="toggle-switch"></label>
-                </div>
-            </td>
-            <td>
-                <div class="toggle-container">
-                <input 
-                    class="input-toggle" 
-                    type="checkbox"
-                    id="toggle-switch2"
-                    defaultChecked>
-                <label for="toggle-switch2" class="toggle-switch"></label>
-                </div>
-            </td>
-            <td>
-                <div class="toggle-container">
-                <input 
-                    class="input-toggle" 
-                    type="checkbox"
-                    id="toggle-switch3"
-                    defaultChecked>
-                <label for="toggle-switch3" class="toggle-switch"></label>
-                </div>
-            </td>
-            <td>
-                <div class="toggle-container">
-                <input 
-                    class="input-toggle" 
-                    type="checkbox"
-                    id="toggle-switch4"
-                    defaultChecked>
-                <label for="toggle-switch4" class="toggle-switch"></label>
-                </div>
-            </td>
-            <td>
-                <div class="toggle-container">
-                <input 
-                    class="input-toggle" 
-                    type="checkbox"
-                    id="toggle-switch"
-                    defaultChecked>
-                <label for="toggle-switch" class="toggle-switch"></label>
-                </div>
-            </td>
-            </tr>
-        </tbody>
-</table> 
+<div class="permissions-shell">
+  <header class="permissions-header">
+    <div class="header-copy">
+      <h2>Permisos inteligentes</h2>
+      <p>Controla el acceso por rol y habilita excepciones por usuario sin perder trazabilidad.</p>
+    </div>
+    <div class="tab-switch" [class.users]="activeTab === 'users'">
+      <button
+        type="button"
+        [class.active]="activeTab === 'roles'"
+        (click)="activeTab = 'roles'"
+      >
+        Roles
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab === 'users'"
+        (click)="activeTab = 'users'"
+      >
+        Usuarios
+      </button>
+    </div>
+  </header>
+
+  <div class="permissions-body">
+    <aside class="side-panel">
+      <div class="panel-title">
+        <span>{{ activeTab === 'roles' ? 'Roles disponibles' : 'Usuarios' }}</span>
+        <small>{{ activeTab === 'roles' ? roles.length : users.length }} registros</small>
+      </div>
+
+      <div class="search-field" *ngIf="activeTab === 'roles'">
+        <i class="ph ph-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Buscar rol por nombre o clave..."
+          [(ngModel)]="roleSearch"
+        />
+      </div>
+      <div class="search-field" *ngIf="activeTab === 'users'">
+        <i class="ph ph-magnifying-glass"></i>
+        <input
+          type="text"
+          placeholder="Buscar usuario por nombre o correo..."
+          [(ngModel)]="userSearch"
+        />
+      </div>
+
+      <div class="list" *ngIf="activeTab === 'roles'">
+        <button
+          *ngFor="let role of filteredRoles"
+          type="button"
+          class="list-item"
+          [class.active]="selectedRoleKey === (role.key || role.name.toLowerCase())"
+          (click)="selectRole(role)"
+        >
+          <span>{{ role.name }}</span>
+          <small>{{ role.key || role.name.toLowerCase() }}</small>
+        </button>
+      </div>
+
+      <div class="list" *ngIf="activeTab === 'users'">
+        <button
+          *ngFor="let user of filteredUsers"
+          type="button"
+          class="list-item"
+          [class.active]="selectedUserId === user.id"
+          (click)="selectUser(user)"
+        >
+          <div>
+            <strong>{{ user.name }}</strong>
+            <small>{{ user.email }}</small>
+          </div>
+          <span class="role-pill">{{ user.roleName || 'Sin rol' }}</span>
+        </button>
+      </div>
+    </aside>
+
+    <section class="permissions-panel">
+      <div class="panel-header">
+        <div>
+          <h3>{{ activeTab === 'roles' ? 'Permisos del rol' : 'Permisos individuales' }}</h3>
+          <p>
+            {{
+              activeTab === 'roles'
+                ? 'Define el alcance base de cada rol dentro del hospital.'
+                : 'Crea excepciones por usuario sin alterar su rol principal.'
+            }}
+          </p>
+        </div>
+        <div class="panel-actions">
+          <span class="summary-pill">
+            Permisos extra: {{ getOverrideSummary(activeTab === 'roles' ? 'role' : 'user').grants }}
+          </span>
+          <span class="summary-pill danger">
+            Bloqueos: {{ getOverrideSummary(activeTab === 'roles' ? 'role' : 'user').revokes }}
+          </span>
+          <button class="primary-btn" type="button" (click)="saveOverrides()" [disabled]="saving">
+            {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="selection-card" *ngIf="activeTab === 'roles'">
+        <div>
+          <span class="selection-label">Rol seleccionado</span>
+          <h4>{{ selectedRole?.name || 'Selecciona un rol' }}</h4>
+          <p>Clave: {{ selectedRoleKeyLabel }}</p>
+        </div>
+        <div class="selection-meta">
+          <span class="meta-pill">Hereda permisos base</span>
+          <span class="meta-pill subtle">Aplica a todos los usuarios del rol</span>
+        </div>
+      </div>
+
+      <div class="selection-card" *ngIf="activeTab === 'users'">
+        <div>
+          <span class="selection-label">Usuario seleccionado</span>
+          <h4>{{ selectedUser?.name || 'Selecciona un usuario' }}</h4>
+          <p>{{ selectedUser?.email || '-' }}</p>
+        </div>
+        <div class="selection-meta">
+          <span class="meta-pill">Rol base: {{ selectedUser?.roleName || 'Sin rol' }}</span>
+          <span class="meta-pill subtle">Excepciones individuales</span>
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-item">
+          <span class="legend-dot inherit"></span>
+          Hereda
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot allow"></span>
+          Permitir
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot deny"></span>
+          Bloquear
+        </div>
+      </div>
+
+      <div class="permissions-grid">
+        <div class="perm-group" *ngFor="let group of permissionGroups">
+          <div class="group-title">{{ group.label }}</div>
+          <div class="perm-item" *ngFor="let perm of group.items">
+            <div class="perm-info">
+              <strong>{{ perm.label }}</strong>
+              <small>{{ perm.description }}</small>
+            </div>
+            <div class="perm-actions">
+              <button
+                type="button"
+                [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'inherit'"
+                (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'inherit')"
+              >
+                Hereda
+              </button>
+              <button
+                type="button"
+                class="allow"
+                [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'grant'"
+                (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'grant')"
+              >
+                Permitir
+              </button>
+              <button
+                type="button"
+                class="deny"
+                [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'revoke'"
+                (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'revoke')"
+              >
+                Bloquear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

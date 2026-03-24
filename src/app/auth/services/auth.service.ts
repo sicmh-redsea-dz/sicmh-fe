@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { catchError, from, map, Observable, of, switchMap, throwError } from 'rxjs'
+import { catchError, from, map, Observable, of, switchMap, throwError, tap } from 'rxjs'
 import { User, AuthStatus, LoginResponse, CheckTokenResponse } from '../interfaces'
 import { Permission, getPermissionsForRoles } from '../permissions/permissions'
 import { RegisterResponse } from '../interfaces/register-response.interface'
@@ -18,10 +18,18 @@ export class AuthService {
 
   private _currentUser = signal<User|null>(null)
   private _authStatus = signal<AuthStatus>(AuthStatus.checking)
+  private _mustChangePassword = signal(false)
 
   public currentUser = computed(() => this._currentUser())
   public authStatus = computed(() => this._authStatus())
-  public permissions = computed(() => getPermissionsForRoles(this._currentUser()?.roles))
+  public permissions = computed(() => {
+    const user = this._currentUser()
+    if (user?.permissions && user.permissions.length > 0) {
+      return new Set<Permission>(user.permissions)
+    }
+    return getPermissionsForRoles(user?.roles)
+  })
+  public mustChangePassword = computed(() => this._mustChangePassword())
 
   private _auth = inject( Auth )
 
@@ -64,7 +72,10 @@ export class AuthService {
 
     return this.http.post<LoginResponse>(url, {}, { headers })
       .pipe(
-        map(({user}) => this.setAuthentication(user, idToken))
+        switchMap(({user}) => {
+          this.setAuthentication(user, idToken)
+          return from(this.syncPasswordChangeFlag()).pipe(map(() => true))
+        })
       )
   }
 
@@ -83,7 +94,10 @@ export class AuthService {
 
     return this.http.post<RegisterResponse>(url, body, { headers })
       .pipe(
-        map(({user}) => this.setAuthentication(user, idToken))
+        switchMap(({user}) => {
+          this.setAuthentication(user, idToken)
+          return from(this.syncPasswordChangeFlag()).pipe(map(() => true))
+        })
       )
   }
 
@@ -134,10 +148,12 @@ export class AuthService {
             map(( newToken ) => {
               const finalToken = newToken || token
               localStorage.setItem('token', finalToken)
-              return this.setAuthentication(user, finalToken)
+              this.setAuthentication(user, finalToken)
+              return true
             })
           )
         }),
+        switchMap((result) => from(this.syncPasswordChangeFlag()).pipe(map(() => result))),
         catchError(() => {
           this.clearAuthState()
           return of(false)
@@ -158,6 +174,7 @@ export class AuthService {
     localStorage.removeItem('token')
     this._currentUser.set(null)
     this._authStatus.set(AuthStatus.notAuthenticated)
+    this._mustChangePassword.set(false)
   }
 
   logout() {
@@ -179,5 +196,39 @@ export class AuthService {
     if (required.length === 0) return true
     const permissions = this.permissions()
     return required.some((permission) => permissions.has(permission))
+  }
+
+  public updateCurrentUser(patch: Partial<User>) {
+    this._currentUser.update((current) => current ? { ...current, ...patch } : current)
+  }
+
+  public async syncPasswordChangeFlag(): Promise<void> {
+    const user = this._auth.currentUser
+    if (!user) {
+      this._mustChangePassword.set(false)
+      return
+    }
+    try {
+      const tokenResult = await user.getIdTokenResult(true)
+      const mustChange = !!tokenResult?.claims?.['mustChangePassword']
+      this._mustChangePassword.set(mustChange)
+    } catch (err) {
+      this._mustChangePassword.set(false)
+    }
+  }
+
+  public completePasswordChange(): Observable<boolean> {
+    const url = `${this.baseUrl}/auth/complete-password-change`
+    const token = localStorage.getItem('token')
+    if (!token) return of(false)
+    const headers = this.buildIdTokenHeaders(token)
+    return this.http.post(url, {}, { headers })
+      .pipe(
+        tap(() => {
+          this._mustChangePassword.set(false)
+        }),
+        map(() => true),
+        catchError(() => of(false))
+      )
   }
 }
