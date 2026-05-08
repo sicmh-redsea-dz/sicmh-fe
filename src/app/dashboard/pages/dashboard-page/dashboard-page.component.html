@@ -1,116 +1,204 @@
 <div class="dashboard">
-    <div class="card">
-        <div class="card-icon">
-            <i class="fa-solid fa-user"></i>
-        </div>
-        <div class="status-value">{{ patientsCurrent }}</div>
-        <div class="status-header">Pacientes</div>
-        <div 
-            class="card-trend"
-            [ngClass]="{
-                'card-trend--up': patientsPct! >= 0,
-                'card-trend--down': patientsPct! < 0
-            }"
-        >
-            <div class="card-trend__arrow">
-                {{ patientsPct! >= 0 ? '▲' : '▼' }}
-            </div>
-            <span class="card-trend__text">
-                {{ 
-                    patientsPct !== null
-                        ? (patientsPct! >= 0 ? '+' : '') + patientsPct + '%'
-                        : '-' 
-                }}
-            </span>
-        </div>
+
+  <!-- ── Stat cards ───────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+    <div class="status-value">{{ patientsCurrent }}</div>
+    <div class="status-header">Pacientes</div>
+    <div class="card-trend" [ngClass]="{ 'card-trend--up': patientsPct! >= 0, 'card-trend--down': patientsPct! < 0 }">
+      <div class="card-trend__arrow">{{ patientsPct! >= 0 ? '▲' : '▼' }}</div>
+      <span class="card-trend__text">
+        {{ patientsPct !== null ? (patientsPct! >= 0 ? '+' : '') + patientsPct + '%' : '-' }}
+      </span>
     </div>
-    <div class="card">
-        <div class="card-icon">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-        </div>
-        <div class="status-value">{{ invoicesCurrent }}</div>
-        <div class="status-header">Facturas</div>
-        <div 
-            class="card-trend"
-            [ngClass]="{
-                'card-trend--up': invoicesPct! >= 0,
-                'card-trend--down': invoicesPct! < 0
-            }"
-        >
-            <div class="card-trend__arrow">
-                {{ invoicesPct! >= 0 ? '▲' : '▼' }}
-            </div>
-            <span class="card-trend__text">
-                {{ 
-                    invoicesPct !== null
-                        ? (invoicesPct! >= 0 ? '+' : '') + invoicesPct + '%'
-                        : '-' 
-                }}
-            </span>
-        </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+    <div class="status-value">{{ invoicesCurrent }}</div>
+    <div class="status-header">Facturas</div>
+    <div class="card-trend" [ngClass]="{ 'card-trend--up': invoicesPct! >= 0, 'card-trend--down': invoicesPct! < 0 }">
+      <div class="card-trend__arrow">{{ invoicesPct! >= 0 ? '▲' : '▼' }}</div>
+      <span class="card-trend__text">
+        {{ invoicesPct !== null ? (invoicesPct! >= 0 ? '+' : '') + invoicesPct + '%' : '-' }}
+      </span>
     </div>
-    <div class="card">
-        <div class="card-icon">
-            <i class="fa-solid fa-calendar-check"></i>
-        </div>
-        <div class="status-value">{{ visitsCurrent }}</div>
-        <div class="status-header">Citas</div>
-        <div 
-            class="card-trend"
-            [ngClass]="{
-            'card-trend--up':  visitsPct! >= 0,
-            'card-trend--down': visitsPct! <  0
-            }"
-        >
-            <div class="card-trend__arrow">
-                {{ visitsPct! >= 0 ? '▲' : '▼' }}
-            </div>
-            <span class="card-trend__text">
-                {{ 
-                    visitsPct !== null
-                        ? (visitsPct! >= 0 ? '+' : '') + visitsPct + '%'
-                        : '-' 
-                }}
-            </span>
-        </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
+    <div class="status-value">{{ visitsCurrent }}</div>
+    <div class="status-header">Citas</div>
+    <div class="card-trend" [ngClass]="{ 'card-trend--up': visitsPct! >= 0, 'card-trend--down': visitsPct! < 0 }">
+      <div class="card-trend__arrow">{{ visitsPct! >= 0 ? '▲' : '▼' }}</div>
+      <span class="card-trend__text">
+        {{ visitsPct !== null ? (visitsPct! >= 0 ? '+' : '') + visitsPct + '%' : '-' }}
+      </span>
     </div>
-    <div class="calendar">
-        <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <!-- ── Calendar ─────────────────────────────────────────── -->
+  <div class="calendar">
+    <div class="calendar-header">
+      <span class="calendar-legend">
+        <span class="dot" style="background:#3B82F6"></span>Consulta
+        <span class="dot" style="background:#8B5CF6"></span>Cirugía
+        <span class="dot" style="background:#10B981"></span>Hospitalización
+        <span class="dot" style="background:#F59E0B"></span>Seguimiento
+        <span class="dot" style="background:#6B7280"></span>Otro
+      </span>
+      <button *ngIf="canEdit" class="btn-new-cita" (click)="openCreateModal()">
+        <i class="fa-solid fa-plus"></i> Nueva cita
+      </button>
+    </div>
+    <full-calendar #calendarRef [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <!-- ── Day appointments table ───────────────────────────── -->
+  <div class="patients-table">
+    <div class="table-header">
+      <h3>{{ selectedDate ? 'Citas del ' + selectedDate : 'Citas del día' }}</h3>
+    </div>
+    <div class="dash-table-container">
+      <table>
+        <thead>
+          <tr><th>Hora</th><th>Título</th><th>Doctor</th><th>Paciente</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of selectedCitas" (click)="onCitaRowClick(c)" style="cursor:pointer">
+            <td>{{ fmtDt(c.Inicio) }}</td>
+            <td>{{ c.Titulo }}</td>
+            <td>{{ c.NombreDoctor || '—' }}</td>
+            <td>{{ c.NombrePaciente || '—' }}</td>
+            <td>{{ ESTADO_LABELS[c.Estado] }}</td>
+          </tr>
+          <tr *ngIf="!selectedDate">
+            <td colspan="5" style="text-align:center;color:var(--text-muted)">Selecciona un día en el calendario</td>
+          </tr>
+          <tr *ngIf="selectedDate && selectedCitas.length === 0">
+            <td colspan="5" style="text-align:center;color:var(--text-muted)">Sin citas para este día</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Appointment modal
+     ═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>{{ editingCita ? 'Editar cita' : 'Nueva cita' }}</h3>
+      <button class="modal-close" (click)="closeModal()">×</button>
     </div>
 
-    <div class="patients-table">
-        <div class="table-header">
-            <h3>Programación de hoy</h3>
-            <div 
-                class="sort-control" 
-                (click)="toggleSort()"
-            >
-                {{ sortAsc ? 'Ord: A - Z' : 'Ord: Z - A' }}
-                <i 
-                    class="fa-solid"
-                    [ngClass]="sortAsc ? 'fa-chevron-up' : 'fa-chevron-down'"
-                ></i>
-            </div>
+    <form [formGroup]="citaForm" (ngSubmit)="saveCita()" class="modal-form">
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Título *</label>
+          <input formControlName="titulo" placeholder="Ej. Consulta general" />
+          <small *ngIf="citaForm.get('titulo')?.touched && citaForm.get('titulo')?.invalid">Requerido</small>
         </div>
-        <div class="dash-table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Doctor</th>
-                        <th>Paciente</th>
-                        <th>Ultima Visita</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let visit of visits; let idx = index">
-                        <td>{{visit.HistoriaID}}</td>
-                        <td>{{visit.NombreDoctor}}</td>
-                        <td>{{visit.NombrePaciente}}</td>
-                        <td>{{visit.FechaUltimaVisita | formatDate}}</td>
-                    </tr>
-                </tbody>
-            </table>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select formControlName="tipo">
+            <option *ngFor="let t of tipoOptions" [value]="t">{{ TIPO_LABELS[t] }}</option>
+          </select>
         </div>
-    </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select formControlName="estado">
+            <option *ngFor="let e of estadoOptions" [value]="e">{{ ESTADO_LABELS[e] }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Origen</label>
+          <select formControlName="source">
+            <option *ngFor="let s of sources" [value]="s">{{ $any(SOURCE_LABELS)[s] || s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Inicio *</label>
+          <input type="datetime-local" formControlName="inicio" />
+          <small *ngIf="citaForm.get('inicio')?.touched && citaForm.get('inicio')?.invalid">Requerido</small>
+        </div>
+        <div class="form-group">
+          <label>Fin *</label>
+          <input type="datetime-local" formControlName="fin" />
+          <small *ngIf="citaForm.get('fin')?.touched && citaForm.get('fin')?.invalid">Requerido</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Doctor</label>
+          <select formControlName="personalId">
+            <option [ngValue]="null">— Sin asignar —</option>
+            <option *ngFor="let d of doctors" [ngValue]="d.id">{{ d.nombre }} ({{ d.especialidad }})</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Identificación del paciente</label>
+          <input type="text" formControlName="pacienteIdentificacion" placeholder="Cédula / ID" maxlength="20" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Nombre del paciente</label>
+          <input type="text" formControlName="nombrePaciente" placeholder="Nombre completo (opcional)" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Recurso</label>
+          <select formControlName="recursoTipo">
+            <option [ngValue]="null">— Ninguno —</option>
+            <option value="quirofano">Quirófano</option>
+            <option value="cama">Cama / Hospitalización</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="citaForm.get('recursoTipo')?.value">
+          <label>ID del recurso</label>
+          <input formControlName="recursoId" placeholder="Ej. Q-01 o C-14" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion" rows="2" placeholder="Motivo de la cita…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Notas internas</label>
+          <textarea formControlName="notas" rows="2" placeholder="Instrucciones, preparación…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" *ngIf="editingCita" (click)="deleteCita()">
+          <i class="fa-solid fa-trash"></i> Eliminar
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isSaving">
+          {{ isSaving ? 'Guardando…' : (editingCita ? 'Guardar cambios' : 'Crear cita') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>

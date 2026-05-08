@@ -6,7 +6,7 @@ export type ThemeMode = 'light' | 'dark'
   providedIn: 'root'
 })
 export class ThemeService {
-  private readonly storageKey = 'sicmh.theme'
+  private readonly storageKey = 'medit.theme'
   private readonly _theme = signal<ThemeMode>(this.resolveInitialTheme())
 
   public theme = computed(() => this._theme())

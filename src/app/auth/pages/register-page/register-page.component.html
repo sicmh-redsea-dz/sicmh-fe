@@ -8,8 +8,6 @@
 
     <span class="form-title">Register</span>
 
-    <app-google-button (onClick)="submitWithGoogle($event)"/>
-
     <div class="wrap-input" [class.invalid]="myForm.get('name')?.touched && myForm.get('name')?.invalid">
         <span class="label-input">Nombre</span>
         <input class="input"

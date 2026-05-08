@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "quickmed": {
+    "medit": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/quickmed",
+            "outputPath": "dist/medit",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -83,10 +83,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "quickmed:build:production"
+              "buildTarget": "medit:build:production"
             },
             "development": {
-              "buildTarget": "quickmed:build:development"
+              "buildTarget": "medit:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -117,11 +117,14 @@
         "deploy": {
           "builder": "angular-cli-ghpages:deploy",
           "options": {
-            "buildTarget": "quickmed:build:production",
-            "baseHref": "/sicmh-fe/"
+            "buildTarget": "medit:build:production",
+            "baseHref": "/medit/"
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "f3f2308c-065b-4a70-9395-962ce5b02b4c"
   }
 }
