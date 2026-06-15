@@ -22,12 +22,20 @@ type PatientOption = {
   id: number
   name: string
   idNumber?: string
+  birthDate?: string
 }
 
 type DoctorOption = {
   id: number
   name: string
   specialty?: string
+}
+
+type ServiceOption = {
+  id: number
+  serviceName?: string
+  serviceDescription?: string
+  servicePrice?: number
 }
 
 @Component({
@@ -56,6 +64,8 @@ export class InvoiceComponent implements OnInit {
   public options: Options = { doctors: [], services: [], pMethods: [] }
   public chargeItems: BillingLedgerItem[] = []
   public chargeSnapshot: BillingInvoiceSnapshot | null = null
+  public selectedServiceId = ''
+  public serviceSaving = false
 
   public patientQuery = ''
   public doctorQuery = ''
@@ -203,6 +213,77 @@ export class InvoiceComponent implements OnInit {
     return key
   }
 
+  public onAddService() {
+    if (this.isReadOnly || !this.isDrawerSetToUpd() || this.serviceSaving) return
+
+    const service = this.options.services.find((item) => Number(item.id) === Number(this.selectedServiceId)) as ServiceOption | undefined
+    const patientId = Number(this.invoiceForm.get('patient')?.value || 0)
+    if (!service || !patientId) return
+
+    const description = this.getServiceName(service)
+    const unitPrice = this.getServicePrice(service)
+    if (!description) return
+
+    this.serviceSaving = true
+    this.billingService.createManualCharge({
+      patientId,
+      invoiceNumber: this.invoiceIdToUpd(),
+      station: this.getChargeStation(),
+      category: 'servicio',
+      description,
+      quantity: 1,
+      unitPrice,
+      occurredAt: this.invoiceForm.get('date')?.value || new Date().toISOString(),
+      status: 'Pendiente'
+    })
+      .pipe(finalize(() => {
+        this.serviceSaving = false
+      }))
+      .subscribe({
+        next: (charge) => {
+          this.selectedServiceId = ''
+          if (charge) {
+            this.chargeItems = [charge, ...this.chargeItems]
+            this.selectedServices = this.chargeItems.map((item) => ({
+              id: item.id,
+              description: item.description,
+              desc: this.buildChargeMeta(item),
+              price: item.total
+            }))
+            this.loadMutableData()
+          } else {
+            this.loadInvoiceSnapshot(this.invoiceIdToUpd())
+          }
+        },
+        error: (message) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
+  }
+
+  public getServiceName(service: ServiceOption) {
+    return service.serviceName ?? (service as any).name ?? ''
+  }
+
+  public getServiceDescription(service: ServiceOption) {
+    return service.serviceDescription ?? (service as any).description ?? ''
+  }
+
+  public getServicePrice(service: ServiceOption) {
+    return Number(service.servicePrice ?? (service as any).price ?? 0)
+  }
+
+  private getChargeStation() {
+    const visitType = this.chargeSnapshot?.invoice?.visitType
+    if (!visitType) return 'otros'
+    const normalized = visitType.toLowerCase()
+    if (normalized.includes('emer')) return 'emergencia'
+    if (normalized.includes('hosp')) return 'hospitalizacion'
+    if (normalized.includes('quiro')) return 'quirofano'
+    if (normalized.includes('consult')) return 'consulta'
+    return 'otros'
+  }
+
   private setDataInForm(data: Record<string, any>) {
     const {
       patientId,
@@ -261,6 +342,9 @@ export class InvoiceComponent implements OnInit {
           if (!patient) return
           const idSuffix = patient.idNumber ? ` · ${patient.idNumber}` : ''
           this.patientQuery = `${patient.name} ${patient.lastName}`.trim() + idSuffix
+          if (!this.isReadOnly) {
+            this.applyElderlyDiscount(patient.birthDate)
+          }
         },
         error: () => {
           this.patientQuery = `Paciente ${patientId}`
@@ -322,6 +406,7 @@ export class InvoiceComponent implements OnInit {
     this.invoiceForm.get('patient')?.setValue(patient.id)
     const idSuffix = patient.idNumber ? ` · ${patient.idNumber}` : ''
     this.patientQuery = `${patient.name}`.trim() + idSuffix
+    this.applyElderlyDiscountForPatient(patient.id, patient.birthDate)
     this.patientResults = []
     this.patientOpen = false
   }
@@ -337,6 +422,7 @@ export class InvoiceComponent implements OnInit {
     if (this.isReadOnly) return
     this.invoiceForm.get('patient')?.setValue('')
     this.patientQuery = ''
+    this.applyElderlyDiscount()
     this.patientResults = []
     this.patientLoading = false
     this.patientOpen = false
@@ -369,7 +455,8 @@ export class InvoiceComponent implements OnInit {
           this.patientResults = data?.patients?.map((p) => ({
             id: p.id,
             name: `${p.name} ${p.lastName}`.trim(),
-            idNumber: p.idNumber
+            idNumber: p.idNumber,
+            birthDate: p.birthDate
           })) ?? []
         },
         error: () => {
@@ -534,5 +621,57 @@ export class InvoiceComponent implements OnInit {
 
     this.invoiceForm.get('amount')?.setValue(totalAmount.toFixed(2), { emitEvent: false })
     this.invoiceForm.get('description')?.setValue(concatDescriptions.trim(), { emitEvent: false })
+  }
+
+  private applyElderlyDiscount(birthDate?: string) {
+    const age = this.calculateAge(birthDate)
+    let elderlyPercent = 0
+
+    if (age !== null && age >= 80) {
+      elderlyPercent = 35
+    } else if (age !== null && age >= 60) {
+      elderlyPercent = 25
+    }
+
+    this.invoiceForm.get('elderlyDiscount')?.setValue(elderlyPercent > 0)
+    this.invoiceForm.get('elderlyDiscountPercent')?.setValue(elderlyPercent)
+  }
+
+  private applyElderlyDiscountForPatient(patientId: number, birthDate?: string) {
+    if (birthDate) {
+      this.applyElderlyDiscount(birthDate)
+      return
+    }
+
+    this.patientsService.getPatient(patientId)
+      .subscribe({
+        next: (patient) => {
+          if (Number(this.invoiceForm.get('patient')?.value) !== Number(patientId)) return
+          this.applyElderlyDiscount(patient?.birthDate)
+        },
+        error: () => {
+          if (Number(this.invoiceForm.get('patient')?.value) !== Number(patientId)) return
+          this.applyElderlyDiscount()
+        }
+      })
+  }
+
+  private calculateAge(birthDate?: string): number | null {
+    if (!birthDate) return null
+    const dateOnly = birthDate.toString().split('T')[0]
+    const [year, month, day] = dateOnly.split('-').map((part) => Number(part))
+    const parsedBirthDate = year && month && day
+      ? new Date(year, month - 1, day)
+      : new Date(birthDate)
+    if (Number.isNaN(parsedBirthDate.getTime())) return null
+
+    const today = new Date()
+    let age = today.getFullYear() - parsedBirthDate.getFullYear()
+    const birthdayPassed =
+      today.getMonth() > parsedBirthDate.getMonth()
+      || (today.getMonth() === parsedBirthDate.getMonth() && today.getDate() >= parsedBirthDate.getDate())
+
+    if (!birthdayPassed) age -= 1
+    return age
   }
 }

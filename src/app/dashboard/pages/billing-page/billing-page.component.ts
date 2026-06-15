@@ -5,7 +5,6 @@ import { DrawerService } from '../../services/drawer-service/drawer.service'
 import { DrawerContents } from '../../interface/drawer-content.enum'
 import { InvoicesService } from '../../services/invoices-services/invoices.service'
 import { BillingService } from '../../services/billing-service/billing.service'
-import { PatientsService } from '../../services/patients-service/patients.service'
 import { BillingLedgerItem, BillingMovement, BillingReport, BillingSummary } from '../../interface/billing.interface'
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
@@ -59,7 +58,6 @@ export class BillingPageComponent {
   private router = inject( Router )
   private invoiceService = inject( InvoicesService )
   private billingService = inject( BillingService )
-  private patientsService = inject( PatientsService )
   public bodyContent: Invoice[] = []
   public reportSummary: BillingSummary | null = null
   public reportLedger: BillingLedgerItem[] = []
@@ -100,7 +98,6 @@ export class BillingPageComponent {
   constructor() {
     this.getInvoices()
     this.initReportFilters()
-    this.loadPatients()
     this.loadReport()
 
     this.searchTermSubject.pipe(
@@ -277,6 +274,10 @@ export class BillingPageComponent {
 
   public loadReport() {
     this.reportLoading = true
+    this.loadReportPatients(() => this.fetchReport())
+  }
+
+  private fetchReport() {
     this.billingService.getReport({
       from: this.reportFilters.from,
       to: this.reportFilters.to,
@@ -387,18 +388,31 @@ export class BillingPageComponent {
     return found?.label ?? key
   }
 
-  private loadPatients() {
-    this.patientsService.getPatients({ limit: 200, offset: 0, term: '' })
+  private loadReportPatients(done?: () => void) {
+    this.billingService.getReport({
+      from: this.reportFilters.from,
+      to: this.reportFilters.to,
+      patientIds: [],
+      station: 'all',
+      status: 'all'
+    })
       .subscribe({
-        next: (data) => {
-          this.patientsOptions = data?.patients?.map((p) => ({
-            id: p.id,
-            name: `${p.name} ${p.lastName}`.trim(),
-            idNumber: p.idNumber
+        next: (report: BillingReport) => {
+          this.patientsOptions = report.summary.byPatient.map((patient) => ({
+            id: patient.patientId,
+            name: patient.patientName
           })) ?? []
+          const availableIds = new Set(this.patientsOptions.map((patient) => Number(patient.id)))
+          this.reportFilters.patientIds = this.reportFilters.patientIds
+            .map((id) => Number(id))
+            .filter((id) => availableIds.has(id))
+          done?.()
         },
         error: (message) => {
-          console.warn('patients load error', message)
+          console.warn('report patients load error', message)
+          this.patientsOptions = []
+          this.reportFilters.patientIds = []
+          done?.()
         }
       })
   }

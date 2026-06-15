@@ -17,6 +17,8 @@ export interface BillingReportFilters {
 export interface ManualChargePayload {
   patientId: number
   patientName?: string
+  encounterId?: string
+  invoiceNumber?: string
   station?: string
   category?: string
   description: string

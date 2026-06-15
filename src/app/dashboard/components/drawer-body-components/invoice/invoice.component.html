@@ -141,9 +141,30 @@
   <section class="form-section">
     <div class="section-head">
       <h3>Servicios</h3>
-      <p>Cargos generados desde movimientos, inventario y registros manuales.</p>
+      <p>Cargos generados desde servicios, movimientos, inventario y registros manuales.</p>
     </div>
     <div class="section-body">
+      <div class="service-picker" *ngIf="!isReadOnly && isDrawerSetToUpd()">
+        <div class="form-group">
+          <label>Servicio</label>
+          <select [(ngModel)]="selectedServiceId" [ngModelOptions]="{standalone: true}" [disabled]="serviceSaving">
+            <option value="">Selecciona un servicio</option>
+            @for(service of options.services; track service.id) {
+              <option [value]="service.id">
+                {{ getServiceName(service) }} - L. {{ getServicePrice(service) | number:'1.2-2' }}
+              </option>
+            }
+          </select>
+        </div>
+        <button
+          class="btn service-add"
+          type="button"
+          (click)="onAddService()"
+          [disabled]="!selectedServiceId || serviceSaving"
+        >
+          {{ serviceSaving ? 'Agregando...' : 'Agregar' }}
+        </button>
+      </div>
       @if(selectedServices.length > 0) {
         <div class="service-list">
           @for(ss of selectedServices; track $index) {

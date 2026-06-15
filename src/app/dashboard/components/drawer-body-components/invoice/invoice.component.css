@@ -264,6 +264,23 @@
   gap: 0.5rem;
 }
 
+.service-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.6rem;
+}
+
+.btn.service-add {
+  min-height: 2.25rem;
+  background: var(--secondary-color);
+}
+
+.btn.service-add:disabled {
+  background: var(--color-light-gray);
+  cursor: default;
+}
+
 .service-item {
   display: flex;
   justify-content: space-between;
@@ -442,5 +459,9 @@ textarea.ng-invalid.ng-touched {
   .header-meta {
     grid-template-columns: 1fr;
     align-items: flex-start;
+  }
+
+  .service-picker {
+    grid-template-columns: 1fr;
   }
 }
