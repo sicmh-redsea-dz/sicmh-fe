@@ -153,12 +153,13 @@
         <div class="number-input-group">
           <label class="required">Temperatura</label>
           <div class="number-input">
-            <input type="number" 
+            <input type="number"
                   formControlName="temperature"
-                  placeholder="Ej. 36º"/>
+                  placeholder="Ej. 36º"
+                  (keydown)="onArrowKey($event, 'temperature')"/>
             <div class="button-group">
-              <button type="button" class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
-              <button type="button" class="increment" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'temperature'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'temperature'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
           <small class="error-text" *ngIf="visitForm.get('temperature')?.invalid && (visitForm.get('temperature')?.touched || visitForm.get('temperature')?.dirty)">
@@ -168,11 +169,11 @@
         <div class="number-input-group">
           <label class="required">Altura</label>
           <div class="number-input">
-            <input type="number" 
-                  formControlName="height" 
+            <input type="number"
+                  formControlName="height"
                   placeholder="Ej. 1.75"/>
             <div class="button-group">
-              <select>
+              <select tabindex="-1">
                 <option value="mts">cms</option>
                 <option value="pgs">pgs</option>
               </select>
@@ -187,10 +188,11 @@
           <div class="number-input">
             <input type="number"
                   formControlName="glucometry"
-                  placeholder="Ej. 90 mg/dL"/>
+                  placeholder="Ej. 90 mg/dL"
+                  (keydown)="onArrowKey($event, 'glucometry')"/>
             <div class="button-group">
-              <button type="button" class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
-              <button type="button" class="increment" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'glucometry'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'glucometry'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
           <small class="error-text" *ngIf="visitForm.get('glucometry')?.invalid && (visitForm.get('glucometry')?.touched || visitForm.get('glucometry')?.dirty)">
@@ -201,11 +203,12 @@
           <label class="required">Oxigenacion</label>
           <div class="number-input">
             <input type="number"
-                  formControlName="oxygenation" 
-                  placeholder="Ej. 100%"/>
+                  formControlName="oxygenation"
+                  placeholder="Ej. 100%"
+                  (keydown)="onArrowKey($event, 'oxygenation')"/>
             <div class="button-group">
-              <button type="button" class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
-              <button type="button" class="increment" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, 1)">+</button>
+              <button type="button" class="increment" tabindex="-1" [attr.data-caller]="'oxygenation'" (click)="updateValue($event, -1)">-</button>
             </div>
           </div>
           <small class="error-text" *ngIf="visitForm.get('oxygenation')?.invalid && (visitForm.get('oxygenation')?.touched || visitForm.get('oxygenation')?.dirty)">
@@ -215,11 +218,11 @@
         <div class="number-input-group">
           <label class="required">Peso</label>
           <div class="number-input">
-            <input type="number" 
+            <input type="number"
                   formControlName="weight"
                   placeholder="Ej. 120"/>
             <div class="button-group">
-              <select>
+              <select tabindex="-1">
                 <option value="kg">kg</option>
                 <option value="lbs">lbs</option>
               </select>

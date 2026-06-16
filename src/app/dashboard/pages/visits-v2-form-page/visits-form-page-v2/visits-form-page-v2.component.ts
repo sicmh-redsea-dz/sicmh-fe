@@ -623,6 +623,16 @@ export class VisitsFormPageV2Component implements OnInit {
     }
   }
 
+  public onArrowKey(event: KeyboardEvent, fieldName: string) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      const change = event.key === 'ArrowUp' ? 1 : -1
+      const currentVal = parseInt(this.visitForm.get(fieldName)?.value || '0')
+      const valueToSet = currentVal + change
+      if(valueToSet > 0 && valueToSet < 100) this.visitForm.get(fieldName)?.setValue(valueToSet.toString())
+    }
+  }
+
   public incrementQuantity(index: number) {
     const item = this.selectedStockItems[index];
     if (item.currentQuantity < item.productQuantity) {

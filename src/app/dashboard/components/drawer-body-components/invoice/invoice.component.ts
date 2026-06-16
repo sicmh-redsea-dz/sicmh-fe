@@ -66,6 +66,7 @@ export class InvoiceComponent implements OnInit {
   public chargeSnapshot: BillingInvoiceSnapshot | null = null
   public selectedServiceId = ''
   public serviceSaving = false
+  public serviceRemoving: Set<string> = new Set()
 
   public patientQuery = ''
   public doctorQuery = ''
@@ -132,8 +133,20 @@ export class InvoiceComponent implements OnInit {
   }
 
   private setupDiscountWatchers() {
-    const fields = ['elderlyDiscount', 'elderlyDiscountPercent', 'promCode', 'discount']
-    fields.forEach((field) => {
+    this.invoiceForm.get('elderlyDiscount')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((enabled: boolean) => {
+        if (enabled) {
+          const current = Number(this.invoiceForm.get('elderlyDiscountPercent')?.value || 0)
+          if (!current) {
+            this.invoiceForm.get('elderlyDiscountPercent')?.setValue(25, { emitEvent: false })
+          }
+        }
+        this.loadMutableData()
+      })
+
+    const otherFields = ['elderlyDiscountPercent', 'promCode', 'discount']
+    otherFields.forEach((field) => {
       this.invoiceForm.get(field)?.valueChanges
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.loadMutableData())
@@ -251,9 +264,33 @@ export class InvoiceComponent implements OnInit {
               price: item.total
             }))
             this.loadMutableData()
+            this.drawerParams.updateInvoiceMonto(this.invoiceIdToUpd(), this.totalAmount)
           } else {
             this.loadInvoiceSnapshot(this.invoiceIdToUpd())
           }
+        },
+        error: (message) => {
+          Swal.fire('Error', message, 'error')
+        }
+      })
+  }
+
+  public onRemoveService(chargeId: string) {
+    if (this.isReadOnly || this.serviceRemoving.has(chargeId)) return
+    this.serviceRemoving.add(chargeId)
+    this.billingService.deleteManualCharge(chargeId)
+      .pipe(finalize(() => this.serviceRemoving.delete(chargeId)))
+      .subscribe({
+        next: () => {
+          this.chargeItems = this.chargeItems.filter((item) => item.id !== chargeId)
+          this.selectedServices = this.chargeItems.map((item) => ({
+            id: item.id,
+            description: item.description,
+            desc: this.buildChargeMeta(item),
+            price: item.total
+          }))
+          this.loadMutableData()
+          this.drawerParams.updateInvoiceMonto(this.invoiceIdToUpd(), this.totalAmount)
         },
         error: (message) => {
           Swal.fire('Error', message, 'error')
@@ -270,7 +307,9 @@ export class InvoiceComponent implements OnInit {
   }
 
   public getServicePrice(service: ServiceOption) {
-    return Number(service.servicePrice ?? (service as any).price ?? 0)
+    const raw = service.servicePrice ?? (service as any).price ?? 0
+    const price = Number(raw)
+    return isNaN(price) ? 0 : price
   }
 
   private getChargeStation() {

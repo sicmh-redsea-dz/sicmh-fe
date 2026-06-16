@@ -112,6 +112,16 @@ export class BillingService {
       )
   }
 
+  public deleteManualCharge(id: string): Observable<void> {
+    const url = `${this.baseUrl}/app/billing/ledger/${id}`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.delete<any>(url, { headers })
+      .pipe(
+        map(() => undefined),
+        catchError((err) => throwError(() => formatApiError(err)))
+      )
+  }
+
   public getInvoiceSnapshot(invoiceNumber: string): Observable<BillingInvoiceSnapshot> {
     const url = `${this.baseUrl}/app/billing/invoice/${invoiceNumber}`
     const headers = this.authHeaders.buildAuthHeaders()

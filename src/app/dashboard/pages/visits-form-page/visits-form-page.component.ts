@@ -310,6 +310,16 @@ export class VisitsFormPageComponent implements OnInit {
     }
   }
 
+  public onArrowKey(event: KeyboardEvent, fieldName: string) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      const change = event.key === 'ArrowUp' ? 1 : -1
+      const currentVal = parseInt(this.visitForm.get(fieldName)?.value || '0')
+      const valueToSet = currentVal + change
+      if(valueToSet > 0 && valueToSet < 100) this.visitForm.get(fieldName)?.setValue(valueToSet.toString())
+    }
+  }
+
   compareDoctors = (a: Staff, b: Staff): boolean => {
     return a && b ? a.id === b.id : a === b;
   };

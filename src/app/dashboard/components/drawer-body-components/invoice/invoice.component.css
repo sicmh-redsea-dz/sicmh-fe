@@ -316,6 +316,32 @@
   color: var(--secondary-color);
 }
 
+.btn-remove-service {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: border-color 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-remove-service:hover:not(:disabled) {
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.btn-remove-service:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .icon-btn {
   width: 1.5rem;
   height: 1.5rem;

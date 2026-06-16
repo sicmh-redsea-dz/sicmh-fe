@@ -26,11 +26,16 @@ export class DrawerService {
   })
 
   public shouldRefreshInvoices = signal<boolean>(false)
+  public softUpdateInvoiceMonto = signal<{ invoiceNumber: string; newMonto: number } | null>(null)
 
   // método opcional para resetear
   public triggerInvoiceRefresh() {
     this.shouldRefreshInvoices.set(true)
     setTimeout(() => this.shouldRefreshInvoices.set(false), 0)
+  }
+
+  public updateInvoiceMonto(invoiceNumber: string, newMonto: number) {
+    this.softUpdateInvoiceMonto.set({ invoiceNumber, newMonto })
   }
 
 }

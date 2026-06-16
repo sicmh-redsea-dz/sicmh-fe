@@ -122,6 +122,16 @@ export class BillingPageComponent {
         this.getInvoices()
       }
     })
+
+    effect(() => {
+      const update = this.drawerParams.softUpdateInvoiceMonto()
+      if (update) {
+        const invoice = this.bodyContent.find((item) => item.InvoiceNumber === update.invoiceNumber)
+        if (invoice) {
+          invoice.Monto = update.newMonto.toFixed(2)
+        }
+      }
+    })
   }
 
   public onSearchTermChange( term: string ) {

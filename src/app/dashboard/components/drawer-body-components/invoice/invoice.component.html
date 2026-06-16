@@ -175,6 +175,17 @@
               </div>
               <div class="service-meta">
                 <span class="service-price">L. {{ ss.price | number:'1.2-2' }}</span>
+                @if(!isReadOnly && isDrawerSetToUpd()) {
+                  <button
+                    class="btn-remove-service"
+                    type="button"
+                    [disabled]="serviceRemoving.has(ss.id)"
+                    (click)="onRemoveService(ss.id)"
+                    title="Eliminar cargo"
+                  >
+                    {{ serviceRemoving.has(ss.id) ? '...' : '✕' }}
+                  </button>
+                }
               </div>
             </div>
           }
