@@ -6,7 +6,7 @@ export interface User {
   name:     string;
   isActive: boolean;
   roles:    string[];
-  _id:      string;
+  _id:      number;
   permissions?: Permission[];
   profile?: {
     phone?: string;

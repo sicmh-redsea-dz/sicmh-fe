@@ -11,7 +11,7 @@
     <div class="list-panel">
       <div class="panel-header">
         <span>Listado de quirófanos</span>
-        <button class="ghost-btn" type="button" (click)="clearSelection()">Nuevo quirófano</button>
+        <button *appHasPermission="'visits.update'" class="ghost-btn" type="button" (click)="clearSelection()">Nuevo quirófano</button>
       </div>
 
       <div class="table-wrapper" *ngIf="rooms.length > 0; else empty">
@@ -47,41 +47,42 @@
     </div>
 
     <div class="detail-panel">
-      <section class="card">
-        <h3>{{ selectedRoom ? 'Editar quirófano' : 'Nuevo quirófano' }}</h3>
-        <form [formGroup]="roomForm" (ngSubmit)="saveRoom()">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Código</label>
-              <input type="text" formControlName="code" placeholder="Ej. Q-01" />
-              <small class="error-text" *ngIf="roomForm.get('code')?.touched && roomForm.get('code')?.hasError('required')">
-                Este campo es obligatorio.
-              </small>
+      <ng-container *appHasPermission="'visits.update'">
+        <section class="card">
+          <h3>{{ selectedRoom ? 'Editar quirófano' : 'Nuevo quirófano' }}</h3>
+          <form [formGroup]="roomForm" (ngSubmit)="saveRoom()">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Código</label>
+                <input type="text" formControlName="code" placeholder="Ej. Q-01" />
+                <small class="error-text" *ngIf="roomForm.get('code')?.touched && roomForm.get('code')?.hasError('required')">
+                  Este campo es obligatorio.
+                </small>
+              </div>
+              <div class="form-group">
+                <label>Especialidad</label>
+                <input type="text" formControlName="specialty" placeholder="Ej. Cirugía general" />
+              </div>
             </div>
-            <div class="form-group">
-              <label>Especialidad</label>
-              <input type="text" formControlName="specialty" placeholder="Ej. Cirugía general" />
+            <div class="form-row">
+              <div class="form-group">
+                <label>Estado</label>
+                <select formControlName="status">
+                  <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+                </select>
+                <small class="error-text" *ngIf="roomForm.get('status')?.touched && roomForm.get('status')?.hasError('required')">
+                  Selecciona un estado.
+                </small>
+              </div>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Estado</label>
-              <select formControlName="status">
-                <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
-              </select>
-              <small class="error-text" *ngIf="roomForm.get('status')?.touched && roomForm.get('status')?.hasError('required')">
-                Selecciona un estado.
-              </small>
-            </div>
-          </div>
-          <button class="primary-btn" type="submit">
-            {{ selectedRoom ? 'Guardar cambios' : 'Crear quirófano' }}
-          </button>
-        </form>
-      </section>
+            <button class="primary-btn" type="submit">
+              {{ selectedRoom ? 'Guardar cambios' : 'Crear quirófano' }}
+            </button>
+          </form>
+        </section>
 
-      <section class="card" *ngIf="selectedRoom">
-        <h3>Asignación</h3>
+        <section class="card" *ngIf="selectedRoom">
+          <h3>Asignación</h3>
         <form [formGroup]="assignmentForm">
           <div class="form-row">
             <div class="form-group" style="position: relative;">
@@ -159,7 +160,8 @@
             Liberar quirófano
           </button>
         </div>
-      </section>
+        </section>
+      </ng-container>
 
       <section class="card" *ngIf="selectedRoom">
         <h3>Historial</h3>

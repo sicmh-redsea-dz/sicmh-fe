@@ -47,8 +47,8 @@
     <p>Analiza movimientos, cargos y consumos por rango de fechas.</p>
   </div>
   <div class="report-header-actions">
-    <button class="ghost-btn" type="button" (click)="downloadQuickReport('td')">PDF hoy</button>
-    <button class="ghost-btn" type="button" (click)="downloadQuickReport('wk')">PDF semana</button>
+    <button *appHasPermission="'invoice.read'" class="ghost-btn" type="button" (click)="downloadQuickReport('td')">PDF hoy</button>
+    <button *appHasPermission="'invoice.read'" class="ghost-btn" type="button" (click)="downloadQuickReport('wk')">PDF semana</button>
     <div class="billing-view-toggle" role="tablist" aria-label="Vista de facturación">
       <span
         class="toggle-indicator"
@@ -121,8 +121,8 @@
     </div>
 
     <div class="panel-footer">
-      <button class="secondary-btn" type="button" (click)="downloadReportPdf()">Descargar PDF</button>
-      <button class="ghost-btn" type="button" (click)="exportLedgerCsv()">Exportar CSV</button>
+      <button *appHasPermission="'invoice.read'" class="secondary-btn" type="button" (click)="downloadReportPdf()">Descargar PDF</button>
+      <button *appHasPermission="'invoice.read'" class="ghost-btn" type="button" (click)="exportLedgerCsv()">Exportar CSV</button>
     </div>
   </div>
 

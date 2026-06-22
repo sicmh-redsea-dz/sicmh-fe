@@ -21,8 +21,8 @@ export class AuthService {
   public authStatus = computed(() => this._authStatus())
   public permissions = computed(() => {
     const user = this._currentUser()
-    if (user?.permissions && user.permissions.length > 0) {
-      return new Set<Permission>(user.permissions)
+    if (Array.isArray(user?.permissions)) {
+      return new Set<Permission>(user!.permissions!)
     }
     return getPermissionsForRoles(user?.roles)
   })

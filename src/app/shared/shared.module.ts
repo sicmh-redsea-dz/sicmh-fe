@@ -11,6 +11,8 @@ import { NoDataComponent } from './components/no-data/no-data.component';
 import { ToggleOptsComponent } from './components/toggle-opts/toggle-opts.component';
 import { FormatDatePipe } from './pipes/format-date.pipe';
 import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
+import { HasPermissionDirective } from './directives/has-permission.directive';
+import { HasAnyPermissionDirective } from './directives/has-any-permission.directive';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
     ToggleOptsComponent,
     FormatDatePipe,
     FormatFullnamePipe,
+    HasPermissionDirective,
+    HasAnyPermissionDirective,
   ],
   imports: [
     CommonModule,
@@ -38,6 +42,8 @@ import { FormatFullnamePipe } from './pipes/format-fullname.pipe';
     ToggleOptsComponent,
     FormatDatePipe,
     FormatFullnamePipe,
+    HasPermissionDirective,
+    HasAnyPermissionDirective,
   ]
 })
 export class SharedModule {}
