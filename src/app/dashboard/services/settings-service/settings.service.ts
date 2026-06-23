@@ -122,4 +122,24 @@ export class SettingsService {
         catchError((err) => throwError(() => formatApiError(err)))
       )
   }
+
+  public deleteUser(userId: number): Observable<boolean> {
+    const url = `${this.baseUrl}/app/settings/users/${userId}`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.delete<ApiResponse<{ deleted: boolean }>>(url, { headers })
+      .pipe(
+        map((resp) => resp.data.deleted),
+        catchError((err) => throwError(() => formatApiError(err)))
+      )
+  }
+
+  public changeUserPassword(userId: number, newPassword: string): Observable<boolean> {
+    const url = `${this.baseUrl}/app/settings/users/${userId}/password`
+    const headers = this.authHeaders.buildAuthHeaders()
+    return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { newPassword }, { headers })
+      .pipe(
+        map((resp) => resp.data.updated),
+        catchError((err) => throwError(() => formatApiError(err)))
+      )
+  }
 }

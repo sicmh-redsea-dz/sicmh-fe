@@ -36,6 +36,7 @@ export class SidebarComponent {
  })
  public toggledStates:boolean[] = []
  public toggledSidebar:boolean = false
+ public settingsOpen:boolean = false
  private userSignal = computed(() => this.authService.currentUser())
 
   constructor(){
@@ -77,6 +78,19 @@ export class SidebarComponent {
   private isAllowed(required?: Permission[]): boolean {
     if (!required || required.length === 0) return true
     return this.authService.hasAnyPermission(required)
+  }
+
+  public toggleSettings() {
+    this.settingsOpen = !this.settingsOpen
+  }
+
+  public handleSettingsSubmenuOnCollapse() {
+    if (!this.toggledSidebar) return
+    this.settingsOpen = false
+  }
+
+  public canManageSettings(): boolean {
+    return this.isAllowed(['settings.permissions.manage'])
   }
 
   public onLogout() {

@@ -77,6 +77,54 @@ export class StaffManagementComponent implements OnInit {
       })
   }
 
+  public deleteUser(user: SettingsUser) {
+    Swal.fire({
+      title: '¿Eliminar usuario?',
+      html: `Se eliminará <strong>${user.name}</strong> del sistema. Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ef4444'
+    }).then((result) => {
+      if (!result.isConfirmed) return
+      this.settingsService.deleteUser(user.id)
+        .subscribe({
+          next: () => {
+            Swal.fire('Eliminado', `${user.name} fue eliminado.`, 'success')
+            this.loadUsers()
+          },
+          error: (err) => Swal.fire('Error', err, 'error')
+        })
+    })
+  }
+
+  public changePassword(user: SettingsUser) {
+    Swal.fire({
+      title: 'Cambiar contraseña',
+      html: `Nueva contraseña para <strong>${user.name}</strong>`,
+      input: 'password',
+      inputPlaceholder: 'Nueva contraseña (mín. 6 caracteres)',
+      inputAttributes: { autocomplete: 'new-password' },
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: (value: string) => {
+        if (!value || value.length < 6) {
+          Swal.showValidationMessage('La contraseña debe tener al menos 6 caracteres.')
+        }
+        return value
+      }
+    }).then((result) => {
+      if (!result.isConfirmed || !result.value) return
+      this.settingsService.changeUserPassword(user.id, result.value)
+        .subscribe({
+          next: () => Swal.fire('Actualizada', 'La contraseña fue cambiada exitosamente.', 'success'),
+          error: (err) => Swal.fire('Error', err, 'error')
+        })
+    })
+  }
+
   private loadUsers() {
     this.settingsService.getUsers()
       .subscribe({

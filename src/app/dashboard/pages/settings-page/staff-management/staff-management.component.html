@@ -42,8 +42,8 @@
           <input type="text" formControlName="identification" placeholder="DNI / RTN">
         </div>
         <div class="form-group">
-          <label>Departamento</label>
-          <input type="text" formControlName="department" placeholder="Área o unidad">
+          <label>Departamento / Especialidad</label>
+          <input type="text" formControlName="department" placeholder="Área o especialidad">
         </div>
         <div class="form-group">
           <label>Cargo</label>
@@ -68,11 +68,19 @@
 
       <div class="list">
         <div class="list-item" *ngFor="let user of users">
-          <div>
+          <div class="user-info">
             <strong>{{ user.name | lowercase }}</strong>
             <small>{{ user.email | lowercase }}</small>
           </div>
-          <span class="role-pill">{{ user.roleName || 'Sin rol' }}</span>
+          <div class="item-actions">
+            <span class="role-pill">{{ user.roleName || 'Sin rol' }}</span>
+            <button class="action-btn" title="Cambiar contraseña" (click)="changePassword(user)">
+              <i class="ph-bold ph-lock-key"></i>
+            </button>
+            <button class="action-btn danger" title="Eliminar usuario" (click)="deleteUser(user)">
+              <i class="ph-bold ph-trash"></i>
+            </button>
+          </div>
         </div>
         <div class="empty" *ngIf="!users.length">Aún no hay usuarios registrados.</div>
       </div>
