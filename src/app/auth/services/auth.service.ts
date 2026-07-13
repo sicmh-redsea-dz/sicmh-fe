@@ -32,38 +32,40 @@ export class AuthService {
     this.checkAuthStatus().subscribe()
   }
 
-  private setAuthentication(user: User, token: string): boolean {
+  private setAuthentication(user: User, token: string, codigoEmpresa: string): boolean {
     this._currentUser.set(user)
     this._authStatus.set(AuthStatus.authenticated)
     localStorage.setItem('token', token)
+    localStorage.setItem('codigoEmpresa', codigoEmpresa.toUpperCase())
     return true
   }
 
   private clearAuthState(): void {
     localStorage.removeItem('token')
+    localStorage.removeItem('codigoEmpresa')
     this._currentUser.set(null)
     this._authStatus.set(AuthStatus.notAuthenticated)
     this._mustChangePassword.set(false)
   }
 
-  login(email: string, password: string): Observable<boolean> {
+  login(email: string, password: string, codigoEmpresa: string): Observable<boolean> {
     const url = `${this.baseUrl}/auth/login`
-    return this.http.post<{ user: User; token: string }>(url, { email, password })
+    return this.http.post<{ user: User; token: string }>(url, { email, password, codigoEmpresa })
       .pipe(
         map(({ user, token }) => {
-          this.setAuthentication(user, token)
+          this.setAuthentication(user, token, codigoEmpresa)
           this._mustChangePassword.set(false)
           return true
         })
       )
   }
 
-  register(name: string, email: string, password: string): Observable<boolean> {
+  register(name: string, email: string, password: string, codigoEmpresa: string): Observable<boolean> {
     const url = `${this.baseUrl}/auth/register`
-    return this.http.post<{ user: User; token: string }>(url, { name, email, password })
+    return this.http.post<{ user: User; token: string }>(url, { name, email, password, codigoEmpresa })
       .pipe(
         map(({ user, token }) => {
-          this.setAuthentication(user, token)
+          this.setAuthentication(user, token, codigoEmpresa)
           this._mustChangePassword.set(false)
           return true
         })
@@ -73,6 +75,7 @@ export class AuthService {
   checkAuthStatus(): Observable<boolean> {
     const url = `${this.baseUrl}/auth/check-token`
     const token = localStorage.getItem('token')
+    const codigoEmpresa = localStorage.getItem('codigoEmpresa') ?? ''
 
     if (!token) {
       this.clearAuthState()
@@ -84,7 +87,7 @@ export class AuthService {
     return this.http.get<{ user: User }>(url, { headers })
       .pipe(
         map(({ user }) => {
-          this.setAuthentication(user, token)
+          this.setAuthentication(user, token, codigoEmpresa)
           return true
         }),
         catchError(() => {

@@ -8,6 +8,25 @@
 
     <span class="form-title">Register</span>
 
+    <div class="wrap-input" [class.invalid]="myForm.get('codigoEmpresa')?.touched && myForm.get('codigoEmpresa')?.invalid">
+        <span class="label-input">Código de empresa</span>
+        <input class="input"
+               type="text"
+               formControlName="codigoEmpresa"
+               placeholder="Ej. HNCAMI"
+               style="text-transform: uppercase;">
+        <span class="focus-input"></span>
+        <small class="error-text" *ngIf="myForm.get('codigoEmpresa')?.touched && myForm.get('codigoEmpresa')?.errors?.['required']">
+          Este campo es obligatorio.
+        </small>
+        <small class="error-text" *ngIf="myForm.get('codigoEmpresa')?.touched && myForm.get('codigoEmpresa')?.errors?.['pattern']">
+          Solo se permiten letras y números.
+        </small>
+        <small class="error-text" *ngIf="myForm.get('codigoEmpresa')?.touched && (myForm.get('codigoEmpresa')?.errors?.['minlength'] || myForm.get('codigoEmpresa')?.errors?.['maxlength'])">
+          Debe tener entre 3 y 10 caracteres.
+        </small>
+    </div>
+
     <div class="wrap-input" [class.invalid]="myForm.get('name')?.touched && myForm.get('name')?.invalid">
         <span class="label-input">Nombre</span>
         <input class="input"

@@ -16,8 +16,9 @@ export class LoginPageComponent {
   private router = inject(Router)
 
   public loginForm: FormGroup = this.fb.group({
-    email   : ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    email        : ['', [Validators.required, Validators.email]],
+    password     : ['', [Validators.required, Validators.minLength(6)]],
+    codigoEmpresa: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10), Validators.pattern(/^[a-zA-Z0-9]+$/)]]
   })
 
   submit() {
@@ -25,9 +26,9 @@ export class LoginPageComponent {
       this.loginForm.markAllAsTouched()
       return
     }
-    const { email, password } = this.loginForm.value
+    const { email, password, codigoEmpresa } = this.loginForm.value
 
-    this.authService.login(email, password)
+    this.authService.login(email, password, codigoEmpresa)
       .subscribe({
         next: () => this.router.navigateByUrl('/dashboard'),
         error: (err) => Swal.fire('Error', this.getErrorMessage(err), 'error')

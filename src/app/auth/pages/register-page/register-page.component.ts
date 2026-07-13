@@ -16,9 +16,10 @@ export class RegisterPageComponent {
   private authService = inject(AuthService)
 
   public myForm: FormGroup = this.fb.group({
-    name    : ['', [Validators.required, Validators.minLength(2)]],
-    email   : ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    codigoEmpresa: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10), Validators.pattern(/^[a-zA-Z0-9]+$/)]],
+    name         : ['', [Validators.required, Validators.minLength(2)]],
+    email        : ['', [Validators.required, Validators.email]],
+    password     : ['', [Validators.required, Validators.minLength(6)]],
   })
 
   submit() {
@@ -26,9 +27,9 @@ export class RegisterPageComponent {
       this.myForm.markAllAsTouched()
       return
     }
-    const { name, email, password } = this.myForm.value
+    const { name, email, password, codigoEmpresa } = this.myForm.value
 
-    this.authService.register(name, email, password)
+    this.authService.register(name, email, password, codigoEmpresa)
       .subscribe({
         next: () => this.router.navigateByUrl('/dashboard'),
         error: (err) => Swal.fire('Error', this.getErrorMessage(err), 'error')
