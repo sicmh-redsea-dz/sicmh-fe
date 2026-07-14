@@ -229,7 +229,7 @@ export class VisitsPageComponent implements OnInit {
     if (!this.canDeleteVisit()) return
     Swal.fire({
       title: 'Estas seguro?',
-      text: 'Esta acción no se puede revertir.',
+      text: 'Esta acción no se puede revertir. La factura pendiente asociada será anulada automáticamente.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Si, aceptar',
