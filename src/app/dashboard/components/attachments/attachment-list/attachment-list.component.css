@@ -1,0 +1,141 @@
+.attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.attachments-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.upload-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.label-input {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: #f9fafb;
+  user-select: none;
+}
+
+.upload-btn:hover {
+  background: #f0f1f3;
+}
+
+.upload-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.state-text {
+  font-size: 0.85rem;
+  color: #667085;
+}
+
+.error-text {
+  font-size: 0.85rem;
+  color: #d92d20;
+  white-space: pre-line;
+}
+
+.attachment-item {
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.attachment-item.queued {
+  border-style: dashed;
+  background: #fcfcfd;
+}
+
+.attachment-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.attachment-row > i {
+  font-size: 1.3rem;
+  color: #475467;
+}
+
+.attachment-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.attachment-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-info {
+  font-size: 0.75rem;
+  color: #667085;
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.attachment-actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  color: #475467;
+}
+
+.attachment-actions button:hover {
+  background: #f0f1f3;
+}
+
+.attachment-actions button.danger:hover {
+  color: #d92d20;
+}
+
+.attachment-preview {
+  margin-top: 0.6rem;
+}
+
+.attachment-preview img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.attachment-preview embed {
+  width: 100%;
+  height: 420px;
+  border-radius: 6px;
+}

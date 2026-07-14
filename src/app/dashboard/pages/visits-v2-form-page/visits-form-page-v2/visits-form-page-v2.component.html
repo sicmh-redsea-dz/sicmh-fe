@@ -114,17 +114,23 @@
 
         <div class="textareas-row">
           <div class="textarea-group">
-            <label>Alergias</label>
-            <textarea 
+            <label class="required">Alergias</label>
+            <textarea
               formControlName="allergies"
               placeholder="Alergias conocidas del paciente."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.allergies')?.invalid && (visitForm.get('expediente.standard.allergies')?.touched || visitForm.get('expediente.standard.allergies')?.dirty)">
+              Este campo es obligatorio.
+            </small>
           </div>
 
           <div class="textarea-group">
-            <label>Medicamentos actuales</label>
-            <textarea 
+            <label class="required">Medicamentos actuales</label>
+            <textarea
               formControlName="currentMeds"
               placeholder="Medicamentos que consume actualmente."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentMeds')?.invalid && (visitForm.get('expediente.standard.currentMeds')?.touched || visitForm.get('expediente.standard.currentMeds')?.dirty)">
+              Este campo es obligatorio.
+            </small>
           </div>
         </div>
       </div>
@@ -167,7 +173,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label class="required">Altura</label>
+          <label>Altura</label>
           <div class="number-input">
             <input type="number"
                   formControlName="height"
@@ -179,9 +185,6 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('height')?.invalid && (visitForm.get('height')?.touched || visitForm.get('height')?.dirty)">
-            Este campo es obligatorio.
-          </small>
         </div>
         <div class="number-input-group">
           <label class="required">Glucometria</label>
@@ -216,7 +219,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label class="required">Peso</label>
+          <label>Peso</label>
           <div class="number-input">
             <input type="number"
                   formControlName="weight"
@@ -228,9 +231,6 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('weight')?.invalid && (visitForm.get('weight')?.touched || visitForm.get('weight')?.dirty)">
-            Este campo es obligatorio.
-          </small>
         </div>
       </div>
 
@@ -276,33 +276,45 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Patologicos</label>
-        <textarea 
+        <label class="required">Patologicos</label>
+        <textarea
           formControlName="pathologicalHst"
           placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('pathologicalHst')?.invalid && (visitForm.get('pathologicalHst')?.touched || visitForm.get('pathologicalHst')?.dirty)">
+          Este campo es obligatorio.
+        </small>
       </div>
 
       <div class="textarea-group">
-        <label>Familiares</label>
-        <textarea 
+        <label class="required">Familiares</label>
+        <textarea
           formControlName="familyHst"
           placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('familyHst')?.invalid && (visitForm.get('familyHst')?.touched || visitForm.get('familyHst')?.dirty)">
+          Este campo es obligatorio.
+        </small>
       </div>
     </div>
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Quirurgicos</label>
-        <textarea 
+        <label class="required">Quirurgicos</label>
+        <textarea
           formControlName="surgicalHst"
           placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('surgicalHst')?.invalid && (visitForm.get('surgicalHst')?.touched || visitForm.get('surgicalHst')?.dirty)">
+          Este campo es obligatorio.
+        </small>
       </div>
 
       <div class="textarea-group">
-        <label>Habitos</label>
-        <textarea 
+        <label class="required">Habitos</label>
+        <textarea
           formControlName="backgroundHst"
           placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('backgroundHst')?.invalid && (visitForm.get('backgroundHst')?.touched || visitForm.get('backgroundHst')?.dirty)">
+          Este campo es obligatorio.
+        </small>
       </div>
     </div>
 
@@ -567,7 +579,7 @@
 
     <div class="inventory-block">
       <div class="form-group">
-        <label>Inventario</label>
+        <label class="required">Inventario</label>
         <select name="stock" (change)="handleChange($event)">
           <option value="">Selecciona un elemento</option>
           @for( s of listOfStockItems(); track $index ) {
@@ -591,18 +603,31 @@
             }
           </ul>
         }
+        <small class="error-text" *ngIf="stockItemsArray.invalid && (stockItemsArray.touched || stockItemsArray.dirty)">
+          Agrega al menos un elemento del inventario.
+        </small>
       </div>
     </div>
-    
+
     <div class="textarea-full">
-      <label>Notas</label>
+      <label class="required">Notas</label>
       <textarea formControlName="notes"
                 placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
+      <small class="error-text" *ngIf="visitForm.get('notes')?.invalid && (visitForm.get('notes')?.touched || visitForm.get('notes')?.dirty)">
+        Este campo es obligatorio.
+      </small>
     </div>
 
+    <app-attachment-list
+      #attachmentList
+      [deferred]="caller === 'nv'"
+      [recordId]="caller === 'nv' ? null : selectedVisit()?.id ?? null"
+      [patientId]="caller === 'nv' ? null : selectedVisit()?.patientId"
+    ></app-attachment-list>
+
     <div class="form-actions">
-      <button class="submit-btn" 
-              [disabled]="visitForm.invalid" 
+      <button class="submit-btn"
+              [disabled]="visitForm.invalid"
               type="submit">
         {{actionButtonText}}
       </button>

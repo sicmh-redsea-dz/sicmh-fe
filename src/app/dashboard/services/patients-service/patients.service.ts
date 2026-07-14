@@ -12,24 +12,6 @@ interface Delimiters {
   term: string
 }
 
-interface ImageCaptureSessionResponse {
-  data: {
-    token: string
-    captureUrl: string
-    qrDataUrl: string
-    expiresAt: string
-  }
-}
-
-interface ImageCaptureStatusResponse {
-  data: {
-    status: 'pending' | 'uploaded' | 'expired'
-    image?: {
-      dataUrl: string
-      fileName?: string
-    }
-  }
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -118,63 +100,4 @@ export class PatientsService {
       )
   }
 
-  public uploadPatientImage(patientId: number, imageDataUrl: string): Observable<boolean> {
-    const url = `${this.baseUrl}/app/patients/${patientId}/image`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post(url, { image: imageDataUrl }, { headers })
-      .pipe(
-        map(() => true),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-
-  public getPatientImage(patientId: number): Observable<string | null> {
-    const url = `${this.baseUrl}/app/patients/${patientId}/image`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<{ data: { image?: { dataUrl?: string } } }>(url, { headers })
-      .pipe(
-        map(({ data }) => data.image?.dataUrl ?? null),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-
-  public deletePatientImage(patientId: number): Observable<boolean> {
-    const url = `${this.baseUrl}/app/patients/${patientId}/image`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.delete(url, { headers })
-      .pipe(
-        map(() => true),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-
-  public createImageCaptureSession(): Observable<ImageCaptureSessionResponse['data']> {
-    const url = `${this.baseUrl}/app/patients/image-capture`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<ImageCaptureSessionResponse>(url, {}, { headers })
-      .pipe(
-        map(({ data }) => data),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-
-  public getImageCaptureSession(token: string): Observable<ImageCaptureStatusResponse['data']> {
-    const url = `${this.baseUrl}/app/patients/image-capture/${token}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ImageCaptureStatusResponse>(url, { headers })
-      .pipe(
-        map(({ data }) => data),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-
-  public deleteImageCaptureSession(token: string): Observable<boolean> {
-    const url = `${this.baseUrl}/app/patients/image-capture/${token}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.delete(url, { headers })
-      .pipe(
-        map(() => true),
-        catchError(( err ) => throwError(() => formatApiError(err)))
-      )
-  }
-} 
+}

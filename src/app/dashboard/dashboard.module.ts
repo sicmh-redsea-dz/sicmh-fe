@@ -29,6 +29,8 @@ import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page
 import { PatientViewComponent } from './components/drawer-body-components/patient-view/patient-view.component';
 import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
 import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
+import { AttachmentListComponent } from './components/attachments/attachment-list/attachment-list.component';
+import { EmpresaComponent } from './pages/settings-page/empresa/empresa.component';
 
 
 @NgModule({
@@ -56,7 +58,9 @@ import { PatientMovementsPageComponent } from './pages/patient-movements-page/pa
     OrRoomsManagementPageComponent,
     PatientViewComponent,
     InvoicePreviewPageComponent,
-    PatientMovementsPageComponent
+    PatientMovementsPageComponent,
+    AttachmentListComponent,
+    EmpresaComponent
   ],
   imports: [
     CommonModule,

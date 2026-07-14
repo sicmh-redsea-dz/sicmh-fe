@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, computed, DestroyRef, inject, OnInit, } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
@@ -11,6 +11,7 @@ import { Staff } from '../../interface/visits-service.interface';
 import { ShortPatient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../helpers/visits-form/visits-form-page.helper';
+import { AttachmentListComponent } from '../../components/attachments/attachment-list/attachment-list.component';
 
 @Component({
   selector: 'app-visits-form-page',
@@ -18,7 +19,8 @@ import { pressureValidator } from '../../helpers/visits-form/visits-form-page.he
   styleUrl: './visits-form-page.component.css'
 })
 export class VisitsFormPageComponent implements OnInit {
-  
+  @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
+
   public title = ''
   public subtitle = ''
   public caller = ''
@@ -32,37 +34,37 @@ export class VisitsFormPageComponent implements OnInit {
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
 
   public visitForm: FormGroup = this.fb.group({
-    ageAccordingToWeight: ['', [Validators.required]],
-    BMI           : ['', [Validators.required]],
+    ageAccordingToWeight: [''],
+    BMI           : [''],
     date          : ['', [Validators.required]],
     diagnosis     : ['', [Validators.required]],
     doctor        : ['', [Validators.required]],
-    fatPercentage : ['', [Validators.required]],
+    fatPercentage : [''],
     glucometry    : ['', [Validators.required]],
-    height        : ['', [Validators.required]],
+    height        : [''],
     notes         : [''],
     oxygenation   : ['', [Validators.required]],
     patient       : ['', [Validators.required]],
     pressure      : ['', [Validators.required, pressureValidator()]],
     temperature   : ['', [Validators.required]],
     treatment     : ['', [Validators.required]],
-    pathologicalHst: [''],
-    familyHst     : [''],
-    surgicalHst   : [''],
-    backgroundHst : [''],
-    visceralFat   : ['', [Validators.required]],
-    weight        : ['', [Validators.required]],
+    pathologicalHst: ['', [Validators.required]],
+    familyHst     : ['', [Validators.required]],
+    surgicalHst   : ['', [Validators.required]],
+    backgroundHst : ['', [Validators.required]],
+    visceralFat   : [''],
+    weight        : [''],
     expediente    : this.fb.group({
       standard: this.fb.group({
         chiefComplaint: ['', [Validators.required]],
         currentIllness: ['', [Validators.required]],
         physicalExam: ['', [Validators.required]],
-        allergies: [''],
-        currentMeds: [''],
+        allergies: ['', [Validators.required]],
+        currentMeds: ['', [Validators.required]],
       }),
       module: this.fb.group({
-        followUpPlan: [''],
-        referrals: [''],
+        followUpPlan: ['', [Validators.required]],
+        referrals: ['', [Validators.required]],
       })
     })
   })
@@ -224,18 +226,33 @@ export class VisitsFormPageComponent implements OnInit {
   public handleCreateVisit(visit: FormVisit) {
     this.visitsService.createVisit( visit, 'visits' )
       .subscribe({
-        next: ( visit ) => {
-          if( visit ) {
+        next: ( visitId ) => {
+          this.uploadPendingAttachments(Number(visit.patient), visitId, () => {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
                 this.router.navigateByUrl('/dashboard/visits')
               })
-          }
+          })
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
         }
       })
+  }
+
+  private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {
+    const list = this.attachmentList
+    if (!list || !list.hasQueuedFiles || !patientId) {
+      done()
+      return
+    }
+    list.uploadQueued(patientId, recordId).subscribe({
+      next: () => done(),
+      error: (message: string) => {
+        Swal.fire('Advertencia', `La visita se guardó, pero algunos archivos no se pudieron adjuntar: ${message}`, 'warning')
+          .then(() => done())
+      }
+    })
   }
 
   public handleSelectedVisit( id: number ) {

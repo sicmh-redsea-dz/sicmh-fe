@@ -1,0 +1,105 @@
+<div class="attachments">
+  <div class="attachments-header">
+    <h4>Archivos adjuntos</h4>
+  </div>
+
+  <div class="upload-row" *ngIf="!readOnly">
+    <input
+      type="text"
+      class="label-input"
+      placeholder="Etiqueta (ej. Radiografía de tórax)"
+      [(ngModel)]="uploadLabel"
+      [ngModelOptions]="{ standalone: true }"
+      [disabled]="isUploading"
+    >
+    <label class="upload-btn" [class.disabled]="isUploading">
+      <i class="ph ph-paperclip"></i>
+      Adjuntar
+      <input
+        type="file"
+        hidden
+        accept="image/jpeg,image/png,image/webp,application/pdf,.doc,.docx"
+        (change)="onFileSelected($event, 'file_upload')"
+      >
+    </label>
+    <label class="upload-btn" [class.disabled]="isUploading">
+      <i class="ph ph-camera"></i>
+      Cámara
+      <input
+        type="file"
+        hidden
+        accept="image/*"
+        capture="environment"
+        (change)="onFileSelected($event, 'in_app_camera')"
+      >
+    </label>
+  </div>
+
+  <div class="state-text" *ngIf="isUploading">Subiendo archivo...</div>
+  <div class="error-text" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <ng-container *ngIf="deferred && queuedFiles.length > 0">
+    <div class="attachment-item queued" *ngFor="let queued of queuedFiles; let i = index">
+      <div class="attachment-row">
+        <i class="ph ph-clock"></i>
+        <div class="attachment-meta">
+          <span class="attachment-label">{{ queued.label }}</span>
+          <span class="attachment-info">
+            {{ formatSize(queued.file.size) }} · se subirá al guardar
+          </span>
+        </div>
+        <div class="attachment-actions">
+          <button type="button" class="danger" (click)="removeQueued(i)" title="Quitar">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="state-text" *ngIf="isLoading; else list">Cargando adjuntos...</div>
+
+  <ng-template #list>
+    <div class="state-text" *ngIf="attachments.length === 0 && queuedFiles.length === 0">
+      No hay archivos adjuntos.
+    </div>
+
+    <div class="attachment-item" *ngFor="let attachment of attachments">
+      <div class="attachment-row">
+        <i [class]="iconFor(attachment)"></i>
+        <div class="attachment-meta">
+          <span class="attachment-label">{{ attachment.label }}</span>
+          <span class="attachment-info">
+            {{ formatSize(attachment.size_bytes) }} · {{ attachment.created_at | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+        <div class="attachment-actions">
+          <button
+            type="button"
+            *ngIf="canPreview(attachment)"
+            (click)="togglePreview(attachment)"
+            [disabled]="loadingPreviewId === attachment.id"
+            title="Ver"
+          >
+            <i class="ph" [class.ph-eye]="!previews.has(attachment.id)" [class.ph-eye-slash]="previews.has(attachment.id)"></i>
+          </button>
+          <button type="button" (click)="download(attachment)" title="Descargar">
+            <i class="ph ph-download-simple"></i>
+          </button>
+          <button type="button" class="danger" *ngIf="!readOnly" (click)="remove(attachment)" title="Eliminar">
+            <i class="ph ph-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="attachment-preview" *ngIf="previews.get(attachment.id) as preview">
+        <img *ngIf="isImage(attachment)" [src]="preview.safeUrl" [alt]="attachment.label">
+        <embed
+          *ngIf="isPdf(attachment)"
+          type="application/pdf"
+          [src]="preview.safeUrl"
+        >
+      </div>
+    </div>
+  </ng-template>
+</div>

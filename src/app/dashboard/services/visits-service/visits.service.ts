@@ -148,17 +148,15 @@ export class VisitsService {
       )
   }
 
-  public createVisit(visit: FormVisit, origin: string): Observable<boolean> {
+  public createVisit(visit: FormVisit, origin: string): Observable<number | null> {
     const url: string = `${this.baseUrl}/app/visits/create`
     const body = {...visit, origin}
 
     const headers = this.authHeaders.buildAuthHeaders()
 
-    return this.http.post(url, body, { headers })
+    return this.http.post<{ data?: { visit?: number } }>(url, body, { headers })
       .pipe(
-        map(() => {
-          return true
-        }),
+        map(( resp ) => resp?.data?.visit ?? null),
         catchError(( err ) => {
           return throwError(() => formatApiError(err))
         })

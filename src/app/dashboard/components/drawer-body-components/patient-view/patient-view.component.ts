@@ -1,7 +1,5 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 import { PatientsService } from '../../../services/patients-service/patients.service';
 import { DrawerService } from '../../../services/drawer-service/drawer.service';
@@ -19,7 +17,6 @@ export class PatientViewComponent {
   private router = inject(Router)
 
   public patient: Patient | null = null
-  public imageUrl: string | null = null
   public isLoading = false
 
   public patientId = computed(() => this.drawerService.setPatientId())
@@ -34,20 +31,13 @@ export class PatientViewComponent {
 
   private loadPatient(patientId: number) {
     this.isLoading = true
-    forkJoin({
-      patient: this.patientsService.getPatient(patientId),
-      image: this.patientsService.getPatientImage(patientId).pipe(
-        catchError(() => of(null))
-      )
-    }).subscribe({
-      next: ({ patient, image }) => {
+    this.patientsService.getPatient(patientId).subscribe({
+      next: (patient) => {
         this.patient = patient
-        this.imageUrl = image
         this.isLoading = false
       },
       error: () => {
         this.patient = null
-        this.imageUrl = null
         this.isLoading = false
       }
     })

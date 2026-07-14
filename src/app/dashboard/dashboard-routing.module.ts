@@ -13,6 +13,7 @@ import { VisitsFormPageV2Component } from './pages/visits-v2-form-page/visits-fo
 import { MyProfileComponent } from './pages/settings-page/my-profile/my-profile.component';
 import { PermissionsComponent } from './pages/settings-page/permissions/permissions.component';
 import { StaffManagementComponent } from './pages/settings-page/staff-management/staff-management.component';
+import { EmpresaComponent } from './pages/settings-page/empresa/empresa.component';
 import { InventoryPageComponent } from './pages/inventory-page/inventory-page.component';
 import { InventoryFormPageComponent } from './pages/inventory-form-page/inventory-form-page.component';
 import { VisitsReportPageComponent } from './pages/visits-report-page/visits-report-page.component';
@@ -320,9 +321,15 @@ const routes: Routes = [
             canActivate: [permissionsGuard],
             data: { permissions: ['settings.permissions.manage'] }
           },
-          { 
-            path: 'staff', 
+          {
+            path: 'staff',
             component: StaffManagementComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['settings.permissions.manage'] }
+          },
+          {
+            path: 'empresa',
+            component: EmpresaComponent,
             canActivate: [permissionsGuard],
             data: { permissions: ['settings.permissions.manage'] }
           },

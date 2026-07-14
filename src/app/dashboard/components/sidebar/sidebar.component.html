@@ -10,7 +10,10 @@
   </div>
   <div class="head">
     <div class="user-img">
-      <i class="fa-solid fa-user"></i>
+      <img *ngIf="logoUrl; else defaultIcon" [src]="logoUrl" alt="Logo de la empresa" (error)="onLogoError()">
+      <ng-template #defaultIcon>
+        <i class="fa-solid fa-hospital"></i>
+      </ng-template>
     </div>
     <div class="user-details">
       <p class="title">{{user.role}}</p>
@@ -68,6 +71,11 @@
           <li *ngIf="canManageSettings()" (click)="handleSettingsSubmenuOnCollapse()">
             <a [routerLink]="['settings/permissions']">
               <span class="text">Permisos</span>
+            </a>
+          </li>
+          <li *ngIf="canManageSettings()" (click)="handleSettingsSubmenuOnCollapse()">
+            <a [routerLink]="['settings/empresa']">
+              <span class="text">Empresa</span>
             </a>
           </li>
         </ul>

@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
@@ -13,6 +13,7 @@ import { ShortPatient } from '../../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../../helpers/visits-form/visits-form-page.helper';
 import { BedRecord, BedModule } from '../../../interface/bed-management.interface';
+import { AttachmentListComponent } from '../../../components/attachments/attachment-list/attachment-list.component';
 
 type StockItemPayload = {
   id: number
@@ -31,6 +32,8 @@ type FormVisitWithStock = FormVisit & {
   styleUrl: './visits-form-page-v2.component.css'
 })
 export class VisitsFormPageV2Component implements OnInit {
+  @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
+
   public title = ''
   public subtitle = ''
   public caller = ''
@@ -59,30 +62,30 @@ export class VisitsFormPageV2Component implements OnInit {
     patient     : ['', [Validators.required]],
     doctor      : ['', [Validators.required]],
     date        : ['', [Validators.required]],
-    notes       : ['', []],
+    notes       : ['', [Validators.required]],
     pressure    : ['', [Validators.required, pressureValidator()]],
     oxygenation : ['', [Validators.required]],
     temperature : ['', [Validators.required]],
     glucometry  : ['', [Validators.required]],
-    weight      : ['', [Validators.required]],
-    height      : ['', [Validators.required]],
+    weight      : [''],
+    height      : [''],
     BMI         : [''],
     fatPercentage: [''],
     visceralFat : [''],
     ageAccordingToWeight: [''],
     diagnosis   : ['', [Validators.required]],
     treatment   : ['', [Validators.required]],
-    pathologicalHst: [''],
-    familyHst   : [''],
-    surgicalHst : [''],
-    backgroundHst: [''],
+    pathologicalHst: ['', [Validators.required]],
+    familyHst   : ['', [Validators.required]],
+    surgicalHst : ['', [Validators.required]],
+    backgroundHst: ['', [Validators.required]],
     expediente  : this.fb.group({
       standard: this.fb.group({
         chiefComplaint: ['', [Validators.required]],
         currentIllness: ['', [Validators.required]],
         physicalExam: ['', [Validators.required]],
-        allergies: [''],
-        currentMeds: [''],
+        allergies: ['', [Validators.required]],
+        currentMeds: ['', [Validators.required]],
       }),
       module: this.fb.group({
         followUpPlan: [''],
@@ -110,7 +113,7 @@ export class VisitsFormPageV2Component implements OnInit {
         dischargeDate: [''],
       })
     }),
-    stockItems  : this.fb.array([])
+    stockItems  : this.fb.array([], [Validators.required])
   })
 
   public doctorSearchControl = new FormControl()
@@ -508,19 +511,34 @@ export class VisitsFormPageV2Component implements OnInit {
     
     this.visitsService.createVisit( payload, this.origin )
       .subscribe({
-        next: ( visit ) => {
-          if( visit ) {
+        next: ( visitId ) => {
+          this.uploadPendingAttachments(Number(payload.patient), visitId, () => {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
                 this.clearDraft()
                 this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
-          }
+          })
         },
         error: ( message ) => {
           Swal.fire('Error', message, 'error')
         }
       })
+  }
+
+  private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {
+    const list = this.attachmentList
+    if (!list || !list.hasQueuedFiles || !patientId) {
+      done()
+      return
+    }
+    list.uploadQueued(patientId, recordId).subscribe({
+      next: () => done(),
+      error: (message: string) => {
+        Swal.fire('Advertencia', `La visita se guardó, pero algunos archivos no se pudieron adjuntar: ${message}`, 'warning')
+          .then(() => done())
+      }
+    })
   }
 
   public handleSelectedVisit( id: number ) {
@@ -574,8 +592,9 @@ export class VisitsFormPageV2Component implements OnInit {
                 })
               }
             })
+            this.loadDataOfStockArray()
           }
-          
+
         },
         error: ( err ) => {
           Swal.fire('Error', err, 'error')
@@ -653,6 +672,7 @@ export class VisitsFormPageV2Component implements OnInit {
     const { target } = event
     const value = target.value
     const stockItems = this.listOfStockItems() ?? []
+    this.stockItemsArray.markAsTouched()
     if (this.selectedStockItems.length === 0){
       const existingItem = stockItems.find((item: any) => item.id === parseInt(value));
       if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
@@ -670,6 +690,7 @@ export class VisitsFormPageV2Component implements OnInit {
   public removeListItem(id: number, idx: number) {
     this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== +id)
     this.stockItemsArray.removeAt(idx)
+    this.stockItemsArray.markAsTouched()
     this.loadDataOfStockArray()
   }
 

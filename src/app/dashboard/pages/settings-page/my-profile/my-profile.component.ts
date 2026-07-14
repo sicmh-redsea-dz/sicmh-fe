@@ -28,7 +28,6 @@ export class MyProfileComponent implements OnInit {
     theme: ['light']
   })
 
-  public userImageUrl: string | null = null
   public saving = false
   public rolesLabel = ''
 
@@ -38,19 +37,6 @@ export class MyProfileComponent implements OnInit {
       this.rolesLabel = current.roles?.[0] ?? ''
     }
     this.loadProfile()
-  }
-
-  onAvatarChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.userImageUrl = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
   }
 
   saveProfile(): void {
@@ -67,8 +53,7 @@ export class MyProfileComponent implements OnInit {
         identification: this.profileForm.get('identification')?.value || '',
         department: this.profileForm.get('department')?.value || '',
         position: this.profileForm.get('position')?.value || '',
-        theme: this.profileForm.get('theme')?.value || 'light',
-        avatarDataUrl: this.userImageUrl || undefined
+        theme: this.profileForm.get('theme')?.value || 'light'
       } as UserProfile
     }
 
@@ -122,9 +107,6 @@ export class MyProfileComponent implements OnInit {
             position: user.profile?.position || '',
             theme: user.profile?.theme || 'light'
           })
-          if (user.profile?.avatarDataUrl) {
-            this.userImageUrl = user.profile.avatarDataUrl
-          }
           if (user.profile?.theme) {
             this.themeService.syncWithPreference(user.profile.theme)
           }

@@ -2,12 +2,9 @@
   <ng-container *ngIf="patient; else empty">
     <div class="patient-header">
       <div class="avatar">
-        <img *ngIf="imageUrl; else placeholder" [src]="imageUrl" alt="Foto del paciente">
-        <ng-template #placeholder>
-          <div class="avatar-fallback">
-            <i class="ph ph-user"></i>
-          </div>
-        </ng-template>
+        <div class="avatar-fallback">
+          <i class="ph ph-user"></i>
+        </div>
       </div>
       <div class="patient-meta">
         <h3>{{ patient.name }} {{ patient.lastName }}</h3>
@@ -37,6 +34,8 @@
         <span>{{ patient.birthDate | formatDate }}</span>
       </div>
     </div>
+
+    <app-attachment-list [readOnly]="true" [patientId]="patientId()"></app-attachment-list>
 
     <button class="edit-link" type="button" (click)="goToEdit()">
       Ir a editar

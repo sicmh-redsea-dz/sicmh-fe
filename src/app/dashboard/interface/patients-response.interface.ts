@@ -39,6 +39,5 @@ export interface FormPatient {
   gender    : string
   phone     : string
   email     : string
-  image     : string
   notes     : string
 }

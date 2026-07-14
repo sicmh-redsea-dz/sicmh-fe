@@ -1,0 +1,168 @@
+.empresa-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.page-header p {
+  margin: 0.25rem 0 0;
+  color: #667085;
+  font-size: 0.9rem;
+}
+
+.tenant-pill {
+  background: #eef2ff;
+  color: #3538cd;
+  border-radius: 999px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.card-header .title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-header .title i {
+  font-size: 1.4rem;
+  color: #3538cd;
+}
+
+.card-header h3 {
+  margin: 0;
+}
+
+.card-header span {
+  color: #667085;
+  font-size: 0.85rem;
+}
+
+.logo-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.logo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-preview img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px;
+}
+
+.logo-preview small {
+  color: #b54708;
+  font-size: 0.75rem;
+}
+
+.logo-placeholder {
+  width: 140px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px dashed #d0d5dd;
+  border-radius: 12px;
+  color: #98a2b3;
+  font-size: 0.8rem;
+}
+
+.logo-placeholder i {
+  font-size: 2rem;
+}
+
+.logo-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  background: #fff;
+  user-select: none;
+}
+
+.upload-btn:hover {
+  background: #f9fafb;
+}
+
+.upload-btn.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.save-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  background: #14b8a6;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #475467;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.hint {
+  color: #98a2b3;
+  font-size: 0.75rem;
+  max-width: 320px;
+}

@@ -102,18 +102,30 @@ export class StaffManagementComponent implements OnInit {
   public changePassword(user: SettingsUser) {
     Swal.fire({
       title: 'Cambiar contraseña',
-      html: `Nueva contraseña para <strong>${user.name}</strong>`,
-      input: 'password',
-      inputPlaceholder: 'Nueva contraseña (mín. 6 caracteres)',
-      inputAttributes: { autocomplete: 'new-password' },
+      html: `
+        <p>Nueva contraseña para <strong>${user.name}</strong></p>
+        <input id="swal-new-password" type="password" class="swal2-input"
+          placeholder="Nueva contraseña (mín. 6 caracteres)" autocomplete="new-password">
+        <input id="swal-confirm-password" type="password" class="swal2-input"
+          placeholder="Confirmar contraseña" autocomplete="new-password">
+      `,
       showCancelButton: true,
       confirmButtonText: 'Guardar',
       cancelButtonText: 'Cancelar',
-      preConfirm: (value: string) => {
-        if (!value || value.length < 6) {
+      focusConfirm: false,
+      preConfirm: () => {
+        const popup = Swal.getPopup()!
+        const password = (popup.querySelector('#swal-new-password') as HTMLInputElement).value
+        const confirmation = (popup.querySelector('#swal-confirm-password') as HTMLInputElement).value
+        if (!password || password.length < 6) {
           Swal.showValidationMessage('La contraseña debe tener al menos 6 caracteres.')
+          return
         }
-        return value
+        if (password !== confirmation) {
+          Swal.showValidationMessage('Las contraseñas no coinciden.')
+          return
+        }
+        return password
       }
     }).then((result) => {
       if (!result.isConfirmed || !result.value) return

@@ -15,10 +15,11 @@
         autocomplete="off"
         [formGroup]="visitForm"
         (ngSubmit)="onHandleSubmit()">
+    <p class="form-legend">Los campos marcados con <span>*</span> son obligatorios.</p>
 
     <div class="input-row">
       <div class="input-group date-group">
-        <label>Date</label>
+        <label class="required">Date</label>
         <input type="date" 
               formControlName="date"/>
         <small class="error-text" *ngIf="visitForm.get('date')?.touched && visitForm.get('date')?.hasError('required')">
@@ -27,7 +28,7 @@
       </div>
 
       <div class="input-group" style="position: relative;">
-        <label>Doctor</label>
+        <label class="required">Doctor</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
@@ -50,7 +51,7 @@
       </div>
 
       <div class="input-group" style="position: relative;">
-        <label>Paciente</label>
+        <label class="required">Paciente</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
@@ -81,7 +82,7 @@
       <div formGroupName="standard">
         <div class="textareas-row">
           <div class="textarea-group">
-            <label>Motivo de consulta/ingreso</label>
+            <label class="required">Motivo de consulta/ingreso</label>
             <textarea 
               formControlName="chiefComplaint"
               placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
@@ -91,7 +92,7 @@
           </div>
 
           <div class="textarea-group">
-            <label>Padecimiento actual</label>
+            <label class="required">Padecimiento actual</label>
             <textarea 
               formControlName="currentIllness"
               placeholder="Resume el padecimiento actual del paciente."></textarea>
@@ -102,7 +103,7 @@
         </div>
 
         <div class="textarea-full">
-          <label>Exploración física</label>
+          <label class="required">Exploración física</label>
           <textarea 
             formControlName="physicalExam"
             placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
@@ -113,17 +114,23 @@
 
         <div class="textareas-row">
           <div class="textarea-group">
-            <label>Alergias</label>
-            <textarea 
+            <label class="required">Alergias</label>
+            <textarea
               formControlName="allergies"
               placeholder="Alergias conocidas del paciente."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.allergies')?.touched && visitForm.get('expediente.standard.allergies')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
           </div>
 
           <div class="textarea-group">
-            <label>Medicamentos actuales</label>
-            <textarea 
+            <label class="required">Medicamentos actuales</label>
+            <textarea
               formControlName="currentMeds"
               placeholder="Medicamentos que consume actualmente."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentMeds')?.touched && visitForm.get('expediente.standard.currentMeds')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
           </div>
         </div>
       </div>
@@ -137,7 +144,7 @@
       <!-- Columna izquierda (75%) -->
       <div class="left-column">
         <div class="number-input-group">
-          <label>Presion</label>
+          <label class="required">Presion</label>
           <div class="number-input">
             <input type="text"
                   formControlName="pressure"
@@ -151,7 +158,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label>Temperatura</label>
+          <label class="required">Temperatura</label>
           <div class="number-input">
             <input type="number"
                   formControlName="temperature"
@@ -179,12 +186,9 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('height')?.touched && visitForm.get('height')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
         <div class="number-input-group">
-          <label>Glucometria</label>
+          <label class="required">Glucometria</label>
           <div class="number-input">
             <input type="number"
                   formControlName="glucometry"
@@ -200,7 +204,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label>Oxigenacion</label>
+          <label class="required">Oxigenacion</label>
           <div class="number-input">
             <input type="number"
                   formControlName="oxygenation"
@@ -228,9 +232,6 @@
               </select>
             </div>
           </div>
-          <small class="error-text" *ngIf="visitForm.get('weight')?.touched && visitForm.get('weight')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
       </div>
 
@@ -243,9 +244,6 @@
                 type="text" 
                 formControlName="BMI"
                 placeholder="Ej. 22.86"/>
-          <small class="error-text" *ngIf="visitForm.get('BMI')?.touched && visitForm.get('BMI')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
 
         <div class="calculated-input-group">
@@ -254,9 +252,6 @@
                 type="text" 
                 formControlName="fatPercentage"
                 placeholder="Ej. 25.8%"/>
-          <small class="error-text" *ngIf="visitForm.get('fatPercentage')?.touched && visitForm.get('fatPercentage')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
 
         <div class="calculated-input-group">
@@ -265,9 +260,6 @@
                 type="text" 
                 formControlName="visceralFat"
                 placeholder="Ej. 1.07"/>
-          <small class="error-text" *ngIf="visitForm.get('visceralFat')?.touched && visitForm.get('visceralFat')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
 
         <div class="calculated-input-group">
@@ -276,9 +268,6 @@
                 type="text" 
                 formControlName="ageAccordingToWeight"
                 placeholder="Ej. 32"/>
-          <small class="error-text" *ngIf="visitForm.get('ageAccordingToWeight')?.touched && visitForm.get('ageAccordingToWeight')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
       </div>
     </div>
@@ -289,33 +278,45 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Patologicos</label>
-        <textarea 
+        <label class="required">Patologicos</label>
+        <textarea
           formControlName="pathologicalHst"
           placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('pathologicalHst')?.touched && visitForm.get('pathologicalHst')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
       </div>
 
       <div class="textarea-group">
-        <label>Familiares</label>
-        <textarea 
+        <label class="required">Familiares</label>
+        <textarea
           formControlName="familyHst"
           placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('familyHst')?.touched && visitForm.get('familyHst')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
       </div>
     </div>
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Quirurgicos</label>
-        <textarea 
+        <label class="required">Quirurgicos</label>
+        <textarea
           formControlName="surgicalHst"
           placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('surgicalHst')?.touched && visitForm.get('surgicalHst')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
       </div>
 
       <div class="textarea-group">
-        <label>Habitos</label>
-        <textarea 
+        <label class="required">Habitos</label>
+        <textarea
           formControlName="backgroundHst"
           placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
+        <small class="error-text" *ngIf="visitForm.get('backgroundHst')?.touched && visitForm.get('backgroundHst')?.hasError('required')">
+          Este campo es obligatorio.
+        </small>
       </div>
     </div>
 
@@ -325,7 +326,7 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label>Diagnostico</label>
+        <label class="required">Diagnostico</label>
         <textarea formControlName="diagnosis"
                   placeholder="Escribe aquí el diagnóstico detallado del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('diagnosis')?.touched && visitForm.get('diagnosis')?.hasError('required')">
@@ -334,7 +335,7 @@
       </div>
     
       <div class="textarea-group">
-        <label>Tratamiento</label>
+        <label class="required">Tratamiento</label>
         <textarea formControlName="treatment"
                   placeholder="Describe el plan de tratamiento y medicamentos recomendados."></textarea>
         <small class="error-text" *ngIf="visitForm.get('treatment')?.touched && visitForm.get('treatment')?.hasError('required')">
@@ -356,18 +357,31 @@
 
       <div formGroupName="module" class="textareas-row">
         <div class="textarea-group">
-          <label>Plan de seguimiento</label>
+          <label class="required">Plan de seguimiento</label>
           <textarea formControlName="followUpPlan"
                     placeholder="Describe el plan de seguimiento."></textarea>
+          <small class="error-text" *ngIf="visitForm.get('expediente.module.followUpPlan')?.touched && visitForm.get('expediente.module.followUpPlan')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
 
         <div class="textarea-group">
-          <label>Referencias/Interconsultas</label>
+          <label class="required">Referencias/Interconsultas</label>
           <textarea formControlName="referrals"
                     placeholder="Referencias o interconsultas sugeridas."></textarea>
+          <small class="error-text" *ngIf="visitForm.get('expediente.module.referrals')?.touched && visitForm.get('expediente.module.referrals')?.hasError('required')">
+            Este campo es obligatorio.
+          </small>
         </div>
       </div>
     </div>
+
+    <app-attachment-list
+      #attachmentList
+      [deferred]="caller === 'nv'"
+      [recordId]="caller === 'nv' ? null : selectedVisit()?.id ?? null"
+      [patientId]="caller === 'nv' ? null : selectedVisit()?.patientId"
+    ></app-attachment-list>
 
     <div class="form-actions">
       <button class="submit-btn" [disabled]="visitForm.invalid" type="submit">

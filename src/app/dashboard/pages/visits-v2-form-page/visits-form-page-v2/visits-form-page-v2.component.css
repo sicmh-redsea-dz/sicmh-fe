@@ -92,6 +92,8 @@
 }
 
 .input-group label.required::after,
+.number-input-group label.required::after,
+.form-group label.required::after,
 .textarea-group label.required::after,
 .textarea-full label.required::after {
   content: ' *';

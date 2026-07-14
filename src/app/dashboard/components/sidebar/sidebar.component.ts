@@ -2,6 +2,7 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { SidebarItem, sidebarItems } from '../../helpers/sidebar-items/sidebar-items.helper';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Permission } from '../../../auth/permissions/permissions';
+import { AttachmentsService } from '../../services/attachments-service/attachments.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -34,9 +35,11 @@ export class SidebarComponent {
     })
     .filter((item): item is SidebarItem => item !== null)
  })
+ private attachmentsService = inject( AttachmentsService )
  public toggledStates:boolean[] = []
  public toggledSidebar:boolean = false
  public settingsOpen:boolean = false
+ public logoFailed = false
  private userSignal = computed(() => this.authService.currentUser())
 
   constructor(){
@@ -51,6 +54,16 @@ export class SidebarComponent {
       name: this.userSignal()?.name,
       role: this.userSignal()?.roles?.[0] ?? ''
     }
+  }
+
+  public get logoUrl(): string | null {
+    const tenantCode = localStorage.getItem('codigoEmpresa')
+    if (!tenantCode || this.logoFailed) return null
+    return this.attachmentsService.logoUrl(tenantCode)
+  }
+
+  public onLogoError() {
+    this.logoFailed = true
   }
 
   

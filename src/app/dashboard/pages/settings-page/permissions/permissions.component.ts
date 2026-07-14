@@ -82,6 +82,14 @@ export class PermissionsComponent implements OnInit {
       ]
     },
     {
+      label: 'Archivos adjuntos',
+      items: [
+        { key: 'attachments.read', label: 'Ver adjuntos', description: 'Ver y descargar archivos del expediente.' },
+        { key: 'attachments.create', label: 'Adjuntar archivos', description: 'Subir archivos al expediente del paciente.' },
+        { key: 'attachments.delete', label: 'Eliminar adjuntos', description: 'Eliminar archivos del expediente.' }
+      ]
+    },
+    {
       label: 'Configuraciones',
       items: [
         { key: 'settings.permissions.manage', label: 'Administrar permisos', description: 'Gestionar roles y accesos.' }

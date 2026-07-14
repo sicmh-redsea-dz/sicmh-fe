@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
   baseUrl: 'http://localhost:3000',
+  publicAssetsBaseUrl: 'https://storage.googleapis.com/nubsmart-medit-public',
   firebaseConfig: {
     apiKey: "AIzaSyDKG7fmZ-xSS6nHaT_8FxIv8jCPRWZjVcE",
     authDomain: "sampleapp-d2514.firebaseapp.com",

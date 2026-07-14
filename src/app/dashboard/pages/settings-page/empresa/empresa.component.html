@@ -1,0 +1,68 @@
+<div class="empresa-page">
+  <div class="page-header">
+    <div>
+      <h2>Empresa</h2>
+      <p>Configura la identidad de tu empresa dentro del sistema.</p>
+    </div>
+    <span class="tenant-pill" *ngIf="tenantCode">{{ tenantCode }}</span>
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <div class="title">
+        <i class="ph-bold ph-buildings"></i>
+        <div>
+          <h3>Logo de la empresa</h3>
+          <span>Se muestra en el panel lateral. Visible públicamente.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="logo-body">
+      <div class="logo-preview">
+        <ng-container *ngIf="pendingPreviewUrl; else currentLogo">
+          <img [src]="pendingPreviewUrl" alt="Nuevo logo (vista previa)">
+          <small>Vista previa — aún no guardado</small>
+        </ng-container>
+        <ng-template #currentLogo>
+          <img
+            *ngIf="currentLogoUrl && !currentLogoFailed; else noLogo"
+            [src]="currentLogoUrl"
+            alt="Logo actual"
+            (error)="onLogoError()"
+          >
+          <ng-template #noLogo>
+            <div class="logo-placeholder">
+              <i class="ph ph-image"></i>
+              <span>Aún no hay logo</span>
+            </div>
+          </ng-template>
+        </ng-template>
+      </div>
+
+      <div class="logo-actions">
+        <label class="upload-btn" [class.disabled]="saving">
+          <i class="ph ph-upload-simple"></i>
+          {{ selectedFile ? 'Elegir otra imagen' : 'Elegir imagen' }}
+          <input
+            type="file"
+            hidden
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileSelected($event)"
+          >
+        </label>
+
+        <ng-container *ngIf="selectedFile">
+          <button class="save-btn" type="button" (click)="save()" [disabled]="saving">
+            {{ saving ? 'Guardando...' : 'Guardar logo' }}
+          </button>
+          <button class="cancel-btn" type="button" (click)="cancelSelection()" [disabled]="saving">
+            Cancelar
+          </button>
+        </ng-container>
+
+        <small class="hint">Formato JPEG/PNG/WebP, máx. 5MB. Se convierte a PNG y se redimensiona automáticamente.</small>
+      </div>
+    </div>
+  </section>
+</div>

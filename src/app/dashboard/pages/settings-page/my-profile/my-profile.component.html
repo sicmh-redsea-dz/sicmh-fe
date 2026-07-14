@@ -23,18 +23,6 @@
       </div>
 
       <div class="profile-body">
-        <div class="avatar-block">
-          <label class="avatar-hover-wrapper" for="avatarUpload">
-            <div class="avatar" *ngIf="!userImageUrl">
-              <i class="ph-bold ph-user"></i>
-            </div>
-            <img *ngIf="userImageUrl" [src]="userImageUrl" alt="avatar" class="avatar-img">
-            <div class="avatar-overlay">Cambiar foto</div>
-          </label>
-          <input type="file" id="avatarUpload" (change)="onAvatarChange($event)" hidden />
-          <small>Formato PNG/JPG. Máx. 2MB.</small>
-        </div>
-
         <form class="form-grid" [formGroup]="profileForm">
           <div class="form-group">
             <label>Nombre completo</label>
