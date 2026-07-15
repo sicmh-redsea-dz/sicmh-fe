@@ -133,6 +133,7 @@ export class VisitsFormPageV2Component implements OnInit {
   public isDocLoading: boolean = false
   public isPatLoading: boolean = false
   public isBedLoading: boolean = false
+  public isSaving: boolean = false
 
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
@@ -487,6 +488,7 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public onHandleSubmit() {
+    if (this.isSaving) return
     if (this.visitForm.invalid) {
       this.visitForm.markAllAsTouched()
       return
@@ -508,7 +510,8 @@ export class VisitsFormPageV2Component implements OnInit {
         })) ?? []
       }
       : visit
-    
+
+    this.isSaving = true
     this.visitsService.createVisit( payload, this.origin )
       .subscribe({
         next: ( visitId ) => {
@@ -521,6 +524,7 @@ export class VisitsFormPageV2Component implements OnInit {
           })
         },
         error: ( message ) => {
+          this.isSaving = false
           Swal.fire('Error', message, 'error')
         }
       })
@@ -614,6 +618,7 @@ export class VisitsFormPageV2Component implements OnInit {
       }
       : visit
     const payloadWithOrigin = { ...payload, origin: this.origin }
+    this.isSaving = true
     this.visitsService.editVisit(this.selectedVisit()?.id!, payloadWithOrigin )
       .subscribe({
         next: ( visit ) => {
@@ -623,9 +628,12 @@ export class VisitsFormPageV2Component implements OnInit {
                 this.clearDraft()
                 this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
               })
+          } else {
+            this.isSaving = false
           }
         },
         error: ( message ) => {
+          this.isSaving = false
           Swal.fire('Error', message, 'error')
         }
       })

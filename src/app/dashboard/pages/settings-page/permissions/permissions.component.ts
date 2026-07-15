@@ -54,7 +54,8 @@ export class PermissionsComponent implements OnInit {
         { key: 'visits.read', label: 'Ver atenciones', description: 'Acceso a consultas y reportes.' },
         { key: 'visits.create', label: 'Registrar atención', description: 'Crear consultas o emergencias.' },
         { key: 'visits.update', label: 'Editar atención', description: 'Actualizar visitas y formularios.' },
-        { key: 'visits.delete', label: 'Eliminar atención', description: 'Anular atenciones.' }
+        { key: 'visits.delete', label: 'Eliminar atención', description: 'Anular atenciones.' },
+        { key: 'visits.inventory.manage', label: 'Insumos en consulta externa', description: 'Agregar inventario y facturarlo desde la consulta externa.' }
       ]
     },
     {

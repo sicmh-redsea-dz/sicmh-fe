@@ -491,3 +491,91 @@ select.ng-invalid.ng-touched {
   0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
   100% { transform: translateY(-50%) rotate(360deg); }
 }
+
+/* Inventario (visits.inventory.manage) — styles ported from visits-form-page-v2 */
+.inventory-block {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.inventory-block .form-group {
+  width: 100%;
+  max-width: 640px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 75%;
+}
+
+.form-group label {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-gray);
+}
+
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.form-group select:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 5px rgba(131, 131, 222, 0.5);
+  background-color: #fff;
+}
+
+.list {
+  max-height: 90px;
+  overflow-y: auto;
+  margin-bottom: .5rem;
+}
+
+.list li {
+  margin: 0 .5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list li::marker {
+  color: var(--color-gray)
+}
+
+.list li span {
+  font-size: 12px;
+  color: var(--secondary-color);
+}
+
+.list li .icon {
+  margin-left: .5rem;
+  font-size: 10px;
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.list li .icon.arrow {
+  margin: 0 .5rem;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.list li .icon.arrow:hover {
+  transform: scale(1.2);
+  color: var(--hover-color);
+}
+
+.list li .icon:hover {
+  color: #c82333;
+}

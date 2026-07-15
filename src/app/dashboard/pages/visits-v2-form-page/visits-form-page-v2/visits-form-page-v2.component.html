@@ -627,9 +627,10 @@
 
     <div class="form-actions">
       <button class="submit-btn"
-              [disabled]="visitForm.invalid"
+              [disabled]="visitForm.invalid || isSaving"
               type="submit">
-        {{actionButtonText}}
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="isSaving"></i>
+        {{ isSaving ? 'Guardando...' : actionButtonText }}
       </button>
       <button 
         class="secondary-btn"

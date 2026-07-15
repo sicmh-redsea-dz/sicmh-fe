@@ -1,17 +1,24 @@
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
-import { Staff } from '../../interface/visits-service.interface';
+import { Staff, Stock } from '../../interface/visits-service.interface';
 import { ShortPatient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../helpers/visits-form/visits-form-page.helper';
 import { AttachmentListComponent } from '../../components/attachments/attachment-list/attachment-list.component';
+import { AuthService } from '../../../auth/services/auth.service';
+
+type FormVisitWithStock = FormVisit & {
+  stockItems?: { id: number; qty: number }[]
+}
+
+const CONSULTA_SUBINVENTORY_ID = 1
 
 @Component({
   selector: 'app-visits-form-page',
@@ -30,8 +37,15 @@ export class VisitsFormPageComponent implements OnInit {
   public visitsService = inject( VisitsService )
   private route = inject( ActivatedRoute )
   private destroyRef = inject( DestroyRef )
+  private authService = inject( AuthService )
 
   public selectedVisit = computed(() => this.visitsService.selectedVisit())
+  public listOfStockItems = computed(() => this.visitsService.listOfStockItems())
+  public canManageInventory = computed(() =>
+    this.authService.hasPermission('visits.inventory.manage')
+  )
+  public selectedStockItems: Stock[] = []
+  public isSaving: boolean = false
 
   public visitForm: FormGroup = this.fb.group({
     ageAccordingToWeight: [''],
@@ -66,7 +80,8 @@ export class VisitsFormPageComponent implements OnInit {
         followUpPlan: ['', [Validators.required]],
         referrals: ['', [Validators.required]],
       })
-    })
+    }),
+    stockItems    : this.fb.array([])
   })
 
   public doctorSearchControl = new FormControl(this.caller !== 'nv' ? String(this.selectedVisit()?.docName) : '')
@@ -85,6 +100,15 @@ export class VisitsFormPageComponent implements OnInit {
   public showPatDropdown: boolean = false
 
   ngOnInit(): void {
+    if ( this.canManageInventory() ) {
+      this.visitsService.searchStockItems( CONSULTA_SUBINVENTORY_ID )
+        .subscribe({
+          error: ( err ) => {
+            console.error('Error calling stock items', err)
+          }
+        })
+    }
+
     this.doctorSearchControl.valueChanges.pipe(
       debounceTime( 600 ),
       distinctUntilChanged(),
@@ -163,6 +187,8 @@ export class VisitsFormPageComponent implements OnInit {
           this.visitForm.reset();
           this.doctorSearchControl.reset();
           this.patientSearchControl.reset();
+          this.selectedStockItems = []
+          this.stockItemsArray.clear()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
         } else {
           this.caller = 'ev'
@@ -208,22 +234,82 @@ export class VisitsFormPageComponent implements OnInit {
     setTimeout(() => this.showPatDropdown = false, 200)
   }
 
+  get stockItemsArray(): FormArray {
+    return this.visitForm.get('stockItems') as FormArray
+  }
+
   public get idTag() : string {
     return `# ${this.selectedVisit()?.id}`
   }
 
+  public incrementQuantity(index: number) {
+    const item = this.selectedStockItems[index];
+    if (item.currentQuantity < item.productQuantity) {
+      item.currentQuantity += 1
+      this.loadDataOfStockArray()
+    }
+  }
+
+  public decrementQuantity(index: number) {
+    const item = this.selectedStockItems[index];
+    if (item.currentQuantity > 1) {
+      item.currentQuantity -= 1
+      this.loadDataOfStockArray()
+    }
+  }
+
+  public handleChange(event: any) {
+    const { target } = event
+    const value = target.value
+    const stockItems = this.listOfStockItems() ?? []
+    this.stockItemsArray.markAsTouched()
+    if (this.selectedStockItems.length === 0){
+      const existingItem = stockItems.find((item: any) => item.id === parseInt(value));
+      if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
+    }
+    else {
+      const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
+      if (!existingItem) {
+        const matched = stockItems.find((item: any) => item.id === parseInt(value))
+        if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
+      }
+    }
+    this.loadDataOfStockArray()
+  }
+
+  public removeListItem(id: number, idx: number) {
+    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== +id)
+    this.stockItemsArray.removeAt(idx)
+    this.stockItemsArray.markAsTouched()
+    this.loadDataOfStockArray()
+  }
+
+  private loadDataOfStockArray() {
+    this.stockItemsArray.clear()
+    this.selectedStockItems.forEach((item) => {
+      this.stockItemsArray.push(
+        this.fb.control(
+          {id: item.id, qty: item.currentQuantity},
+          [Validators.required]
+        )
+      )
+    })
+  }
+
   public onHandleSubmit() {
+    if (this.isSaving) return
     if (this.visitForm.invalid) {
       this.visitForm.markAllAsTouched()
       return
     }
-    const visit = this.visitForm.value
+    const visit = this.visitForm.value as FormVisitWithStock
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )
     : this.handleEditVisit( visit )
   }
 
-  public handleCreateVisit(visit: FormVisit) {
+  public handleCreateVisit(visit: FormVisitWithStock) {
+    this.isSaving = true
     this.visitsService.createVisit( visit, 'visits' )
       .subscribe({
         next: ( visitId ) => {
@@ -235,6 +321,7 @@ export class VisitsFormPageComponent implements OnInit {
           })
         },
         error: ( message ) => {
+          this.isSaving = false
           Swal.fire('Error', message, 'error')
         }
       })
@@ -290,6 +377,25 @@ export class VisitsFormPageComponent implements OnInit {
           }
 
           this.initializeAutocompleteValues()
+
+          if ( this.canManageInventory() ) {
+            this.selectedStockItems = []
+            this.stockItemsArray.clear()
+
+            if ( visit.usedInventory?.length > 0 ) {
+              const stockItems = this.listOfStockItems() ?? []
+              visit.usedInventory.forEach(( uv ) => {
+                const matched = stockItems.find( i => i.id === uv.stockId )
+                if ( matched ) {
+                  this.selectedStockItems.push({
+                    ...matched,
+                    currentQuantity: uv.stockQty
+                  })
+                }
+              })
+              this.loadDataOfStockArray()
+            }
+          }
         },
         error: ( err ) => {
           Swal.fire('Error', err, 'error')
@@ -297,9 +403,10 @@ export class VisitsFormPageComponent implements OnInit {
       })
   }
 
-  public handleEditVisit( visit: FormVisit ) {
+  public handleEditVisit( visit: FormVisitWithStock ) {
     visit.date =  visit.date.split('T')[0]
     const payload = { ...visit, origin: 'visits' }
+    this.isSaving = true
     this.visitsService.editVisit(this.selectedVisit()?.id!, payload )
       .subscribe({
         next: ( visit ) => {
@@ -308,9 +415,12 @@ export class VisitsFormPageComponent implements OnInit {
               .then(() => {
                 this.router.navigateByUrl('/dashboard/visits')
               })
+          } else {
+            this.isSaving = false
           }
         },
         error: ( message ) => {
+          this.isSaving = false
           Swal.fire('Error', message, 'error')
         }
       })
