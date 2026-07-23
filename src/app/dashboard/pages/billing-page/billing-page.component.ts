@@ -5,18 +5,12 @@ import { DrawerService } from '../../services/drawer-service/drawer.service'
 import { DrawerContents } from '../../interface/drawer-content.enum'
 import { InvoicesService } from '../../services/invoices-services/invoices.service'
 import { BillingService } from '../../services/billing-service/billing.service'
-import { BillingLedgerItem, BillingMovement, BillingReport, BillingSummary } from '../../interface/billing.interface'
+import { BillingLedgerItem, BillingPatientSummary, BillingReport, BillingSummary } from '../../interface/billing.interface'
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Invoice } from '../../interface/invoice-response.interface'
 import { AuthService } from '../../../auth/services/auth.service'
 import { formatNewDate } from '../../../shared/utils/date-formatters'
-
-type PatientOption = {
-  id: number
-  name: string
-  idNumber?: string
-}
 
 @Component({
   selector: 'app-billing-page',
@@ -61,17 +55,14 @@ export class BillingPageComponent {
   public bodyContent: Invoice[] = []
   public reportSummary: BillingSummary | null = null
   public reportLedger: BillingLedgerItem[] = []
-  public reportMovements: BillingMovement[] = []
-  public filteredMovements: BillingMovement[] = []
-  public movementSearch = ''
+  public selectedPatientId: number | null = null
+  public patientSearch = ''
   public reportFilters = {
     from: '',
     to: '',
-    patientIds: [] as number[],
     station: 'all',
     status: 'all'
   }
-  public patientsOptions: PatientOption[] = []
   public stationOptions = [
     { key: 'consulta', label: 'Consulta' },
     { key: 'emergencia', label: 'Emergencia' },
@@ -83,7 +74,6 @@ export class BillingPageComponent {
     { key: 'pendiente', label: 'Pendiente' }
   ]
   private searchTermSubject = new Subject<string>()
-  private movementSearchSubject = new Subject<string>()
   private destroyRef = inject(DestroyRef)
   public billingView: 'facturas' | 'reportes' = 'facturas'
 
@@ -93,6 +83,24 @@ export class BillingPageComponent {
 
   get isReportesView(): boolean {
     return this.billingView === 'reportes'
+  }
+
+  get displayedLedger(): BillingLedgerItem[] {
+    if (!this.selectedPatientId) return this.reportLedger
+    return this.reportLedger.filter((item) => item.patientId === this.selectedPatientId)
+  }
+
+  get selectedPatientName(): string | null {
+    if (!this.selectedPatientId) return null
+    const patient = this.reportSummary?.byPatient.find((item) => item.patientId === this.selectedPatientId)
+    return patient?.patientName ?? null
+  }
+
+  get filteredPatientSummary(): BillingPatientSummary[] {
+    const list = this.reportSummary?.byPatient ?? []
+    const term = this.patientSearch.trim().toLowerCase()
+    if (!term) return list
+    return list.filter((item) => item.patientName.toLowerCase().includes(term))
   }
 
   constructor() {
@@ -108,14 +116,6 @@ export class BillingPageComponent {
       this.getInvoices( term )
     })
 
-    this.movementSearchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => {
-      this.applyMovementFilter()
-    })
-    
     effect(() => {
       if (this.drawerParams.shouldRefreshInvoices()) {
         this.bodyContent = []
@@ -145,9 +145,16 @@ export class BillingPageComponent {
     this.billingView = view
   }
 
-  public onMovementSearchChange(term: string) {
-    this.movementSearch = term
-    this.movementSearchSubject.next(term)
+  public selectPatientFilter(patientId: number) {
+    this.selectedPatientId = this.selectedPatientId === patientId ? null : patientId
+  }
+
+  public clearPatientFilter() {
+    this.selectedPatientId = null
+  }
+
+  public clearPatientSearch() {
+    this.patientSearch = ''
   }
 
   public onPageChange( page: number ) {
@@ -254,7 +261,6 @@ export class BillingPageComponent {
     this.billingService.downloadReportPdf({
       from,
       to,
-      patientIds: this.reportFilters.patientIds,
       station: this.reportFilters.station,
       status: this.reportFilters.status
     })
@@ -284,14 +290,13 @@ export class BillingPageComponent {
 
   public loadReport() {
     this.reportLoading = true
-    this.loadReportPatients(() => this.fetchReport())
+    this.fetchReport()
   }
 
   private fetchReport() {
     this.billingService.getReport({
       from: this.reportFilters.from,
       to: this.reportFilters.to,
-      patientIds: this.reportFilters.patientIds,
       station: this.reportFilters.station,
       status: this.reportFilters.status
     })
@@ -304,8 +309,8 @@ export class BillingPageComponent {
         next: (report: BillingReport) => {
           this.reportSummary = report.summary
           this.reportLedger = report.ledger
-          this.reportMovements = report.movements
-          this.applyMovementFilter()
+          this.selectedPatientId = null
+          this.patientSearch = ''
         },
         error: (message) => {
           Swal.fire('Error', message, 'error')
@@ -324,7 +329,6 @@ export class BillingPageComponent {
     this.billingService.downloadReportPdf({
       from: this.reportFilters.from,
       to: this.reportFilters.to,
-      patientIds: this.reportFilters.patientIds,
       station: this.reportFilters.station,
       status: this.reportFilters.status
     })
@@ -398,41 +402,11 @@ export class BillingPageComponent {
     return found?.label ?? key
   }
 
-  private loadReportPatients(done?: () => void) {
-    this.billingService.getReport({
-      from: this.reportFilters.from,
-      to: this.reportFilters.to,
-      patientIds: [],
-      station: 'all',
-      status: 'all'
-    })
-      .subscribe({
-        next: (report: BillingReport) => {
-          this.patientsOptions = report.summary.byPatient.map((patient) => ({
-            id: patient.patientId,
-            name: patient.patientName
-          })) ?? []
-          const availableIds = new Set(this.patientsOptions.map((patient) => Number(patient.id)))
-          this.reportFilters.patientIds = this.reportFilters.patientIds
-            .map((id) => Number(id))
-            .filter((id) => availableIds.has(id))
-          done?.()
-        },
-        error: (message) => {
-          console.warn('report patients load error', message)
-          this.patientsOptions = []
-          this.reportFilters.patientIds = []
-          done?.()
-        }
-      })
-  }
-
   private initReportFilters() {
     const today = new Date()
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
     this.reportFilters.from = formatNewDate(firstDay)
     this.reportFilters.to = formatNewDate(today)
-    this.reportFilters.patientIds = []
     this.reportFilters.station = 'all'
     this.reportFilters.status = 'all'
   }
@@ -451,50 +425,4 @@ export class BillingPageComponent {
     return { from: this.reportFilters.from, to: this.reportFilters.to }
   }
 
-  private applyMovementFilter() {
-    const term = this.movementSearch.trim().toLowerCase()
-    if (!term) {
-      this.filteredMovements = [...this.reportMovements]
-      return
-    }
-    this.filteredMovements = this.reportMovements.filter((mv) => {
-      const haystack = [
-        mv.patientName,
-        this.getMovementStationLabel(mv.fromStation),
-        this.getMovementStationLabel(mv.toStation),
-        mv.reason,
-        mv.notes,
-        mv.source
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(term)
-    })
-  }
-
-  public getMovementSourceLabel(source?: string) {
-    const key = (source || '').toLowerCase().trim()
-    const labels: Record<string, string> = {
-      movement: 'Movimiento',
-      manual: 'Manual',
-      inventory: 'Inventario',
-      invoice: 'Factura',
-      visit: 'Visita',
-      system: 'Sistema',
-      auto: 'Sistema'
-    }
-    if (labels[key]) return labels[key]
-    if (!source) return 'Sistema'
-    return source.charAt(0).toUpperCase() + source.slice(1)
-  }
-
-  public getMovementSourceClass(source?: string) {
-    const key = (source || '').toLowerCase()
-    if (key.includes('mov')) return 'movement'
-    if (key.includes('manual')) return 'manual'
-    if (key.includes('invent')) return 'inventory'
-    if (key.includes('fact')) return 'invoice'
-    return 'system'
-  }
 }

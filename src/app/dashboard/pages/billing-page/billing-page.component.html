@@ -98,13 +98,6 @@
         <input type="date" [(ngModel)]="reportFilters.to">
       </div>
       <div class="form-group">
-        <label>Pacientes</label>
-        <select multiple [(ngModel)]="reportFilters.patientIds">
-          <option *ngFor="let p of patientsOptions" [ngValue]="p.id">{{ p.name }}</option>
-        </select>
-        <small class="hint">{{ patientsOptions.length }} pacientes con facturas en el rango.</small>
-      </div>
-      <div class="form-group">
         <label>Estación</label>
         <select [(ngModel)]="reportFilters.station">
           <option value="all">Todas</option>
@@ -126,141 +119,117 @@
     </div>
   </div>
 
-  <div class="summary-panel">
-    <div class="summary-cards">
-      <div class="summary-card">
-        <span>Total facturado</span>
-        <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoiceTotal) }}</strong>
-        <small>{{ reportSummary?.counts?.invoices || 0 }} facturas</small>
-      </div>
-      <div class="summary-card">
-        <span>Pagado</span>
-        <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoicePaid) }}</strong>
-        <small>Facturas cerradas</small>
-      </div>
-      <div class="summary-card">
-        <span>Pendiente</span>
-        <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoicePending) }}</strong>
-        <small>Por cobrar</small>
-      </div>
-      <div class="summary-card">
-        <span>Consumo inventario</span>
-        <strong>L. {{ getSummaryTotal(reportSummary?.totals?.inventoryTotal) }}</strong>
-        <small>Detalle de insumos</small>
-      </div>
-      <div class="summary-card">
-        <span>Cargos manuales</span>
-        <strong>L. {{ getSummaryTotal(reportSummary?.totals?.manualTotal) }}</strong>
-        <small>Servicios adicionales</small>
-      </div>
+  <div class="summary-cards">
+    <div class="summary-card">
+      <span>Total facturado</span>
+      <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoiceTotal) }}</strong>
+      <small>{{ reportSummary?.counts?.invoices || 0 }} facturas</small>
     </div>
-
-    <div class="card summary-table">
-      <div class="panel-header">
-        <h3>Resumen por día</h3>
-        <span class="badge info">{{ reportSummary?.byDay?.length || 0 }} días</span>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Facturas</th>
-              <th>Inventario</th>
-              <th>Manual</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let day of reportSummary?.byDay">
-              <td>{{ day.date }}</td>
-              <td>L. {{ day.invoiceTotal | number:'1.2-2' }}</td>
-              <td>L. {{ day.inventoryTotal | number:'1.2-2' }}</td>
-              <td>L. {{ day.manualTotal | number:'1.2-2' }}</td>
-              <td class="highlight">L. {{ day.total | number:'1.2-2' }}</td>
-            </tr>
-            <tr *ngIf="!reportSummary?.byDay?.length">
-              <td colspan="5">Sin datos para este rango.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="summary-card">
+      <span>Pagado</span>
+      <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoicePaid) }}</strong>
+      <small>Facturas cerradas</small>
     </div>
+    <div class="summary-card">
+      <span>Pendiente</span>
+      <strong>L. {{ getSummaryTotal(reportSummary?.totals?.invoicePending) }}</strong>
+      <small>Por cobrar</small>
+    </div>
+    <div class="summary-card">
+      <span>Consumo inventario</span>
+      <strong>L. {{ getSummaryTotal(reportSummary?.totals?.inventoryTotal) }}</strong>
+      <small>Detalle de insumos</small>
+    </div>
+    <div class="summary-card">
+      <span>Cargos por servicios</span>
+      <strong>L. {{ getSummaryTotal(reportSummary?.totals?.manualTotal) }}</strong>
+      <small>Servicios adicionales</small>
+    </div>
+  </div>
+</section>
 
-    <div class="card summary-table">
-      <div class="panel-header">
-        <h3>Resumen por paciente</h3>
-        <span class="badge info">{{ reportSummary?.byPatient?.length || 0 }} pacientes</span>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Paciente</th>
-              <th>Facturas</th>
-              <th>Inventario</th>
-              <th>Manual</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of reportSummary?.byPatient">
-              <td>{{ item.patientName }}</td>
-              <td>L. {{ item.invoiceTotal | number:'1.2-2' }}</td>
-              <td>L. {{ item.inventoryTotal | number:'1.2-2' }}</td>
-              <td>L. {{ item.manualTotal | number:'1.2-2' }}</td>
-              <td class="highlight">L. {{ item.total | number:'1.2-2' }}</td>
-            </tr>
-            <tr *ngIf="!reportSummary?.byPatient?.length">
-              <td colspan="5">Sin datos para este rango.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<section class="billing-summary-grid" *ngIf="isReportesView">
+  <div class="card summary-table">
+    <div class="panel-header">
+      <h3>Resumen por día</h3>
+      <span class="badge info">{{ reportSummary?.byDay?.length || 0 }} días</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Inventario</th>
+            <th>Servicios</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let day of reportSummary?.byDay">
+            <td>{{ day.date }}</td>
+            <td>L. {{ day.inventoryTotal | number:'1.2-2' }}</td>
+            <td>L. {{ day.manualTotal | number:'1.2-2' }}</td>
+            <td class="highlight">L. {{ day.total | number:'1.2-2' }}</td>
+          </tr>
+          <tr *ngIf="!reportSummary?.byDay?.length">
+            <td colspan="4">Sin datos para este rango.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card summary-table">
+    <div class="panel-header">
+      <h3>Resumen por paciente</h3>
+      <span class="badge info">{{ filteredPatientSummary.length }} pacientes</span>
+    </div>
+    <div class="search-box">
+      <input type="text" [(ngModel)]="patientSearch" placeholder="Buscar paciente...">
+      <button *ngIf="patientSearch" type="button" class="search-clear" (click)="clearPatientSearch()" aria-label="Limpiar búsqueda">✕</button>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Inventario</th>
+            <th>Servicios</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of filteredPatientSummary"
+            class="selectable-row"
+            [class.active]="selectedPatientId === item.patientId"
+            (click)="selectPatientFilter(item.patientId)"
+          >
+            <td>{{ item.patientName }}</td>
+            <td>L. {{ item.inventoryTotal | number:'1.2-2' }}</td>
+            <td>L. {{ item.manualTotal | number:'1.2-2' }}</td>
+            <td class="highlight">L. {{ item.total | number:'1.2-2' }}</td>
+          </tr>
+          <tr *ngIf="!filteredPatientSummary.length">
+            <td colspan="4">Sin datos para este rango.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
 
 <section class="billing-detail-grid" *ngIf="isReportesView">
-  <div class="card movements-panel">
-    <div class="panel-header stacked">
-      <div class="panel-title">
-        <h3>Movimientos de pacientes</h3>
-        <span class="badge info">{{ filteredMovements.length }}</span>
-      </div>
-      <div class="panel-search">
-        <input
-          type="text"
-          [value]="movementSearch"
-          (input)="onMovementSearchChange($any($event.target).value)"
-          placeholder="Buscar por paciente, estación o motivo"
-        >
-      </div>
-    </div>
-    <div class="timeline" *ngIf="filteredMovements.length; else emptyMovements">
-      <div class="timeline-item" *ngFor="let mv of filteredMovements">
-        <div class="timeline-date">{{ mv.occurredAt }}</div>
-        <div class="timeline-body">
-          <div class="timeline-title">{{ mv.patientName }}</div>
-          <div class="timeline-sub">
-            {{ getMovementStationLabel(mv.fromStation) || '—' }} → {{ getMovementStationLabel(mv.toStation) }}
-          </div>
-          <div class="timeline-note" *ngIf="mv.reason">{{ mv.reason }}</div>
-        </div>
-        <span class="badge status" [ngClass]="getMovementSourceClass(mv.source)">
-          {{ getMovementSourceLabel(mv.source) }}
-        </span>
-      </div>
-    </div>
-    <ng-template #emptyMovements>
-      <div class="empty-state">Sin movimientos registrados para este rango.</div>
-    </ng-template>
-  </div>
-
   <div class="card ledger-panel">
     <div class="panel-header">
       <h3>Detalle de cargos</h3>
-      <span class="badge info">{{ reportLedger.length }}</span>
+      <div class="panel-title">
+        <span class="active-filter" *ngIf="selectedPatientId">
+          {{ selectedPatientName }}
+          <button type="button" (click)="clearPatientFilter()" aria-label="Quitar filtro">✕</button>
+        </span>
+        <span class="badge info">{{ displayedLedger.length }}</span>
+      </div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -279,7 +248,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of reportLedger">
+          <tr *ngFor="let item of displayedLedger">
             <td>{{ item.occurredAt }}</td>
             <td>{{ item.patientName }}</td>
             <td>{{ getMovementStationLabel(item.station) }}</td>
@@ -291,7 +260,7 @@
             <td>{{ item.status }}</td>
             <td>{{ item.source }}</td>
           </tr>
-          <tr *ngIf="!reportLedger.length">
+          <tr *ngIf="!displayedLedger.length">
             <td colspan="10">Sin cargos para este rango.</td>
           </tr>
         </tbody>
