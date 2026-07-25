@@ -2,7 +2,6 @@ import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { catchError, map, Observable, throwError } from 'rxjs'
 import { environment } from '../../../../environments/environment'
-import { AuthHeadersService } from '../../../core/http/auth-headers.service'
 import { formatApiError } from '../../../shared/utils/api-error'
 import { BillingInvoiceSnapshot, BillingReport } from '../../interface/billing.interface'
 
@@ -53,11 +52,8 @@ export interface MovementPayload {
 export class BillingService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject(HttpClient)
-  private authHeaders = inject(AuthHeadersService)
-
   public getReport(filters: BillingReportFilters): Observable<BillingReport> {
     const url = `${this.baseUrl}/app/billing/report`
-    const headers = this.authHeaders.buildAuthHeaders()
     let params = new HttpParams()
 
     if (filters.from) params = params.set('from', filters.from)
@@ -68,7 +64,7 @@ export class BillingService {
       params = params.set('patients', filters.patientIds.join(','))
     }
 
-    return this.http.get<any>(url, { headers, params })
+    return this.http.get<any>(url, { params })
       .pipe(
         map(({ data }) => data as BillingReport),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -77,7 +73,6 @@ export class BillingService {
 
   public downloadReportPdf(filters: BillingReportFilters): Observable<Blob> {
     const url = `${this.baseUrl}/app/billing/report/pdf`
-    const headers = this.authHeaders.buildAuthHeaders()
     let params = new HttpParams()
     if (filters.from) params = params.set('from', filters.from)
     if (filters.to) params = params.set('to', filters.to)
@@ -86,7 +81,7 @@ export class BillingService {
     if (filters.patientIds && filters.patientIds.length > 0) {
       params = params.set('patients', filters.patientIds.join(','))
     }
-    return this.http.get(url, { headers, params, responseType: 'blob' })
+    return this.http.get(url, { params, responseType: 'blob' })
       .pipe(
         catchError((err) => throwError(() => formatApiError(err)))
       )
@@ -94,8 +89,7 @@ export class BillingService {
 
   public createManualCharge(payload: ManualChargePayload): Observable<any> {
     const url = `${this.baseUrl}/app/billing/ledger`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<any>(url, payload, { headers })
+    return this.http.post<any>(url, payload, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -104,8 +98,7 @@ export class BillingService {
 
   public createMovement(payload: MovementPayload): Observable<any> {
     const url = `${this.baseUrl}/app/billing/movements`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<any>(url, payload, { headers })
+    return this.http.post<any>(url, payload, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -114,8 +107,7 @@ export class BillingService {
 
   public deleteManualCharge(id: string): Observable<void> {
     const url = `${this.baseUrl}/app/billing/ledger/${id}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.delete<any>(url, { headers })
+    return this.http.delete<any>(url, {})
       .pipe(
         map(() => undefined),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -124,8 +116,7 @@ export class BillingService {
 
   public getInvoiceSnapshot(invoiceNumber: string): Observable<BillingInvoiceSnapshot> {
     const url = `${this.baseUrl}/app/billing/invoice/${invoiceNumber}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<any>(url, { headers })
+    return this.http.get<any>(url, {})
       .pipe(
         map(({ data }) => data as BillingInvoiceSnapshot),
         catchError((err) => throwError(() => formatApiError(err)))

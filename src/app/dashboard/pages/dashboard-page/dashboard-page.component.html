@@ -65,7 +65,7 @@
           <tr><th>Hora</th><th>Título</th><th>Doctor</th><th>Paciente</th><th>Estado</th></tr>
         </thead>
         <tbody>
-          <tr *ngFor="let c of selectedCitas" (click)="onCitaRowClick(c)" style="cursor:pointer">
+          <tr *ngFor="let c of selectedCitas; trackBy: trackByCitaId" (click)="onCitaRowClick(c)" style="cursor:pointer">
             <td>{{ fmtDt(c.Inicio) }}</td>
             <td>{{ c.Titulo }}</td>
             <td>{{ c.NombreDoctor || '—' }}</td>
@@ -109,19 +109,19 @@
         <div class="form-group">
           <label>Tipo</label>
           <select formControlName="tipo">
-            <option *ngFor="let t of tipoOptions" [value]="t">{{ TIPO_LABELS[t] }}</option>
+            <option *ngFor="let t of tipoOptions; trackBy: trackBySelf" [value]="t">{{ TIPO_LABELS[t] }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Estado</label>
           <select formControlName="estado">
-            <option *ngFor="let e of estadoOptions" [value]="e">{{ ESTADO_LABELS[e] }}</option>
+            <option *ngFor="let e of estadoOptions; trackBy: trackBySelf" [value]="e">{{ ESTADO_LABELS[e] }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Origen</label>
           <select formControlName="source">
-            <option *ngFor="let s of sources" [value]="s">{{ $any(SOURCE_LABELS)[s] || s }}</option>
+            <option *ngFor="let s of sources; trackBy: trackBySelf" [value]="s">{{ $any(SOURCE_LABELS)[s] || s }}</option>
           </select>
         </div>
       </div>
@@ -144,7 +144,7 @@
           <label>Doctor</label>
           <select formControlName="personalId">
             <option [ngValue]="null">— Sin asignar —</option>
-            <option *ngFor="let d of doctors" [ngValue]="d.id">{{ d.nombre }} ({{ d.especialidad }})</option>
+            <option *ngFor="let d of doctors; trackBy: trackById" [ngValue]="d.id">{{ d.nombre }} ({{ d.especialidad }})</option>
           </select>
         </div>
         <div class="form-group">

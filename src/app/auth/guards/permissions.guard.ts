@@ -17,15 +17,11 @@ export const permissionsGuard: CanActivateFn = (route) => {
   ) return true
 
   const evaluatePermissions = () => {
-    if (required) {
-      return authService.hasPermission(required)
-        ? true
-        : router.parseUrl('/dashboard/main')
+    if (required && !authService.hasPermission(required)) {
+      return router.parseUrl('/dashboard/main')
     }
-    if (requiredAny && requiredAny.length > 0) {
-      return authService.hasAnyPermission(requiredAny)
-        ? true
-        : router.parseUrl('/dashboard/main')
+    if (requiredAny && requiredAny.length > 0 && !authService.hasAnyPermission(requiredAny)) {
+      return router.parseUrl('/dashboard/main')
     }
     return true
   }

@@ -5,7 +5,8 @@ import { DrawerService } from '../../services/drawer-service/drawer.service'
 import { DrawerContents } from '../../interface/drawer-content.enum'
 import { InvoicesService } from '../../services/invoices-services/invoices.service'
 import { BillingService } from '../../services/billing-service/billing.service'
-import { BillingLedgerItem, BillingPatientSummary, BillingReport, BillingSummary } from '../../interface/billing.interface'
+import { BillingDaySummary, BillingLedgerItem, BillingPatientSummary, BillingReport, BillingSummary } from '../../interface/billing.interface'
+import { trackByKey, trackById } from '../../../shared/utils/track-by'
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Invoice } from '../../interface/invoice-response.interface'
@@ -18,6 +19,10 @@ import { formatNewDate } from '../../../shared/utils/date-formatters'
   styleUrl: './billing-page.component.css'
 })
 export class BillingPageComponent {
+  public trackByKey = trackByKey
+  public trackById = trackById
+  public trackByDate = (_: number, day: BillingDaySummary) => day.date
+  public trackByPatientId = (_: number, item: BillingPatientSummary) => item.patientId
   public headers: string[] = [
     'Factura',
     'Doctor',

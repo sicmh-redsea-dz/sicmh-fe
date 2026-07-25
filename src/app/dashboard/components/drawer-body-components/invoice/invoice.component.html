@@ -64,7 +64,7 @@
               <button
                 class="search-item"
                 type="button"
-                *ngFor="let p of patientResults"
+                *ngFor="let p of patientResults; trackBy: trackById"
                 (mousedown)="selectPatient(p)"
               >
                 <span>{{ p.name }}</span>
@@ -118,7 +118,7 @@
               <button
                 class="search-item"
                 type="button"
-                *ngFor="let d of doctorResults"
+                *ngFor="let d of doctorResults; trackBy: trackById"
                 (mousedown)="selectDoctor(d)"
               >
                 <span>{{ d.name }}</span>

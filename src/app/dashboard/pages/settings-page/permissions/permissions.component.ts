@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core'
 import Swal from 'sweetalert2'
 import { SettingsService } from '../../../services/settings-service/settings.service'
 import { RoleOption, RolePermissionsMap, SettingsUser, UserPermissionsMap, PermissionOverride } from '../../../interface/settings.interface'
+import { trackById, trackByKey } from '../../../../shared/utils/track-by'
 
 type PermissionState = 'inherit' | 'grant' | 'revoke'
 
@@ -16,6 +17,9 @@ type PermissionGroup = {
   styleUrl: './permissions.component.css'
 })
 export class PermissionsComponent implements OnInit {
+  public trackById = trackById
+  public trackByKey = trackByKey
+  public trackByLabel = (_: number, group: PermissionGroup) => group.label
   private settingsService = inject(SettingsService)
 
   public activeTab: 'roles' | 'users' = 'roles'

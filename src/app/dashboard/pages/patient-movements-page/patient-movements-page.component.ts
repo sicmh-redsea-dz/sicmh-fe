@@ -6,6 +6,7 @@ import { BillingService } from '../../services/billing-service/billing.service'
 import { PatientsService } from '../../services/patients-service/patients.service'
 import { BillingMovement } from '../../interface/billing.interface'
 import { formatNewDate } from '../../../shared/utils/date-formatters'
+import { trackByKey } from '../../../shared/utils/track-by'
 
 @Component({
   selector: 'app-patient-movements-page',
@@ -24,6 +25,7 @@ export class PatientMovementsPageComponent implements OnInit {
   public patientIdNumber = ''
   public currentStation = 'consulta'
   public loading = false
+  public trackByKey = trackByKey
 
   public stationOptions = [
     { key: 'consulta', label: 'Consulta' },
@@ -177,14 +179,25 @@ export class PatientMovementsPageComponent implements OnInit {
       return
     }
 
+    const quantity = Number(this.manualChargeForm.quantity) || 1
+    const unitPrice = Number(this.manualChargeForm.unitPrice) || 0
+    if (quantity <= 0) {
+      Swal.fire('Error', 'La cantidad debe ser mayor a cero.', 'error')
+      return
+    }
+    if (unitPrice < 0) {
+      Swal.fire('Error', 'El precio no puede ser negativo.', 'error')
+      return
+    }
+
     this.billingService.createManualCharge({
       patientId: this.patientId,
       patientName: this.patientName,
       station: this.manualChargeForm.station,
       category: this.manualChargeForm.category,
       description: this.manualChargeForm.description.trim(),
-      quantity: Number(this.manualChargeForm.quantity) || 1,
-      unitPrice: Number(this.manualChargeForm.unitPrice) || 0,
+      quantity,
+      unitPrice,
       occurredAt: this.manualChargeForm.occurredAt || undefined,
       status: 'Pendiente'
     })

@@ -28,7 +28,7 @@
           <label>Rol</label>
           <select formControlName="roleId">
             <option value="" disabled>Selecciona un rol</option>
-            <option *ngFor="let role of roles" [value]="role.id">
+            <option *ngFor="let role of roles; trackBy: trackById" [value]="role.id">
               {{ role.name }}
             </option>
           </select>
@@ -67,7 +67,7 @@
       </div>
 
       <div class="list">
-        <div class="list-item" *ngFor="let user of users">
+        <div class="list-item" *ngFor="let user of users; trackBy: trackById">
           <div class="user-info">
             <strong>{{ user.name | lowercase }}</strong>
             <small>{{ user.email | lowercase }}</small>

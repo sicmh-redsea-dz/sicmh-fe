@@ -46,6 +46,11 @@ export interface Stock {
     productQuantity:    number
     productUnitPrice:   number
     currentQuantity:    number
+    // Quantity this same visit already had reserved before editing began (only
+    // set when populating from an existing visit's usedInventory). productQuantity
+    // reflects stock available AFTER that reservation, so the real ceiling for
+    // currentQuantity is productQuantity + reservedQuantity, not productQuantity alone.
+    reservedQuantity?:  number
 }
 
 export interface Patients {
@@ -76,7 +81,7 @@ export interface Visit {
     glucoseLevel:       string
     height:             string
     id:                 number
-    invoiceId:          number
+    invoiceId:          string
     lastVisitDate:      Date
     notes:              string
     oxygenSaturation:   number

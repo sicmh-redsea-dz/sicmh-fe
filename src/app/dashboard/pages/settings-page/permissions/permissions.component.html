@@ -48,7 +48,7 @@
 
       <div class="list" *ngIf="activeTab === 'roles'">
         <button
-          *ngFor="let role of filteredRoles"
+          *ngFor="let role of filteredRoles; trackBy: trackById"
           type="button"
           class="list-item"
           [class.active]="selectedRoleKey === (role.key || role.name.toLowerCase())"
@@ -61,7 +61,7 @@
 
       <div class="list" *ngIf="activeTab === 'users'">
         <button
-          *ngFor="let user of filteredUsers"
+          *ngFor="let user of filteredUsers; trackBy: trackById"
           type="button"
           class="list-item"
           [class.active]="selectedUserId === user.id"
@@ -141,9 +141,9 @@
       </div>
 
       <div class="permissions-grid">
-        <div class="perm-group" *ngFor="let group of permissionGroups">
+        <div class="perm-group" *ngFor="let group of permissionGroups; trackBy: trackByLabel">
           <div class="group-title">{{ group.label }}</div>
-          <div class="perm-item" *ngFor="let perm of group.items">
+          <div class="perm-item" *ngFor="let perm of group.items; trackBy: trackByKey">
             <div class="perm-info">
               <strong>{{ perm.label }}</strong>
               <small>{{ perm.description }}</small>

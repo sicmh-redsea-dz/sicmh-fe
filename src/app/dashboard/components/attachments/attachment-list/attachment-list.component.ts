@@ -3,6 +3,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { concatMap, from, map, Observable, of, toArray } from 'rxjs'
 import { AttachmentsService } from '../../../services/attachments-service/attachments.service'
 import { AttachmentSource, ClinicalAttachment } from '../../../interface/clinical-attachments.interface'
+import { trackById, trackByIndex } from '../../../../shared/utils/track-by'
 
 interface AttachmentPreview {
   objectUrl: string
@@ -21,6 +22,8 @@ interface QueuedFile {
   styleUrl: './attachment-list.component.css'
 })
 export class AttachmentListComponent implements OnDestroy {
+  public trackById = trackById
+  public trackByIndex = trackByIndex
   private attachmentsService = inject(AttachmentsService)
   private sanitizer = inject(DomSanitizer)
 

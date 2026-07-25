@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms'
 import Swal from 'sweetalert2'
 import { SettingsService } from '../../../services/settings-service/settings.service'
 import { RoleOption, SettingsUser } from '../../../interface/settings.interface'
+import { trackById } from '../../../../shared/utils/track-by'
 
 @Component({
   selector: 'app-staff-management',
@@ -10,6 +11,7 @@ import { RoleOption, SettingsUser } from '../../../interface/settings.interface'
   styleUrl: './staff-management.component.css'
 })
 export class StaffManagementComponent implements OnInit {
+  public trackById = trackById
   private fb = inject(FormBuilder)
   private settingsService = inject(SettingsService)
 

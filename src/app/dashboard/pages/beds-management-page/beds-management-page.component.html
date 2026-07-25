@@ -29,7 +29,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let bed of beds" (click)="selectBed(bed)" [class.active]="selectedBed?.id === bed.id">
+            <tr *ngFor="let bed of beds; trackBy: trackById" (click)="selectBed(bed)" [class.active]="selectedBed?.id === bed.id">
               <td>{{ bed.code }}</td>
               <td>{{ bed.area || '-' }}</td>
               <td>
@@ -71,7 +71,7 @@
               <div class="form-group">
                 <label>Estado</label>
                 <select formControlName="status">
-                  <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+                  <option *ngFor="let status of statuses; trackBy: trackByValue" [value]="status.value">{{ status.label }}</option>
                 </select>
                 <small class="error-text" *ngIf="bedForm.get('status')?.touched && bedForm.get('status')?.hasError('required')">
                   Selecciona un estado.
@@ -100,7 +100,7 @@
                   <div *ngIf="isPatLoading" class="loader"></div>
                 </div>
                 <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
-                  <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+                  <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="selectPatient(patient)">
                     {{ patient.name }}
                   </li>
                 </ul>
@@ -120,7 +120,7 @@
                   <div *ngIf="isDocLoading" class="loader"></div>
                 </div>
                 <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
-                  <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+                  <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="selectDoctor(doctor)">
                     {{ doctor.name }}
                   </li>
                 </ul>
@@ -158,7 +158,7 @@
       <section class="card" *ngIf="selectedBed">
         <h3>Historial</h3>
         <div class="history" *ngIf="selectedBed.history.length; else noHistory">
-          <div class="history-item" *ngFor="let entry of selectedBed.history | slice:0:6">
+          <div class="history-item" *ngFor="let entry of selectedBed.history | slice:0:6; trackBy: trackByEventId">
             <div>
               <span class="history-type">{{ entry.type }}</span>
               <span class="history-meta">{{ entry.timestamp | date:'short' }}</span>

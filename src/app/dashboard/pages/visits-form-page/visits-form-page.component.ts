@@ -12,6 +12,7 @@ import { ShortPatient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../helpers/visits-form/visits-form-page.helper';
 import { AttachmentListComponent } from '../../components/attachments/attachment-list/attachment-list.component';
+import { trackById } from '../../../shared/utils/track-by';
 import { AuthService } from '../../../auth/services/auth.service';
 
 type FormVisitWithStock = FormVisit & {
@@ -26,6 +27,7 @@ const CONSULTA_SUBINVENTORY_ID = 1
   styleUrl: './visits-form-page.component.css'
 })
 export class VisitsFormPageComponent implements OnInit {
+  public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
 
   public title = ''
@@ -244,7 +246,8 @@ export class VisitsFormPageComponent implements OnInit {
 
   public incrementQuantity(index: number) {
     const item = this.selectedStockItems[index];
-    if (item.currentQuantity < item.productQuantity) {
+    const maxQuantity = item.productQuantity + (item.reservedQuantity ?? 0)
+    if (item.currentQuantity < maxQuantity) {
       item.currentQuantity += 1
       this.loadDataOfStockArray()
     }
@@ -389,7 +392,8 @@ export class VisitsFormPageComponent implements OnInit {
                 if ( matched ) {
                   this.selectedStockItems.push({
                     ...matched,
-                    currentQuantity: uv.stockQty
+                    currentQuantity: uv.stockQty,
+                    reservedQuantity: uv.stockQty
                   })
                 }
               })

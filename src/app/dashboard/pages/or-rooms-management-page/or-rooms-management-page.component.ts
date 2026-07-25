@@ -10,6 +10,7 @@ import { VisitsService } from '../../services/visits-service/visits.service';
 import { OrRoomRecord, OrRoomStatus } from '../../interface/or-rooms.interface';
 import { Doctor } from '../../interface/visits-response.interface';
 import { ShortPatient } from '../../interface/patients-response.interface';
+import { trackById, trackByValue } from '../../../shared/utils/track-by';
 
 @Component({
   selector: 'app-or-rooms-management-page',
@@ -17,6 +18,9 @@ import { ShortPatient } from '../../interface/patients-response.interface';
   styleUrl: './or-rooms-management-page.component.css'
 })
 export class OrRoomsManagementPageComponent implements OnInit {
+  public trackById = trackById
+  public trackByValue = trackByValue
+  public trackByEventId = (_: number, entry: { eventId: string }) => entry.eventId
   private route = inject(ActivatedRoute)
   private router = inject(Router)
   private destroyRef = inject(DestroyRef)

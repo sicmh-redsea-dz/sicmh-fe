@@ -39,6 +39,7 @@
                   placeholder="Precio por unidad del articulo">
           <div class="error-message" *ngIf="articleForm.get('prodUnitPrice')?.touched && articleForm.get('prodUnitPrice')?.invalid">
             <small *ngIf="articleForm.get('prodUnitPrice')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="articleForm.get('prodUnitPrice')?.errors?.['min']">El precio no puede ser negativo.</small>
           </div>
         </div>
       </div>
@@ -60,6 +61,7 @@
                   placeholder="Cantidad de articulos a ingresar">
           <div class="error-message" *ngIf="articleForm.get('prodQty')?.touched && articleForm.get('prodQty')?.invalid">
             <small *ngIf="articleForm.get('prodQty')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="articleForm.get('prodQty')?.errors?.['min']">La cantidad no puede ser negativa.</small>
           </div>
         </div>
       </div>

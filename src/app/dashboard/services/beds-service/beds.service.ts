@@ -4,7 +4,6 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import { formatApiError } from '../../../shared/utils/api-error'
 
 import { environment } from '../../../../environments/environment';
-import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { BedModule, BedRecord, BedStatus } from '../../interface/bed-management.interface';
 
 interface BedPayload {
@@ -30,12 +29,9 @@ interface AssignPayload {
 export class BedsService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject(HttpClient)
-  private authHeaders = inject(AuthHeadersService)
-
   public getBeds(module: BedModule): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<any>(url, { headers })
+    return this.http.get<any>(url, {})
       .pipe(
         map(({ data }) => data.beds as BedRecord[]),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -44,8 +40,7 @@ export class BedsService {
 
   public createBed(module: BedModule, payload: BedPayload): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<any>(url, payload, { headers })
+    return this.http.post<any>(url, payload, {})
       .pipe(
         map(({ data }) => data.beds as BedRecord[]),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -54,8 +49,7 @@ export class BedsService {
 
   public updateBed(module: BedModule, bedId: number, payload: BedPayload): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<any>(url, payload, { headers })
+    return this.http.patch<any>(url, payload, {})
       .pipe(
         map(({ data }) => data.beds as BedRecord[]),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -64,8 +58,7 @@ export class BedsService {
 
   public assignBed(module: BedModule, bedId: number, payload: AssignPayload): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}/assign`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<any>(url, payload, { headers })
+    return this.http.post<any>(url, payload, {})
       .pipe(
         map(({ data }) => data.beds as BedRecord[]),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -74,8 +67,7 @@ export class BedsService {
 
   public releaseBed(module: BedModule, bedId: number, payload?: { reason?: string; status?: BedStatus }): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}/release`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<any>(url, payload ?? {}, { headers })
+    return this.http.post<any>(url, payload ?? {}, {})
       .pipe(
         map(({ data }) => data.beds as BedRecord[]),
         catchError((err) => throwError(() => formatApiError(err)))

@@ -11,6 +11,7 @@ import { formatIncomingData, formatNewDate } from '../../../../shared/utils/date
 import { VisitsService } from '../../../services/visits-service/visits.service'
 import { PatientsService } from '../../../services/patients-service/patients.service'
 import { BillingLedgerItem, BillingInvoiceSnapshot } from '../../../interface/billing.interface'
+import { trackById } from '../../../../shared/utils/track-by'
 
 interface Options {
   doctors: any[]
@@ -44,6 +45,7 @@ type ServiceOption = {
   styleUrl: './invoice.component.css'
 })
 export class InvoiceComponent implements OnInit {
+  public trackById = trackById
   private fb = inject(FormBuilder)
   private drawerParams = inject(DrawerService)
   private invoiceService = inject(InvoicesService)

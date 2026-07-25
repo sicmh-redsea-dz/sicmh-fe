@@ -1,7 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { AuthHeadersService } from '../../../core/http/auth-headers.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Article } from '../../interface/article.interface';
 import { formatApiError } from '../../../shared/utils/api-error'
@@ -18,8 +17,6 @@ interface Delimiters {
 export class InventoryService {
   private readonly baseUrl: string = environment.baseUrl
   private readonly http = inject( HttpClient )
-  private readonly authHeaders = inject( AuthHeadersService )
-
   private _selectedItem = signal<Article | null >( null )
   public selectedItem = computed(() => this._selectedItem() )
 
@@ -28,16 +25,13 @@ export class InventoryService {
 
   public getInventoryItems( args: Delimiters, subinvId: string ): Observable< any > {
     const url: string = `${ this.baseUrl }/app/inventory`
-
-    const headers = this.authHeaders.buildAuthHeaders()
-
     const params = new HttpParams()
       .set('limit', args.limit)
       .set('offset', args.offset)
       .set('term', args.term)
       .set('subinvId', subinvId)
     
-    return this.http.get( url, { headers, params } )
+    return this.http.get( url, { params } )
       .pipe(
         map(( resp: any ) => {
           const items = resp?.data?.resp ?? []
@@ -52,10 +46,7 @@ export class InventoryService {
 
   public getInventoryItemById(id: string | number): Observable<Article> {
     const url = `${this.baseUrl}/app/inventory/${id}`
-    
-    const headers = this.authHeaders.buildAuthHeaders()
-
-    return this.http.get<{ data: Article }>(url, { headers }).pipe(
+    return this.http.get<{ data: Article }>(url, {}).pipe(
       map((resp: { data: Article }) => {
         this._selectedItem.set( resp.data )
         return resp.data
@@ -69,12 +60,9 @@ export class InventoryService {
   public transferItemById( params: Record<string, any> ): Observable<any> {
     
     const url = `${this.baseUrl}/app/inventory/transfer`
-
-    const headers = this.authHeaders.buildAuthHeaders()
-
     const body = params
 
-    return this.http.post(url, body, { headers }).pipe(
+    return this.http.post(url, body, {}).pipe(
       map((resp: any) => resp),
       catchError((err) => {
         return throwError(() => formatApiError(err))
@@ -84,10 +72,7 @@ export class InventoryService {
 
   public saveArticle( params: Record< string, any>): Observable<any> {
     const url = `${this.baseUrl}/app/inventory/new-item`
-
-    const headers = this.authHeaders.buildAuthHeaders()
-
-    return this.http.post(url, params, { headers })
+    return this.http.post(url, params, {})
       .pipe(
         map( resp => resp),
         catchError( err => {
@@ -99,10 +84,7 @@ export class InventoryService {
 
   public updArticle( params: Record< string, any>, articId: number): Observable<any> {
     const url = `${this.baseUrl}/app/inventory/edit-item/${articId}`
-    
-    const headers = this.authHeaders.buildAuthHeaders()
-
-    return this.http.patch(url, params, { headers })
+    return this.http.patch(url, params, {})
       .pipe(
         map( resp => resp),
         catchError( err => {

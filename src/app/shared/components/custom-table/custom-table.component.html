@@ -2,7 +2,7 @@
   <table class="bill-table">
     <thead>
       <tr>
-        <th *ngFor="let h of headers">{{ h }}</th>
+        <th *ngFor="let h of headers; trackBy: trackBySelf">{{ h }}</th>
         <th></th>
       </tr>
     </thead>

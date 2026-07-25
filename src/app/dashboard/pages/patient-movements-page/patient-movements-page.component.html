@@ -19,7 +19,7 @@
         <div class="form-group">
           <label class="required">Desde</label>
           <select [(ngModel)]="movementForm.fromStation" [disabled]="true">
-            <option *ngFor="let s of stationOptions" [value]="s.key">{{ s.label }}</option>
+            <option *ngFor="let s of stationOptions; trackBy: trackByKey" [value]="s.key">{{ s.label }}</option>
           </select>
         </div>
         <div class="form-group">
@@ -27,7 +27,7 @@
           <select [(ngModel)]="movementForm.toStation" required>
             <option value="">Selecciona destino</option>
             <option
-              *ngFor="let s of stationOptions"
+              *ngFor="let s of stationOptions; trackBy: trackByKey"
               [value]="s.key"
               [disabled]="s.key === movementForm.fromStation"
             >
@@ -79,7 +79,7 @@
         <div class="form-group">
           <label class="required">Estación</label>
           <select [(ngModel)]="manualChargeForm.station" [disabled]="true">
-            <option *ngFor="let s of stationOptions" [value]="s.key">{{ s.label }}</option>
+            <option *ngFor="let s of stationOptions; trackBy: trackByKey" [value]="s.key">{{ s.label }}</option>
           </select>
         </div>
         <div class="form-group">

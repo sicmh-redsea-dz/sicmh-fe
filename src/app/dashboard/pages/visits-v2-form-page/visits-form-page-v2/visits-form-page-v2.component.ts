@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { pressureValidator } from '../../../helpers/visits-form/visits-form-page.helper';
 import { BedRecord, BedModule } from '../../../interface/bed-management.interface';
 import { AttachmentListComponent } from '../../../components/attachments/attachment-list/attachment-list.component';
+import { trackById } from '../../../../shared/utils/track-by';
 
 type StockItemPayload = {
   id: number
@@ -32,6 +33,7 @@ type FormVisitWithStock = FormVisit & {
   styleUrl: './visits-form-page-v2.component.css'
 })
 export class VisitsFormPageV2Component implements OnInit {
+  public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
 
   public title = ''
@@ -113,7 +115,7 @@ export class VisitsFormPageV2Component implements OnInit {
         dischargeDate: [''],
       })
     }),
-    stockItems  : this.fb.array([], [Validators.required])
+    stockItems  : this.fb.array([])
   })
 
   public doctorSearchControl = new FormControl()
@@ -592,7 +594,8 @@ export class VisitsFormPageV2Component implements OnInit {
               if ( matched ) {
                 this.selectedStockItems.push({
                   ...matched,
-                  currentQuantity: uv.stockQty
+                  currentQuantity: uv.stockQty,
+                  reservedQuantity: uv.stockQty
                 })
               }
             })
@@ -662,7 +665,8 @@ export class VisitsFormPageV2Component implements OnInit {
 
   public incrementQuantity(index: number) {
     const item = this.selectedStockItems[index];
-    if (item.currentQuantity < item.productQuantity) {
+    const maxQuantity = item.productQuantity + (item.reservedQuantity ?? 0)
+    if (item.currentQuantity < maxQuantity) {
       item.currentQuantity += 1
       this.loadDataOfStockArray()
     }

@@ -30,7 +30,7 @@
         <tr 
           [ngClass]="getRowClass(visit)"
           (click)="handleSelectedVisit(visit.id)" 
-          *ngFor="let visit of dataToRender(); let idx = index"
+          *ngFor="let visit of visits; trackBy: trackById"
         >
           <td>{{visit.id}}</td>
           <td>{{visit.patientId}}</td>

@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../auth/services/auth.service';
 import { DrawerService } from '../../services/drawer-service/drawer.service';
 import { DrawerContents } from '../../interface/drawer-content.enum';
+import { trackById } from '../../../shared/utils/track-by';
 
 @Component({
   selector: 'app-patients',
@@ -15,6 +16,7 @@ import { DrawerContents } from '../../interface/drawer-content.enum';
   styleUrl: './patients-page.component.css'
 })
 export class PatientsPageComponent {
+  public trackById = trackById
   public searchTerm: string = ''
   public currentPage: number = 1
   public totalPages: number = 1
@@ -136,18 +138,9 @@ export class PatientsPageComponent {
     }).then(( result ) => {
       if( result.isConfirmed ) {
         this.deletePatient( id )
-        Swal.fire('Acción confirmada', 'Has aceptado la acción', 'success')
       }
       else if( result.dismiss === Swal.DismissReason.cancel) 
         Swal.fire('Acción cancelada', 'No se realizo ningun cambio', 'info')
-    })
-  }
-
-  public dataToRender() {
-    return this.patients.filter((patient) => {
-      return patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        patient.lastName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        patient.idNumber.includes(this.searchTerm) 
     })
   }
 
@@ -155,7 +148,10 @@ export class PatientsPageComponent {
     this.patientService.deletePatient(id)
       .subscribe({
         next: ( result ) => {
-          if( result ) this.getPatients()
+          if( result ) {
+            this.getPatients()
+            Swal.fire('Acción confirmada', 'Has aceptado la acción', 'success')
+          }
         },
         error:( err ) => {
           Swal.fire('Error', err, 'error')

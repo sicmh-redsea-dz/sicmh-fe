@@ -101,14 +101,14 @@
         <label>Estación</label>
         <select [(ngModel)]="reportFilters.station">
           <option value="all">Todas</option>
-          <option *ngFor="let s of stationOptions" [value]="s.key">{{ s.label }}</option>
+          <option *ngFor="let s of stationOptions; trackBy: trackByKey" [value]="s.key">{{ s.label }}</option>
         </select>
       </div>
       <div class="form-group">
         <label>Estado</label>
         <select [(ngModel)]="reportFilters.status">
           <option value="all">Todos</option>
-          <option *ngFor="let s of statusOptions" [value]="s.key">{{ s.label }}</option>
+          <option *ngFor="let s of statusOptions; trackBy: trackByKey" [value]="s.key">{{ s.label }}</option>
         </select>
       </div>
     </div>
@@ -165,7 +165,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let day of reportSummary?.byDay">
+          <tr *ngFor="let day of reportSummary?.byDay; trackBy: trackByDate">
             <td>{{ day.date }}</td>
             <td>L. {{ day.inventoryTotal | number:'1.2-2' }}</td>
             <td>L. {{ day.manualTotal | number:'1.2-2' }}</td>
@@ -200,7 +200,7 @@
         </thead>
         <tbody>
           <tr
-            *ngFor="let item of filteredPatientSummary"
+            *ngFor="let item of filteredPatientSummary; trackBy: trackByPatientId"
             class="selectable-row"
             [class.active]="selectedPatientId === item.patientId"
             (click)="selectPatientFilter(item.patientId)"
@@ -248,7 +248,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of displayedLedger">
+          <tr *ngFor="let item of displayedLedger; trackBy: trackById">
             <td>{{ item.occurredAt }}</td>
             <td>{{ item.patientName }}</td>
             <td>{{ getMovementStationLabel(item.station) }}</td>

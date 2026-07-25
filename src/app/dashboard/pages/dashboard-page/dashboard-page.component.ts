@@ -11,6 +11,7 @@ import { SchedulingService } from '../../services/scheduling-service/scheduling.
 import { Cita, CitaTipo, CitaEstado, Doctor, TIPO_COLORS, TIPO_LABELS, ESTADO_LABELS, SOURCE_LABELS } from '../../interface/cita.interface'
 import { AuthService } from '../../../auth/services/auth.service'
 import { formatApiError } from '../../../shared/utils/api-error'
+import { trackById, trackBySelf } from '../../../shared/utils/track-by'
 
 @Component({
   selector: 'app-dashboard-page',
@@ -18,6 +19,9 @@ import { formatApiError } from '../../../shared/utils/api-error'
   styleUrl: './dashboard-page.component.css'
 })
 export class DashboardPageComponent implements AfterViewInit {
+  public trackById = trackById
+  public trackBySelf = trackBySelf
+  public trackByCitaId = (_: number, c: Cita) => c.CitaID
   @ViewChild('calendarRef') calendarRef!: FullCalendarComponent
 
   private fb                = inject(FormBuilder)

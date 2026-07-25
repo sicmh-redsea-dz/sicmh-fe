@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Observable, catchError, map, throwError } from 'rxjs'
+import { Observable, catchError, map, shareReplay, throwError } from 'rxjs'
 import { environment } from '../../../../environments/environment'
-import { AuthHeadersService } from '../../../core/http/auth-headers.service'
 import { formatApiError } from '../../../shared/utils/api-error'
 import { InviteResult, RoleOption, SettingsUser, UserProfile, RolePermissionsMap, UserPermissionsMap } from '../../interface/settings.interface'
 
@@ -16,12 +15,9 @@ interface ApiResponse<T> {
 export class SettingsService {
   private readonly baseUrl = environment.baseUrl
   private http = inject(HttpClient)
-  private authHeaders = inject(AuthHeadersService)
-
   public getProfile(): Observable<{ user: SettingsUser }> {
     const url = `${this.baseUrl}/app/settings/profile`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ApiResponse<{ user: SettingsUser }>>(url, { headers })
+    return this.http.get<ApiResponse<{ user: SettingsUser }>>(url, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -30,28 +26,36 @@ export class SettingsService {
 
   public updateProfile(payload: Partial<SettingsUser> & { profile?: UserProfile }): Observable<SettingsUser> {
     const url = `${this.baseUrl}/app/settings/profile`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<ApiResponse<{ user: SettingsUser }>>(url, payload, { headers })
+    return this.http.patch<ApiResponse<{ user: SettingsUser }>>(url, payload, {})
       .pipe(
         map((resp) => resp.data.user),
         catchError((err) => throwError(() => formatApiError(err)))
       )
   }
 
+  // Roles are a static catalog (no create/edit-role UI exists), so this is
+  // cached for the app session instead of refetched on every navigation.
+  private rolesCache$?: Observable<RoleOption[]>
+
   public getRoles(): Observable<RoleOption[]> {
-    const url = `${this.baseUrl}/app/settings/roles`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ApiResponse<{ roles: RoleOption[] }>>(url, { headers })
-      .pipe(
-        map((resp) => resp.data.roles),
-        catchError((err) => throwError(() => formatApiError(err)))
-      )
+    if (!this.rolesCache$) {
+      const url = `${this.baseUrl}/app/settings/roles`
+      this.rolesCache$ = this.http.get<ApiResponse<{ roles: RoleOption[] }>>(url, {})
+        .pipe(
+          map((resp) => resp.data.roles),
+          catchError((err) => {
+            this.rolesCache$ = undefined
+            return throwError(() => formatApiError(err))
+          }),
+          shareReplay(1)
+        )
+    }
+    return this.rolesCache$
   }
 
   public getUsers(): Observable<SettingsUser[]> {
     const url = `${this.baseUrl}/app/settings/users`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ApiResponse<{ users: SettingsUser[] }>>(url, { headers })
+    return this.http.get<ApiResponse<{ users: SettingsUser[] }>>(url, {})
       .pipe(
         map((resp) => resp.data.users),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -60,8 +64,7 @@ export class SettingsService {
 
   public updateUserRole(userId: number, roleId: number): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}/role`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { roleId }, { headers })
+    return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { roleId }, {})
       .pipe(
         map((resp) => resp.data.updated),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -75,8 +78,7 @@ export class SettingsService {
     profile?: UserProfile
   }): Observable<InviteResult> {
     const url = `${this.baseUrl}/app/settings/users`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.post<ApiResponse<InviteResult>>(url, payload, { headers })
+    return this.http.post<ApiResponse<InviteResult>>(url, payload, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -85,8 +87,7 @@ export class SettingsService {
 
   public getRolePermissions(): Observable<{ roles: RoleOption[]; permissions: string[]; overrides: RolePermissionsMap }> {
     const url = `${this.baseUrl}/app/settings/permissions/roles`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ApiResponse<{ roles: RoleOption[]; permissions: string[]; overrides: RolePermissionsMap }>>(url, { headers })
+    return this.http.get<ApiResponse<{ roles: RoleOption[]; permissions: string[]; overrides: RolePermissionsMap }>>(url, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -95,8 +96,7 @@ export class SettingsService {
 
   public updateRolePermissions(roleKey: string, grants: string[], revokes: string[]): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/permissions/roles/${roleKey}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<ApiResponse<{ roleKey: string }>>(url, { grants, revokes }, { headers })
+    return this.http.patch<ApiResponse<{ roleKey: string }>>(url, { grants, revokes }, {})
       .pipe(
         map(() => true),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -105,8 +105,7 @@ export class SettingsService {
 
   public getUserPermissions(): Observable<{ users: SettingsUser[]; permissions: string[]; overrides: UserPermissionsMap }> {
     const url = `${this.baseUrl}/app/settings/permissions/users`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.get<ApiResponse<{ users: SettingsUser[]; permissions: string[]; overrides: UserPermissionsMap }>>(url, { headers })
+    return this.http.get<ApiResponse<{ users: SettingsUser[]; permissions: string[]; overrides: UserPermissionsMap }>>(url, {})
       .pipe(
         map((resp) => resp.data),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -115,8 +114,7 @@ export class SettingsService {
 
   public updateUserPermissions(userId: number, grants: string[], revokes: string[]): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/permissions/users/${userId}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<ApiResponse<{ userId: number }>>(url, { grants, revokes }, { headers })
+    return this.http.patch<ApiResponse<{ userId: number }>>(url, { grants, revokes }, {})
       .pipe(
         map(() => true),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -125,8 +123,7 @@ export class SettingsService {
 
   public deleteUser(userId: number): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.delete<ApiResponse<{ deleted: boolean }>>(url, { headers })
+    return this.http.delete<ApiResponse<{ deleted: boolean }>>(url, {})
       .pipe(
         map((resp) => resp.data.deleted),
         catchError((err) => throwError(() => formatApiError(err)))
@@ -135,8 +132,7 @@ export class SettingsService {
 
   public changeUserPassword(userId: number, newPassword: string): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}/password`
-    const headers = this.authHeaders.buildAuthHeaders()
-    return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { newPassword }, { headers })
+    return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { newPassword }, {})
       .pipe(
         map((resp) => resp.data.updated),
         catchError((err) => throwError(() => formatApiError(err)))

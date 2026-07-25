@@ -14,7 +14,7 @@
     <button
         type="button"
         class="tab-btn"
-        *ngFor="let tab of inventoryTabs"
+        *ngFor="let tab of inventoryTabs; trackBy: trackById"
         [class.active]="subinventoryId === tab.id"
         (click)="selectTab(tab)"
     >
@@ -27,7 +27,7 @@
         <table class="inv-table">
             <thead>
                 <tr>
-                    <th *ngFor="let h of headers">{{ h }}</th>
+                    <th *ngFor="let h of headers; trackBy: trackBySelf">{{ h }}</th>
                     <th></th>
                 </tr>
             </thead>

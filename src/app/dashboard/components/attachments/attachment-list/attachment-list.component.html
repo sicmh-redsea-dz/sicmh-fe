@@ -39,7 +39,7 @@
   <div class="error-text" *ngIf="errorMessage">{{ errorMessage }}</div>
 
   <ng-container *ngIf="deferred && queuedFiles.length > 0">
-    <div class="attachment-item queued" *ngFor="let queued of queuedFiles; let i = index">
+    <div class="attachment-item queued" *ngFor="let queued of queuedFiles; let i = index; trackBy: trackByIndex">
       <div class="attachment-row">
         <i class="ph ph-clock"></i>
         <div class="attachment-meta">
@@ -64,7 +64,7 @@
       No hay archivos adjuntos.
     </div>
 
-    <div class="attachment-item" *ngFor="let attachment of attachments">
+    <div class="attachment-item" *ngFor="let attachment of attachments; trackBy: trackById">
       <div class="attachment-row">
         <i [class]="iconFor(attachment)"></i>
         <div class="attachment-meta">

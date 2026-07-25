@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { trackBySelf } from '../../utils/track-by';
 
 @Component({
   selector: 'app-custom-table',
@@ -6,6 +7,7 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
   styleUrl: './custom-table.component.css'
 })
 export class CustomTableComponent {
+  public trackBySelf = trackBySelf
   @Input() headers: string[] = []
   @Input() bodyContent: any[] = []
   @Input() canView: boolean = false

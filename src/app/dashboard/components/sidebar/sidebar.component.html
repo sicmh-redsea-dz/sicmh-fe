@@ -24,7 +24,7 @@
     <div class="menu">
       <p class="title">Principal</p>
       <ul>
-        <li *ngFor="let item of items(); let idx = index" 
+        <li *ngFor="let item of items(); let idx = index; trackBy: trackByIndex"
           [ngClass]="{ active: toggledStates[idx], 'has-submenu': item.hasSubmenu }">
           <a [routerLink]="item.routerLink" 
             (click)="toggleItem(idx)">
@@ -35,7 +35,7 @@
           <ul *ngIf="item.hasSubmenu" 
               [class]="toggledStates[idx] ? 'sub-menu show' : 'sub-menu'">
             <li (click)="handleSubmenuOnCollapse(idx)"
-              *ngFor="let subitem of item.subItems; let i = index">
+              *ngFor="let subitem of item.subItems; let i = index; trackBy: trackByIndex">
               <a [routerLink]="subitem.routerLink">
                 <span class="text" 
                     [style.color]="toggledSidebar ? '#fff' : '#fff'">

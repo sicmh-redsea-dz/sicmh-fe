@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { trackBySelf } from '../../utils/track-by';
 
 @Component({
   selector: 'app-pagination',
@@ -6,6 +7,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
   styleUrl: './pagination.component.css'
 })
 export class PaginationComponent implements OnChanges {
+  public trackBySelf = trackBySelf
   @Input() currentPage: number = 1
   @Input() totalPages: number = 10
   @Input() offset: number = 0

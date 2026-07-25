@@ -25,8 +25,8 @@ public title = ''
     prodDesc      : ['', []],
     prodMinStock  : ['', []],
     prodName      : ['', [Validators.required, Validators.maxLength(20)]],
-    prodQty       : ['', [Validators.required]],
-    prodUnitPrice : ['', [Validators.required]],
+    prodQty       : ['', [Validators.required, Validators.min(0)]],
+    prodUnitPrice : ['', [Validators.required, Validators.min(0)]],
   })
 
   public set frameTitle(v: string) {

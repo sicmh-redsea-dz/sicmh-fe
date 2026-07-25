@@ -3,6 +3,7 @@ import { SidebarItem, sidebarItems } from '../../helpers/sidebar-items/sidebar-i
 import { AuthService } from '../../../auth/services/auth.service';
 import { Permission } from '../../../auth/permissions/permissions';
 import { AttachmentsService } from '../../services/attachments-service/attachments.service';
+import { trackByIndex } from '../../../shared/utils/track-by';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,6 +11,7 @@ import { AttachmentsService } from '../../services/attachments-service/attachmen
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
+ public trackByIndex = trackByIndex
  private authService = inject( AuthService )
  public items = computed<SidebarItem[]>(() => {
   return sidebarItems

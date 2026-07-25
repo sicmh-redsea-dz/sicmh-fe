@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 import { BillingService } from '../../services/billing-service/billing.service'
 import { BillingInvoiceSnapshot } from '../../interface/billing.interface'
 import { formatIncomingData } from '../../../shared/utils/date-formatters'
+import { trackById } from '../../../shared/utils/track-by'
 
 @Component({
   selector: 'app-invoice-preview-page',
@@ -11,6 +12,7 @@ import { formatIncomingData } from '../../../shared/utils/date-formatters'
   styleUrl: './invoice-preview-page.component.css'
 })
 export class InvoicePreviewPageComponent implements OnInit {
+  public trackById = trackById
   private route = inject(ActivatedRoute)
   private router = inject(Router)
   private billingService = inject(BillingService)

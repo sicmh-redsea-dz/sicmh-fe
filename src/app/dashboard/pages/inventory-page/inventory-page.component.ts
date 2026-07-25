@@ -8,6 +8,7 @@ import { DrawerContents } from '../../interface/drawer-content.enum';
 import { Article } from '../../interface/article.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../auth/services/auth.service';
+import { trackById, trackBySelf } from '../../../shared/utils/track-by';
 
 @Component({
   selector: 'app-inventory-page',
@@ -15,6 +16,8 @@ import { AuthService } from '../../../auth/services/auth.service';
   styleUrl: './inventory-page.component.css'
 })
 export class InventoryPageComponent implements OnInit {
+  public trackById = trackById
+  public trackBySelf = trackBySelf
   public headers: string[] = [
     'id',
     'Nombre',

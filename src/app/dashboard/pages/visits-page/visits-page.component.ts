@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SimpleVisit } from '../../interface/visits-service.interface';
 import { AuthService } from '../../../auth/services/auth.service';
+import { trackById } from '../../../shared/utils/track-by';
 
 @Component({
   selector: 'app-visits-page',
@@ -13,6 +14,7 @@ import { AuthService } from '../../../auth/services/auth.service';
   styleUrl: './visits-page.component.css'
 })
 export class VisitsPageComponent implements OnInit {
+  public trackById = trackById
   public searchTerm: string = ''
   public currentPage: number = 1
   public totalPages: number = 1
@@ -262,10 +264,6 @@ export class VisitsPageComponent implements OnInit {
     let urlFragment = this.urlSegment
     this.router.navigateByUrl(`/dashboard/${urlFragment}/new-visit`)
 
-  }
-
-  public dataToRender() {
-    return this.visits
   }
 
 }

@@ -41,7 +41,7 @@
           <div *ngIf="isDocLoading" class="loader"></div>
         </div>
         <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
-          <li *ngFor="let doctor of searchDocResults" (mousedown)="selectDoctor(doctor)">
+          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="selectDoctor(doctor)">
             {{ doctor.name }}
           </li>
         </ul>
@@ -64,7 +64,7 @@
           <div *ngIf="isPatLoading" class="loader"></div>
         </div>
         <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
-          <li *ngFor="let patient of searchPatResults" (mousedown)="selectPatient(patient)">
+          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="selectPatient(patient)">
             {{ patient.name }}
           </li>
         </ul>
@@ -534,7 +534,7 @@
                 <div *ngIf="isBedLoading" class="loader"></div>
               </div>
               <ul class="dropdown-list" *ngIf="showBedDropdown && bedResults.length > 0">
-                <li *ngFor="let bed of bedResults" (mousedown)="selectBed(bed)">
+                <li *ngFor="let bed of bedResults; trackBy: trackById" (mousedown)="selectBed(bed)">
                   {{ bed.code }} <span *ngIf="bed.area">· {{ bed.area }}</span>
                 </li>
               </ul>

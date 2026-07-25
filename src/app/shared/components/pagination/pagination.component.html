@@ -7,7 +7,7 @@
       <i class="fa fa-chevron-left"></i>
     </button>
     
-    <ng-container *ngFor="let page of displayedPages">
+    <ng-container *ngFor="let page of displayedPages; trackBy: trackBySelf">
       <button class="page-number" [class.active]="page === currentPage" (click)="goToPage(page)">
         {{ page }}
       </button>
