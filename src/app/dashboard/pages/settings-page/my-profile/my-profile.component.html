@@ -17,7 +17,7 @@
             <span>Información visible para el equipo.</span>
           </div>
         </div>
-        <button class="ghost-btn" type="button" (click)="saveProfile()" [disabled]="saving">
+        <button class="ghost-btn" type="button" (click)="saveProfile()" [disabled]="saving || !canUpdateProfile">
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}
         </button>
       </div>
@@ -36,6 +36,10 @@
             <label>Teléfono</label>
             <input type="text" formControlName="phone" placeholder="+504 9999-9999">
           </div>
+          <div class="form-group form-group-wide">
+            <label>Dirección profesional</label>
+            <input type="text" formControlName="address" placeholder="Dirección que aparecerá en las recetas">
+          </div>
           <div class="form-group">
             <label>Identificación</label>
             <input type="text" formControlName="identification" placeholder="DNI / RTN">
@@ -49,6 +53,42 @@
             <input type="text" formControlName="position" placeholder="Rol dentro de la clínica">
           </div>
         </form>
+      </div>
+    </section>
+
+    <section class="card prescription-assets-card">
+      <div class="card-header">
+        <div class="title">
+          <i class="ph-bold ph-prescription"></i>
+          <div>
+            <h3>Firma y sello para recetas</h3>
+            <span>Opcionales. Se agregarán automáticamente al imprimir.</span>
+          </div>
+        </div>
+      </div>
+      <div class="prescription-assets">
+        <div class="asset-box">
+          <h4>Firma digital</h4>
+          <div class="asset-preview">
+            <img *ngIf="signatureUrl && !signatureFailed" [src]="signatureUrl" alt="Firma digital" (error)="signatureFailed = true">
+            <span *ngIf="!signatureUrl || signatureFailed">Sin firma guardada</span>
+          </div>
+          <label class="upload-btn" [class.disabled]="!canUpdateProfile">
+            {{ uploadingAsset === 'signature' ? 'Guardando...' : (!signatureUrl || signatureFailed ? 'Subir firma' : 'Reemplazar firma') }}
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPrescriptionAssetSelected($event, 'signature')" [disabled]="uploadingAsset !== null || !canUpdateProfile">
+          </label>
+        </div>
+        <div class="asset-box">
+          <h4>Sello profesional</h4>
+          <div class="asset-preview">
+            <img *ngIf="stampUrl && !stampFailed" [src]="stampUrl" alt="Sello profesional" (error)="stampFailed = true">
+            <span *ngIf="!stampUrl || stampFailed">Sin sello guardado</span>
+          </div>
+          <label class="upload-btn" [class.disabled]="!canUpdateProfile">
+            {{ uploadingAsset === 'stamp' ? 'Guardando...' : (!stampUrl || stampFailed ? 'Subir sello' : 'Reemplazar sello') }}
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPrescriptionAssetSelected($event, 'stamp')" [disabled]="uploadingAsset !== null || !canUpdateProfile">
+          </label>
+        </div>
       </div>
     </section>
 
@@ -68,7 +108,7 @@
           <h4>Tema de la aplicación</h4>
           <p>Elige entre modo claro u oscuro.</p>
         </div>
-        <button class="theme-toggle" type="button" (click)="toggleTheme()">
+        <button class="theme-toggle" type="button" (click)="toggleTheme()" [disabled]="!canUpdateProfile">
           <span>{{ profileForm.get('theme')?.value === 'dark' ? 'Oscuro' : 'Claro' }}</span>
           <i [ngClass]="profileForm.get('theme')?.value === 'dark' ? 'ph-bold ph-moon' : 'ph-bold ph-sun'"></i>
         </button>

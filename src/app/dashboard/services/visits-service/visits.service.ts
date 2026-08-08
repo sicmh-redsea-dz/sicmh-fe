@@ -4,7 +4,7 @@ import { formatApiError } from '../../../shared/utils/api-error'
 import { environment } from '../../../../environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { FormVisit } from '../../interface/visits-response.interface';
-import { Histories, SimpleVisit, Visit, Stock } from '../../interface/visits-service.interface'
+import { Histories, SimpleVisit, Visit, Stock, PrescriptionContext } from '../../interface/visits-service.interface'
 
 interface Delimiters {
   limit: number,
@@ -109,6 +109,15 @@ export class VisitsService {
         catchError((err) => {
           return throwError(() => formatApiError(err))
         })
+      )
+  }
+
+  public getPrescription(id: number): Observable<PrescriptionContext> {
+    const url = `${this.baseUrl}/app/visits/${id}/prescription`
+    return this.http.get<{ data: PrescriptionContext }>(url, {})
+      .pipe(
+        map(({ data }) => data),
+        catchError((err) => throwError(() => formatApiError(err)))
       )
   }
 

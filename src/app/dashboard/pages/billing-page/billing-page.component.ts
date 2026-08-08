@@ -27,6 +27,7 @@ export class BillingPageComponent {
     'Factura',
     'Doctor',
     'Paciente',
+    'Origen',
     'Fecha',
     'Estado',
     'Monto'

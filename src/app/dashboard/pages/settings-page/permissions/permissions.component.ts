@@ -3,6 +3,7 @@ import Swal from 'sweetalert2'
 import { SettingsService } from '../../../services/settings-service/settings.service'
 import { RoleOption, RolePermissionsMap, SettingsUser, UserPermissionsMap, PermissionOverride } from '../../../interface/settings.interface'
 import { trackById, trackByKey } from '../../../../shared/utils/track-by'
+import { AuthService } from '../../../../auth/services/auth.service'
 
 type PermissionState = 'inherit' | 'grant' | 'revoke'
 
@@ -21,6 +22,8 @@ export class PermissionsComponent implements OnInit {
   public trackByKey = trackByKey
   public trackByLabel = (_: number, group: PermissionGroup) => group.label
   private settingsService = inject(SettingsService)
+  private authService = inject(AuthService)
+  public canUpdatePermissions = this.authService.hasPermission('settings.permissions.update')
 
   public activeTab: 'roles' | 'users' = 'roles'
   public roleSearch = ''
@@ -53,13 +56,38 @@ export class PermissionsComponent implements OnInit {
       ]
     },
     {
-      label: 'Atención médica',
+      label: 'Consulta externa',
       items: [
-        { key: 'visits.read', label: 'Ver atenciones', description: 'Acceso a consultas y reportes.' },
-        { key: 'visits.create', label: 'Registrar atención', description: 'Crear consultas o emergencias.' },
-        { key: 'visits.update', label: 'Editar atención', description: 'Actualizar visitas y formularios.' },
-        { key: 'visits.delete', label: 'Eliminar atención', description: 'Anular atenciones.' },
+        { key: 'visits.outpatient.read', label: 'Ver consulta externa', description: 'Consultar atenciones y reportes de consulta externa.' },
+        { key: 'visits.outpatient.update', label: 'Editar consulta externa', description: 'Registrar y actualizar consultas externas.' },
         { key: 'visits.inventory.manage', label: 'Insumos en consulta externa', description: 'Agregar inventario y facturarlo desde la consulta externa.' }
+      ]
+    },
+    {
+      label: 'Emergencia',
+      items: [
+        { key: 'visits.emergency.read', label: 'Ver emergencias', description: 'Consultar atenciones y reportes de emergencia.' },
+        { key: 'visits.emergency.update', label: 'Editar emergencias', description: 'Registrar, actualizar y gestionar camas de emergencia.' }
+      ]
+    },
+    {
+      label: 'Quirófano',
+      items: [
+        { key: 'visits.operating_room.read', label: 'Ver quirófano', description: 'Consultar atenciones y reportes de quirófano.' },
+        { key: 'visits.operating_room.update', label: 'Editar quirófano', description: 'Registrar, actualizar y gestionar quirófanos.' }
+      ]
+    },
+    {
+      label: 'Hospitalización',
+      items: [
+        { key: 'visits.hospitalization.read', label: 'Ver hospitalización', description: 'Consultar atenciones y reportes de hospitalización.' },
+        { key: 'visits.hospitalization.update', label: 'Editar hospitalización', description: 'Registrar, actualizar y gestionar camas de hospitalización.' }
+      ]
+    },
+    {
+      label: 'Atención médica general',
+      items: [
+        { key: 'visits.delete', label: 'Eliminar atenciones', description: 'Anular atenciones de cualquier plantilla cuando también se tiene permiso para editarla.' }
       ]
     },
     {
@@ -97,7 +125,14 @@ export class PermissionsComponent implements OnInit {
     {
       label: 'Configuraciones',
       items: [
-        { key: 'settings.permissions.manage', label: 'Administrar permisos', description: 'Gestionar roles y accesos.' }
+        { key: 'settings.profile.read', label: 'Ver mi perfil', description: 'Acceder a la configuración del perfil propio.' },
+        { key: 'settings.profile.update', label: 'Editar mi perfil', description: 'Actualizar datos, preferencias, firma y sello propios.' },
+        { key: 'settings.staff.read', label: 'Ver personal', description: 'Consultar el personal registrado.' },
+        { key: 'settings.staff.update', label: 'Editar personal', description: 'Registrar, modificar credenciales y eliminar usuarios.' },
+        { key: 'settings.permissions.read', label: 'Ver permisos', description: 'Consultar permisos de roles y usuarios.' },
+        { key: 'settings.permissions.update', label: 'Editar permisos', description: 'Modificar overrides de roles y usuarios.' },
+        { key: 'settings.company.read', label: 'Ver empresa', description: 'Consultar la configuración de la empresa.' },
+        { key: 'settings.company.update', label: 'Editar empresa', description: 'Actualizar el nombre y logo de la empresa.' }
       ]
     }
   ]
@@ -160,6 +195,7 @@ export class PermissionsComponent implements OnInit {
   }
 
   public setPermissionState(context: 'role' | 'user', perm: string, state: PermissionState) {
+    if (!this.canUpdatePermissions) return
     const override = this.ensureOverride(context)
     override.grants = override.grants ?? []
     override.revokes = override.revokes ?? []
@@ -186,6 +222,7 @@ export class PermissionsComponent implements OnInit {
   }
 
   public saveOverrides() {
+    if (!this.canUpdatePermissions) return
     if (this.activeTab === 'roles') {
       if (!this.selectedRoleKey) return
       const override = this.roleOverrides[this.selectedRoleKey] || { grants: [], revokes: [] }

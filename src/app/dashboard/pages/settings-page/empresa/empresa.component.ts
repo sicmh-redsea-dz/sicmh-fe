@@ -1,6 +1,8 @@
 import { Component, inject, OnDestroy } from '@angular/core'
 import Swal from 'sweetalert2'
 import { AttachmentsService } from '../../../services/attachments-service/attachments.service'
+import { SettingsService } from '../../../services/settings-service/settings.service'
+import { AuthService } from '../../../../auth/services/auth.service'
 
 const ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_LOGO_BYTES = 5 * 1024 * 1024
@@ -12,6 +14,9 @@ const MAX_LOGO_BYTES = 5 * 1024 * 1024
 })
 export class EmpresaComponent implements OnDestroy {
   private attachmentsService = inject(AttachmentsService)
+  private settingsService = inject(SettingsService)
+  private authService = inject(AuthService)
+  public canUpdateCompany = this.authService.hasPermission('settings.company.update')
 
   public tenantCode = localStorage.getItem('codigoEmpresa') ?? ''
   public currentLogoUrl: string | null = null
@@ -19,12 +24,18 @@ export class EmpresaComponent implements OnDestroy {
   public pendingPreviewUrl: string | null = null
   public selectedFile: File | null = null
   public saving = false
+  public clinicName = ''
+  public savingName = false
 
   constructor() {
     if (this.tenantCode) {
       // Cache-buster: the bucket serves the logo with max-age=300.
       this.currentLogoUrl = `${this.attachmentsService.logoUrl(this.tenantCode)}?t=${Date.now()}`
     }
+    this.settingsService.getCompany().subscribe({
+      next: ({ name }) => this.clinicName = name,
+      error: (message: string) => Swal.fire('Error', message, 'error')
+    })
   }
 
   ngOnDestroy(): void {
@@ -36,6 +47,7 @@ export class EmpresaComponent implements OnDestroy {
   }
 
   onFileSelected(event: Event): void {
+    if (!this.canUpdateCompany) return
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
     input.value = ''
@@ -61,6 +73,7 @@ export class EmpresaComponent implements OnDestroy {
   }
 
   save(): void {
+    if (!this.canUpdateCompany) return
     if (!this.selectedFile || this.saving) return
 
     this.saving = true
@@ -76,6 +89,21 @@ export class EmpresaComponent implements OnDestroy {
         this.saving = false
         Swal.fire('Error', message, 'error')
       }
+    })
+  }
+
+  saveClinicName(): void {
+    if (!this.canUpdateCompany) return
+    const name = this.clinicName.trim()
+    if (!name || this.savingName) return
+    this.savingName = true
+    this.settingsService.updateCompany(name).subscribe({
+      next: ({ name: savedName }) => {
+        this.clinicName = savedName
+        Swal.fire('Éxito', 'Nombre de la clínica actualizado.', 'success')
+      },
+      error: (message: string) => Swal.fire('Error', message, 'error'),
+      complete: () => this.savingName = false
     })
   }
 

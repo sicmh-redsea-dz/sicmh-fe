@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SimpleVisit } from '../../interface/visits-service.interface';
 import { AuthService } from '../../../auth/services/auth.service';
+import { Permission } from '../../../auth/permissions/permissions';
 import { trackById } from '../../../shared/utils/track-by';
 
 @Component({
@@ -26,15 +27,17 @@ export class VisitsPageComponent implements OnInit {
   public managementLink: string | null = null
   public managementLabel: string | null = null
   private authService = inject(AuthService)
-  public canCreateVisit = computed(() =>
-    this.authService.hasPermission('visits.create')
-  )
-  public canEditVisit = computed(() =>
-    this.authService.hasPermission('visits.update')
-  )
-  public canDeleteVisit = computed(() =>
-    this.authService.hasPermission('visits.delete')
-  )
+  public canCreateVisit(): boolean {
+    return this.authService.hasPermission(this.modulePermission('update'))
+  }
+
+  public canEditVisit(): boolean {
+    return this.authService.hasPermission(this.modulePermission('update'))
+  }
+
+  public canDeleteVisit(): boolean {
+    return this.canEditVisit() && this.authService.hasPermission('visits.delete')
+  }
 
   private router = inject( Router )
   public urlSegment: string = ''
@@ -79,6 +82,17 @@ export class VisitsPageComponent implements OnInit {
       this.managementLink = '/dashboard/o-room/rooms'
       this.managementLabel = 'Gestionar quirófanos'
     }
+  }
+
+  private modulePermission(action: 'read' | 'update'): Permission {
+    const prefixByRoute: Record<string, string> = {
+      visits: 'outpatient',
+      emergency: 'emergency',
+      'o-room': 'operating_room',
+      hospitalization: 'hospitalization'
+    }
+    const prefix = prefixByRoute[this.urlSegment] ?? 'outpatient'
+    return `visits.${prefix}.${action}` as Permission
   }
 
   public getVisits(searchTerm?: string) {

@@ -106,3 +106,26 @@ export interface Visit {
     usedInventory : { stockId: number, stockQty: number}[]
     expediente?: ExpedientePayload | null
 }
+
+export interface PrescriptionContext {
+    visitId: number
+    visitDate: string
+    treatment: string | null
+    diagnosis: string | null
+    patientId: number
+    patientName: string
+    patientBirthDate: string | null
+    patientIdentification: string | null
+    doctorId: number
+    doctorUserId: number | null
+    doctorName: string
+    doctorSpecialty: string | null
+    doctorPosition: string | null
+    doctorPhone: string | null
+    doctorEmail: string | null
+    doctorAddress: string | null
+    clinicName: string
+    logoUrl: string
+    signatureUrl: string | null
+    stampUrl: string | null
+}

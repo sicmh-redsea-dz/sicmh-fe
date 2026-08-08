@@ -14,7 +14,7 @@
     <div class="list-panel">
       <div class="panel-header">
         <span>Listado de camas</span>
-        <button *appHasPermission="'visits.update'" class="ghost-btn" type="button" (click)="clearSelection()">Nueva cama</button>
+        <button class="ghost-btn" type="button" (click)="clearSelection()">Nueva cama</button>
       </div>
 
       <div class="table-wrapper" *ngIf="beds.length > 0; else empty">
@@ -50,7 +50,7 @@
     </div>
 
     <div class="detail-panel">
-      <ng-container *appHasPermission="'visits.update'">
+      <ng-container>
         <section class="card">
           <h3>{{ selectedBed ? 'Editar cama' : 'Nueva cama' }}</h3>
           <form [formGroup]="bedForm" (ngSubmit)="saveBed()">

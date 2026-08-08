@@ -21,6 +21,7 @@ import { BedsManagementPageComponent } from './pages/beds-management-page/beds-m
 import { OrRoomsManagementPageComponent } from './pages/or-rooms-management-page/or-rooms-management-page.component';
 import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoice-preview-page.component';
 import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
+import { PrescriptionPageComponent } from './pages/prescription-page/prescription-page.component';
 
 const routes: Routes = [
   {
@@ -72,14 +73,14 @@ const routes: Routes = [
             component: VisitsPageComponent, 
             pathMatch: 'full',
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'] }
+            data: { permissions: ['visits.operating_room.read'] }
           },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.create'],
+              permissions: ['visits.operating_room.update'],
               origin: 'oroom',
               stockSearchId: 3,
               includeSubinventoryInPayload: false,
@@ -95,7 +96,7 @@ const routes: Routes = [
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.update'],
+              permissions: ['visits.operating_room.update'],
               origin: 'oroom',
               stockSearchId: 3,
               includeSubinventoryInPayload: false,
@@ -110,13 +111,13 @@ const routes: Routes = [
             path: 'report/:id', 
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'], origin: 'oroom' }
+            data: { permissions: ['visits.operating_room.read'], origin: 'oroom' }
           },
           { 
             path: 'rooms', 
             component: OrRoomsManagementPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.update'], title: 'Quirófanos' }
+            data: { permissions: ['visits.operating_room.update'], title: 'Quirófanos' }
           }
         ]
       },
@@ -129,14 +130,14 @@ const routes: Routes = [
             component: VisitsPageComponent, 
             pathMatch: 'full',
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'] }
+            data: { permissions: ['visits.hospitalization.read'] }
           },
           { 
             path: 'new-visit', 
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.create'],
+              permissions: ['visits.hospitalization.update'],
               origin: 'hospitalization',
               stockSearchId: 4,
               includeSubinventoryInPayload: false,
@@ -152,7 +153,7 @@ const routes: Routes = [
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.update'],
+              permissions: ['visits.hospitalization.update'],
               origin: 'hospitalization',
               stockSearchId: 4,
               includeSubinventoryInPayload: false,
@@ -167,13 +168,13 @@ const routes: Routes = [
             path: 'report/:id', 
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'], origin: 'hospitalization' }
+            data: { permissions: ['visits.hospitalization.read'], origin: 'hospitalization' }
           },
           { 
             path: 'beds', 
             component: BedsManagementPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.update'], module: 'hospitalization', title: 'Camas de hospitalización' }
+            data: { permissions: ['visits.hospitalization.update'], module: 'hospitalization', title: 'Camas de hospitalización' }
           }
         ]
       },
@@ -186,14 +187,14 @@ const routes: Routes = [
             component: VisitsPageComponent, 
             pathMatch: 'full',
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'] }
+            data: { permissions: ['visits.emergency.read'] }
           },
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.update'],
+              permissions: ['visits.emergency.update'],
               origin: 'emergency',
               stockSearchId: 2,
               includeSubinventoryInPayload: true,
@@ -209,7 +210,7 @@ const routes: Routes = [
             component: VisitsFormPageV2Component,
             canActivate: [permissionsGuard],
             data: {
-              permissions: ['visits.create'],
+              permissions: ['visits.emergency.update'],
               origin: 'emergency',
               stockSearchId: 2,
               includeSubinventoryInPayload: true,
@@ -224,13 +225,13 @@ const routes: Routes = [
             path: 'report/:id', 
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'], origin: 'emergency' }
+            data: { permissions: ['visits.emergency.read'], origin: 'emergency' }
           },
           { 
             path: 'beds', 
             component: BedsManagementPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.update'], module: 'emergency', title: 'Camas de emergencia' }
+            data: { permissions: ['visits.emergency.update'], module: 'emergency', title: 'Camas de emergencia' }
           },
         ]
       },
@@ -243,27 +244,34 @@ const routes: Routes = [
             component: VisitsPageComponent, 
             pathMatch: 'full',
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'] }
+            data: { permissions: ['visits.outpatient.read'] }
           },
           { 
             path: 'new-visit', 
             component: VisitsFormPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.create'] }
+            data: { permissions: ['visits.outpatient.update'] }
           },
           { 
             path: 'edit-visit/:id', 
             component: VisitsFormPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.update'] }
+            data: { permissions: ['visits.outpatient.update'] }
           },
           { 
             path: 'report/:id', 
             component: VisitsReportPageComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['visits.read'], origin: 'visits' }
+            data: { permissions: ['visits.outpatient.read'], origin: 'visits' }
           },
         ]
+      },
+
+      {
+        path: 'prescription/:id',
+        component: PrescriptionPageComponent,
+        canActivate: [permissionsGuard],
+        data: { anyPermissions: ['visits.outpatient.read', 'visits.emergency.read', 'visits.operating_room.read', 'visits.hospitalization.read'] }
       },
 
       { 
@@ -314,24 +322,29 @@ const routes: Routes = [
         component: SettingsPageComponent,
         children: [
           { path: '', redirectTo: 'my-profile', pathMatch: 'full' },
-          { path: 'my-profile', component: MyProfileComponent },
+          {
+            path: 'my-profile',
+            component: MyProfileComponent,
+            canActivate: [permissionsGuard],
+            data: { permissions: ['settings.profile.read'] }
+          },
           { 
             path: 'permissions', 
             component: PermissionsComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['settings.permissions.manage'] }
+            data: { permissions: ['settings.permissions.read'] }
           },
           {
             path: 'staff',
             component: StaffManagementComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['settings.permissions.manage'] }
+            data: { permissions: ['settings.staff.read'] }
           },
           {
             path: 'empresa',
             component: EmpresaComponent,
             canActivate: [permissionsGuard],
-            data: { permissions: ['settings.permissions.manage'] }
+            data: { permissions: ['settings.company.read'] }
           },
         ]
       },

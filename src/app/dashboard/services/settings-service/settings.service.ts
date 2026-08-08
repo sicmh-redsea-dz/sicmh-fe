@@ -33,6 +33,16 @@ export class SettingsService {
       )
   }
 
+  public getCompany(): Observable<{ name: string }> {
+    return this.http.get<ApiResponse<{ name: string }>>(`${this.baseUrl}/app/settings/company`, {})
+      .pipe(map(({ data }) => data), catchError((err) => throwError(() => formatApiError(err))))
+  }
+
+  public updateCompany(name: string): Observable<{ name: string }> {
+    return this.http.patch<ApiResponse<{ name: string }>>(`${this.baseUrl}/app/settings/company`, { name }, {})
+      .pipe(map(({ data }) => data), catchError((err) => throwError(() => formatApiError(err))))
+  }
+
   // Roles are a static catalog (no create/edit-role UI exists), so this is
   // cached for the app session instead of refetched on every navigation.
   private rolesCache$?: Observable<RoleOption[]>

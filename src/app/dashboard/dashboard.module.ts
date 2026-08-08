@@ -31,6 +31,7 @@ import { InvoicePreviewPageComponent } from './pages/invoice-preview-page/invoic
 import { PatientMovementsPageComponent } from './pages/patient-movements-page/patient-movements-page.component';
 import { AttachmentListComponent } from './components/attachments/attachment-list/attachment-list.component';
 import { EmpresaComponent } from './pages/settings-page/empresa/empresa.component';
+import { PrescriptionPageComponent } from './pages/prescription-page/prescription-page.component';
 
 
 @NgModule({
@@ -60,7 +61,8 @@ import { EmpresaComponent } from './pages/settings-page/empresa/empresa.componen
     InvoicePreviewPageComponent,
     PatientMovementsPageComponent,
     AttachmentListComponent,
-    EmpresaComponent
+    EmpresaComponent,
+    PrescriptionPageComponent
   ],
   imports: [
     CommonModule,

@@ -7,7 +7,7 @@
   (searchTerm)="onSearchTermChange($event)"
 />
 
-<div class="management-link" *ngIf="managementLink && managementLabel">
+<div class="management-link" *ngIf="managementLink && managementLabel && canEditVisit()">
   <a [routerLink]="managementLink">{{ managementLabel }}</a>
 </div>
 

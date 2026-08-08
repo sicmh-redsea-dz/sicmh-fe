@@ -99,6 +99,20 @@ export class AttachmentsService {
       )
   }
 
+  public uploadPrescriptionAsset(type: 'signature' | 'stamp', file: File): Observable<string> {
+    const body = new FormData()
+    body.append('file', file, file.name)
+    return this.http.post<LogoUploadResponse>(`${this.baseUrl}/app/settings/prescription-assets/${type}`, body, {})
+      .pipe(
+        map(({ data }) => data.url),
+        catchError((err) => throwError(() => formatApiError(err)))
+      )
+  }
+
+  public prescriptionAssetUrl(tenantCode: string, userId: number, type: 'signature' | 'stamp'): string {
+    return `${environment.publicAssetsBaseUrl}/${tenantCode}/users/${userId}/${type}.png`
+  }
+
   // The logo bucket is public-read: the URL is built directly, no endpoint needed.
   public logoUrl( tenantCode: string ): string {
     return `${environment.publicAssetsBaseUrl}/${tenantCode}/logo.png`

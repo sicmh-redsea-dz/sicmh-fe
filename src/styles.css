@@ -48,6 +48,9 @@
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
+  --scrollbar-size: 8px;
+  --scrollbar-thumb: rgba(100, 116, 139, 0.55);
+  --scrollbar-thumb-hover: rgba(71, 85, 105, 0.78);
 }
 
 :root[data-theme='dark'] {
@@ -75,6 +78,8 @@
 
   .main-content {
     margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 }
 
@@ -83,6 +88,34 @@
   padding: 0px;
   box-sizing: border-box;
   font-family: Poppins-Regular, sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 body, html {

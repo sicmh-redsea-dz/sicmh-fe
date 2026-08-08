@@ -13,6 +13,7 @@ export interface Invoice {
   FechaFactura: string;
   Estado:       string;
   Monto:        string;
+  TipoVisita?:  string | null;
   InvoiceNumber: string;
 }
 

@@ -3,7 +3,8 @@
   top: 0;
   align-self: flex-start;
   width: 256px;
-  height: 100vh;
+  flex: 0 0 256px;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -72,6 +73,17 @@
   overflow-x: visible;
   padding-right: 4px;
   overscroll-behavior: contain;
+  scrollbar-color: rgba(255, 255, 255, 0.38) transparent;
+}
+
+.nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.38);
+  background-clip: padding-box;
+}
+
+.nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.58);
+  background-clip: padding-box;
 }
 
 .menu ul li {
@@ -174,6 +186,7 @@
 
 .sidebar.active {
   width: 92px;
+  flex-basis: 92px;
   padding: 16px;
 }
 

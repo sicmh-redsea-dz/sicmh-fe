@@ -6,6 +6,7 @@
     </div>
     <div class="report-actions">
       <button class="btn secondary" [routerLink]="['/dashboard', backRoute]">Regresar</button>
+      <button class="btn prescription" [routerLink]="['/dashboard', 'prescription', visit.id]" [queryParams]="{ back: backRoute }">Receta médica</button>
       <button class="btn primary" type="button" (click)="printReport()">Imprimir</button>
     </div>
   </div>

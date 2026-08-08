@@ -128,6 +128,8 @@ export class DashboardPageComponent implements AfterViewInit {
   getData() {
     this.dashboardService.getDataForDashb().subscribe({
       next: ({ cardData }) => {
+        if (cardData == null) return
+
         this.patientsCurrent = cardData.pacientes_actuales
         this.patientsPct     = cardData.pacientes_variacion
         this.invoicesCurrent = cardData.facturas_actuales

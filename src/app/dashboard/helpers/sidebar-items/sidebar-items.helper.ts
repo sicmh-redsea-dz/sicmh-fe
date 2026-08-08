@@ -39,22 +39,22 @@ export const sidebarItems: SidebarItem[] = [
       {
         label: 'Consulta Externa',
         routerLink:'visits',
-        requiredPermissions: ['visits.read']
+        requiredPermissions: ['visits.outpatient.read']
       },
       {
         label:'Emergencias',
         routerLink:'emergency',
-        requiredPermissions: ['visits.read']
+        requiredPermissions: ['visits.emergency.read']
       },
       {
         label: 'Quirofano',
         routerLink: 'o-room',
-        requiredPermissions: ['visits.read']
+        requiredPermissions: ['visits.operating_room.read']
       },
       {
         label: 'Hospitalización',
         routerLink: 'hospitalization',
-        requiredPermissions: ['visits.read']
+        requiredPermissions: ['visits.hospitalization.read']
       }
     ],
     arrowIcon: 'ph-bold ph-caret-down'

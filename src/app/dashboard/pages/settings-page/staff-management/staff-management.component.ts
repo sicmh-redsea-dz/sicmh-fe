@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 import { SettingsService } from '../../../services/settings-service/settings.service'
 import { RoleOption, SettingsUser } from '../../../interface/settings.interface'
 import { trackById } from '../../../../shared/utils/track-by'
+import { AuthService } from '../../../../auth/services/auth.service'
 
 @Component({
   selector: 'app-staff-management',
@@ -14,6 +15,8 @@ export class StaffManagementComponent implements OnInit {
   public trackById = trackById
   private fb = inject(FormBuilder)
   private settingsService = inject(SettingsService)
+  private authService = inject(AuthService)
+  public canUpdateStaff = this.authService.hasPermission('settings.staff.update')
 
   public roles: RoleOption[] = []
   public users: SettingsUser[] = []
@@ -35,6 +38,7 @@ export class StaffManagementComponent implements OnInit {
   }
 
   public submit() {
+    if (!this.canUpdateStaff) return
     if (this.staffForm.invalid) {
       this.staffForm.markAllAsTouched()
       return
@@ -80,6 +84,7 @@ export class StaffManagementComponent implements OnInit {
   }
 
   public deleteUser(user: SettingsUser) {
+    if (!this.canUpdateStaff) return
     Swal.fire({
       title: '¿Eliminar usuario?',
       html: `Se eliminará <strong>${user.name}</strong> del sistema. Esta acción no se puede deshacer.`,
@@ -102,6 +107,7 @@ export class StaffManagementComponent implements OnInit {
   }
 
   public changePassword(user: SettingsUser) {
+    if (!this.canUpdateStaff) return
     Swal.fire({
       title: 'Cambiar contraseña',
       html: `

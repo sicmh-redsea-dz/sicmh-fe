@@ -95,7 +95,7 @@
           <span class="summary-pill danger">
             Bloqueos: {{ getOverrideSummary(activeTab === 'roles' ? 'role' : 'user').revokes }}
           </span>
-          <button class="primary-btn" type="button" (click)="saveOverrides()" [disabled]="saving">
+          <button class="primary-btn" type="button" (click)="saveOverrides()" [disabled]="saving || !canUpdatePermissions">
             {{ saving ? 'Guardando...' : 'Guardar cambios' }}
           </button>
         </div>
@@ -151,6 +151,7 @@
             <div class="perm-actions">
               <button
                 type="button"
+                [disabled]="!canUpdatePermissions"
                 [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'inherit'"
                 (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'inherit')"
               >
@@ -159,6 +160,7 @@
               <button
                 type="button"
                 class="allow"
+                [disabled]="!canUpdatePermissions"
                 [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'grant'"
                 (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'grant')"
               >
@@ -167,6 +169,7 @@
               <button
                 type="button"
                 class="deny"
+                [disabled]="!canUpdatePermissions"
                 [class.active]="getPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key) === 'revoke'"
                 (click)="setPermissionState(activeTab === 'roles' ? 'role' : 'user', perm.key, 'revoke')"
               >

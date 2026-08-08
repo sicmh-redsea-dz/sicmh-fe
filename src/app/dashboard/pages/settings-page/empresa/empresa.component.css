@@ -66,6 +66,20 @@
   flex-wrap: wrap;
 }
 
+.company-name-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.company-name-form input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+}
+
 .logo-preview {
   display: flex;
   flex-direction: column;

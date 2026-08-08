@@ -1,7 +1,7 @@
 .container {
   width: 100%;
-  max-width: 1200px;
-  max-height: 95vh;
+  max-width: none;
+  max-height: calc(100dvh - 48px);
   padding: 2rem;
   background-color: var(--surface);
   border-radius: var(--radius);

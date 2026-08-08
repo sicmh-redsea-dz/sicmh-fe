@@ -10,6 +10,24 @@
   <section class="card">
     <div class="card-header">
       <div class="title">
+        <i class="ph-bold ph-identification-card"></i>
+        <div>
+          <h3>Nombre de la clínica</h3>
+          <span>Se utiliza automáticamente en recetas y documentos.</span>
+        </div>
+      </div>
+    </div>
+    <div class="company-name-form">
+      <input type="text" [(ngModel)]="clinicName" placeholder="Nombre de la clínica" [disabled]="!canUpdateCompany">
+      <button class="save-btn" type="button" (click)="saveClinicName()" [disabled]="!canUpdateCompany || !clinicName.trim() || savingName">
+        {{ savingName ? 'Guardando...' : 'Guardar nombre' }}
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <div class="title">
         <i class="ph-bold ph-buildings"></i>
         <div>
           <h3>Logo de la empresa</h3>
@@ -41,12 +59,13 @@
       </div>
 
       <div class="logo-actions">
-        <label class="upload-btn" [class.disabled]="saving">
+        <label class="upload-btn" [class.disabled]="saving || !canUpdateCompany">
           <i class="ph ph-upload-simple"></i>
           {{ selectedFile ? 'Elegir otra imagen' : 'Elegir imagen' }}
           <input
             type="file"
             hidden
+            [disabled]="!canUpdateCompany"
             accept="image/jpeg,image/png,image/webp"
             (change)="onFileSelected($event)"
           >

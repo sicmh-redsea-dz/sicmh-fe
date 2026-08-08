@@ -104,8 +104,29 @@ export class SidebarComponent {
     this.settingsOpen = false
   }
 
-  public canManageSettings(): boolean {
-    return this.isAllowed(['settings.permissions.manage'])
+  public canViewSettings(): boolean {
+    return this.authService.hasAnyPermission([
+      'settings.profile.read',
+      'settings.staff.read',
+      'settings.permissions.read',
+      'settings.company.read'
+    ])
+  }
+
+  public canViewProfile(): boolean {
+    return this.isAllowed(['settings.profile.read'])
+  }
+
+  public canViewStaff(): boolean {
+    return this.isAllowed(['settings.staff.read'])
+  }
+
+  public canViewPermissions(): boolean {
+    return this.isAllowed(['settings.permissions.read'])
+  }
+
+  public canViewCompany(): boolean {
+    return this.isAllowed(['settings.company.read'])
   }
 
   public onLogout() {

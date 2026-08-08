@@ -1,0 +1,47 @@
+<div class="prescription-screen" *ngIf="prescription; else loading">
+  <div class="screen-actions">
+    <button class="secondary" [routerLink]="['/dashboard', backRoute, 'report', prescription.visitId]">Regresar</button>
+    <button class="primary" type="button" (click)="print()"><i class="ph ph-printer"></i> Imprimir receta</button>
+  </div>
+
+  <article class="prescription-sheet">
+    <header class="prescription-header">
+      <div class="logo-zone">
+        <img *ngIf="!logoFailed" [src]="prescription.logoUrl" alt="Logo de la clínica" (error)="logoFailed = true">
+      </div>
+      <div class="doctor-heading">
+        <div class="clinic-name">{{ prescription.clinicName }}</div>
+        <h1>Dr(a). {{ prescription.doctorName }}</h1>
+        <p>{{ prescription.doctorSpecialty || prescription.doctorPosition || 'Medicina general' }}</p>
+      </div>
+      <address>
+        <strong>{{ prescription.clinicName }}</strong>
+        <span *ngIf="prescription.doctorAddress">{{ prescription.doctorAddress }}</span>
+        <span *ngIf="prescription.doctorPhone">Tel: {{ prescription.doctorPhone }}</span>
+        <span *ngIf="prescription.doctorEmail">{{ prescription.doctorEmail }}</span>
+      </address>
+    </header>
+
+    <section class="prescription-body">
+      <div class="patient-line full"><strong>Nombre del paciente:</strong><span>{{ prescription.patientName }}</span></div>
+      <div class="patient-row">
+        <div class="patient-line"><strong>Edad:</strong><span>{{ patientAge }}</span></div>
+        <div class="patient-line"><strong>Fecha:</strong><span>{{ formattedDate }}</span></div>
+      </div>
+      <div class="rx">℞</div>
+      <div class="treatment">{{ prescription.treatment || 'Sin tratamiento indicado en el expediente.' }}</div>
+
+      <div class="signature-zone">
+        <div class="credential-assets">
+          <img class="stamp" *ngIf="prescription.stampUrl && !stampFailed" [src]="prescription.stampUrl" alt="Sello profesional" (error)="stampFailed = true">
+          <img class="signature" *ngIf="prescription.signatureUrl && !signatureFailed" [src]="prescription.signatureUrl" alt="Firma digital" (error)="signatureFailed = true">
+        </div>
+        <div class="signature-line"></div>
+        <strong>Dr(a). {{ prescription.doctorName }}</strong>
+        <span>{{ prescription.doctorSpecialty || prescription.doctorPosition }}</span>
+      </div>
+    </section>
+  </article>
+</div>
+
+<ng-template #loading><div class="loading-state">Cargando receta médica...</div></ng-template>

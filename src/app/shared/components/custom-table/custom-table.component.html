@@ -15,6 +15,7 @@
           <td>{{ item.InvoiceNumber }}</td>
           <td>{{ item.Doctor }}</td>
           <td>{{ item.Paciente }}</td>
+          <td><span [class]="'origin-badge ' + getInvoiceOriginClass(item.TipoVisita)">{{ getInvoiceOriginLabel(item.TipoVisita) }}</span></td>
           <td><span class="badge date">{{ item.FechaFactura.split('T')[0] }}</span></td>
           <td><span [className]="'badge ' + getStatusClass(item.Estado)">{{ item.Estado }}</span></td>
           <td>{{ item.Monto }}</td>

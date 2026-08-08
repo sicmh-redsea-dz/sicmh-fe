@@ -1,6 +1,6 @@
 .management-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: none;
   margin: 0 auto;
   padding: 2rem;
   background: var(--surface);

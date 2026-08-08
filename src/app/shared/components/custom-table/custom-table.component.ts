@@ -54,4 +54,22 @@ export class CustomTableComponent {
     if (normalized.includes('anul')) return 'canceled'
     return 'warning'
   }
+
+  public getInvoiceOriginLabel(visitType?: string | null): string {
+    const normalized = (visitType || '').toString().trim().toLowerCase()
+    if (normalized.includes('emer')) return 'Emergencia'
+    if (normalized.includes('hosp')) return 'Hospitalización'
+    if (normalized.includes('quiro')) return 'Quirófano'
+    if (normalized.includes('consult')) return 'Consulta externa'
+    return 'Factura directa'
+  }
+
+  public getInvoiceOriginClass(visitType?: string | null): string {
+    const normalized = (visitType || '').toString().trim().toLowerCase()
+    if (normalized.includes('emer')) return 'emergency'
+    if (normalized.includes('hosp')) return 'hospitalization'
+    if (normalized.includes('quiro')) return 'operating-room'
+    if (normalized.includes('consult')) return 'external-care'
+    return 'direct'
+  }
 }

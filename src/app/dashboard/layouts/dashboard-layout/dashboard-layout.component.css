@@ -1,12 +1,40 @@
 .container {
   display: flex;
   width: 100%;
+  min-width: 0;
+  height: 100dvh;
   min-height: 100vh;
   background-color: #fafafa;
+  overflow: hidden;
 }
 
 .main-content {
   margin: 24px 40px;
-  width: 100%;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  height: calc(100dvh - 48px);
+  overflow: auto;
+  overscroll-behavior: contain;
   transition: all 0.3s;
+}
+
+.main-content > router-outlet + * {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .main-content {
+    margin: 20px 24px;
+    height: calc(100dvh - 40px);
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    margin: 16px;
+    height: calc(100dvh - 32px);
+  }
 }

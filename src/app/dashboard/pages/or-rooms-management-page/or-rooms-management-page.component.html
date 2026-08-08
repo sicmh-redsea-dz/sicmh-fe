@@ -11,7 +11,7 @@
     <div class="list-panel">
       <div class="panel-header">
         <span>Listado de quirófanos</span>
-        <button *appHasPermission="'visits.update'" class="ghost-btn" type="button" (click)="clearSelection()">Nuevo quirófano</button>
+        <button *appHasPermission="'visits.operating_room.update'" class="ghost-btn" type="button" (click)="clearSelection()">Nuevo quirófano</button>
       </div>
 
       <div class="table-wrapper" *ngIf="rooms.length > 0; else empty">
@@ -47,7 +47,7 @@
     </div>
 
     <div class="detail-panel">
-      <ng-container *appHasPermission="'visits.update'">
+      <ng-container *appHasPermission="'visits.operating_room.update'">
         <section class="card">
           <h3>{{ selectedRoom ? 'Editar quirófano' : 'Nuevo quirófano' }}</h3>
           <form [formGroup]="roomForm" (ngSubmit)="saveRoom()">

@@ -7,7 +7,7 @@
   </div>
 
   <div class="staff-grid">
-    <section class="card form-card">
+    <section class="card form-card" *ngIf="canUpdateStaff">
       <div class="card-header">
         <div>
           <h3>Registrar nuevo usuario</h3>
@@ -74,10 +74,10 @@
           </div>
           <div class="item-actions">
             <span class="role-pill">{{ user.roleName || 'Sin rol' }}</span>
-            <button class="action-btn" title="Cambiar contraseña" (click)="changePassword(user)">
+            <button *ngIf="canUpdateStaff" class="action-btn" title="Cambiar contraseña" (click)="changePassword(user)">
               <i class="ph-bold ph-lock-key"></i>
             </button>
-            <button class="action-btn danger" title="Eliminar usuario" (click)="deleteUser(user)">
+            <button *ngIf="canUpdateStaff" class="action-btn danger" title="Eliminar usuario" (click)="deleteUser(user)">
               <i class="ph-bold ph-trash"></i>
             </button>
           </div>
