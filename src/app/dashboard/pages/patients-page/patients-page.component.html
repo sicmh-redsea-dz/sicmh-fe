@@ -27,8 +27,8 @@
           </td>
           <td>{{ patient.idNumber }}</td>
           <td>{{patient | formatFullname }}</td>
-          <td>{{ patient.email }}</td>
-          <td>{{ '+504 '+ patient.phone }}</td>
+          <td>{{ patient.email || '-' }}</td>
+          <td>{{ patient.phone }}</td>
           <td><span class="badge date">{{ patient.birthDate| formatDate }}</span></td>
           <td class="opts-wrapper" (click)="$event.stopPropagation()">
             <toggle-opts 

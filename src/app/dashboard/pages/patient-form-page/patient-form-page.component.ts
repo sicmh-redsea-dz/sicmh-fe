@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { filter, map, switchMap, tap } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
-import { FormPatient, Patient } from '../../interface/patients-response.interface';
+import { FormPatient, IdentificationType, Patient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -24,19 +24,20 @@ export class PatientFormPageComponent implements OnInit {
   private destroyRef = inject( DestroyRef )
 
   public patientForm = this.fb.group({
-    id        : ['', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
+    identificationType: this.fb.control<IdentificationType>('identidad', [Validators.required]),
+    id        : ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]+$/)]],
     firstName : ['', [Validators.required, Validators.minLength(2)]],
     lastName  : ['', [Validators.required, Validators.minLength(2)]],
     birthdate : ['', [Validators.required]],
     gender    : ['', [Validators.required]],
-    phone     : ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
-    email     : ['', [Validators.required, Validators.email]],
+    phone     : ['', [Validators.required]],
+    email     : ['', [Validators.email]],
     address   : ['', [Validators.required, Validators.minLength(5)]],
     notes     : [''],
     emergencyContact: this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       relationship: ['', [Validators.required, Validators.minLength(2)]],
-      phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
+      phone: ['', [Validators.required]],
       email: ['', [Validators.email]],
       address: ['']
     })
@@ -97,12 +98,13 @@ export class PatientFormPageComponent implements OnInit {
   private patchForm(patient: Patient) {
     this.patientForm.patchValue({
       id: patient.idNumber,
+      identificationType: patient.identificationType ?? 'identidad',
       firstName: patient.name,
       lastName: patient.lastName,
       birthdate: this.formatDate(patient.birthDate),
       gender: patient.gender,
       phone: patient.phone,
-      email: patient.email,
+      email: patient.email ?? '',
       address: patient.address,
       emergencyContact: {
         name: patient.emergencyContact?.name ?? '',

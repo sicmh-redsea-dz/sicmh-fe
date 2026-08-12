@@ -12,10 +12,11 @@ export interface Patient {
   id        : number;
   phone     : string;
   name      : string;
-  email     : string;
+  email     : string | null;
   gender    : 'male' | 'female' | 'other';
   address   : string;
   idNumber  : string;
+  identificationType: IdentificationType;
   lastName  : string;
   birthDate : string;
   emergencyContact: EmergencyContact | null;
@@ -43,6 +44,7 @@ export interface AddedUser {
 
 export interface FormPatient {
   id        : string
+  identificationType: IdentificationType
   birthdate : string
   firstName : string
   lastName  : string
@@ -59,3 +61,5 @@ export interface FormPatient {
     address: string
   }
 }
+
+export type IdentificationType = 'identidad' | 'pasaporte' | 'carne_residencia'

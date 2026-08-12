@@ -19,16 +19,23 @@
 
       <div class="form-column">
         <div class="form-group">
-          <label class="required">Identidad</label>
+          <label class="required">Tipo de identificación</label>
+          <select formControlName="identificationType">
+            <option value="identidad">Identidad</option>
+            <option value="pasaporte">Pasaporte</option>
+            <option value="carne_residencia">Carné de residencia</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Número de identificación</label>
           <input  class=""
                   type="text" 
                   formControlName="id" 
-                  placeholder="Identidad del paciente">
+                  placeholder="Número o código alfanumérico">
            <div class="error-message" *ngIf="patientForm.get('id')?.invalid && (patientForm.get('id')?.touched || patientForm.get('id')?.dirty)">
             <small *ngIf="patientForm.get('id')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('id')?.errors?.['minlength'] || patientForm.get('id')?.errors?.['maxlength']">
-              Debe tener 13 caracteres.
-            </small>
+            <small *ngIf="patientForm.get('id')?.errors?.['pattern']">Solo se permiten letras y números.</small>
           </div>
         </div>
 
@@ -89,20 +96,16 @@
                   placeholder="Número de teléfono">
           <div class="error-message" *ngIf="patientForm.get('phone')?.invalid && (patientForm.get('phone')?.touched || patientForm.get('phone')?.dirty)">
             <small *ngIf="patientForm.get('phone')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('phone')?.errors?.['minlength'] || patientForm.get('phone')?.errors?.['maxlength']">
-              Debe tener 8 dígitos.
-            </small>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="required">Correo Electrónico</label>
+          <label>Correo Electrónico</label>
           <input  [ngClass]="{'ng-touched': patientForm.get('email')?.touched}" 
                   type="email" 
                   formControlName="email" 
                   placeholder="ejemplo@correo.com">
           <div class="error-message" *ngIf="patientForm.get('email')?.invalid && (patientForm.get('email')?.touched || patientForm.get('email')?.dirty)">
-            <small *ngIf="patientForm.get('email')?.errors?.['required']">Este campo es obligatorio.</small>
             <small *ngIf="patientForm.get('email')?.errors?.['email']">Debe ser un correo válido.</small>
           </div>
         </div>
@@ -152,7 +155,6 @@
           <input type="tel" formControlName="phone" placeholder="Número de teléfono">
           <div class="error-message" *ngIf="patientForm.get('emergencyContact.phone')?.invalid && (patientForm.get('emergencyContact.phone')?.touched || patientForm.get('emergencyContact.phone')?.dirty)">
             <small *ngIf="patientForm.get('emergencyContact.phone')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('emergencyContact.phone')?.errors?.['minlength'] || patientForm.get('emergencyContact.phone')?.errors?.['maxlength']">Debe tener 8 dígitos.</small>
           </div>
         </div>
 
