@@ -3,9 +3,9 @@
         <label for="subinv">Subinventario</label>
         <select id="subinv" formControlName="subinv">
             <option value="">Selecciona una subinventario</option>
-            <option value="2">Emergencia</option>
-            <option value="3">Quirofano</option>
-            <option value="4">Hospitalización</option>
+            @for (subinventory of availableSubinventories(); track subinventory.id) {
+                <option [value]="subinventory.id">{{ subinventory.label }}</option>
+            }
         </select>
         <small class="error-text" *ngIf="invoiceForm.get('subinv')?.touched && invoiceForm.get('subinv')?.hasError('required')">
           Selecciona un subinventario.

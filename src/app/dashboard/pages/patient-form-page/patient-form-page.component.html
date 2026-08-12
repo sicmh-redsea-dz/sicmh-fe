@@ -122,6 +122,55 @@
       </div>
     </div>
 
+    <section class="emergency-contact-section" formGroupName="emergencyContact">
+      <div class="section-heading">
+        <h2>Contacto de emergencia</h2>
+        <p>Persona principal a contactar en caso de una emergencia.</p>
+      </div>
+
+      <div class="emergency-contact-grid">
+        <div class="form-group">
+          <label class="required">Nombre completo</label>
+          <input type="text" formControlName="name" placeholder="Nombre del contacto">
+          <div class="error-message" *ngIf="patientForm.get('emergencyContact.name')?.invalid && (patientForm.get('emergencyContact.name')?.touched || patientForm.get('emergencyContact.name')?.dirty)">
+            <small *ngIf="patientForm.get('emergencyContact.name')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="patientForm.get('emergencyContact.name')?.errors?.['minlength']">Debe tener al menos 2 caracteres.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Parentesco</label>
+          <input type="text" formControlName="relationship" placeholder="Ej. madre, cónyuge, hermano">
+          <div class="error-message" *ngIf="patientForm.get('emergencyContact.relationship')?.invalid && (patientForm.get('emergencyContact.relationship')?.touched || patientForm.get('emergencyContact.relationship')?.dirty)">
+            <small *ngIf="patientForm.get('emergencyContact.relationship')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="patientForm.get('emergencyContact.relationship')?.errors?.['minlength']">Debe tener al menos 2 caracteres.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Teléfono</label>
+          <input type="tel" formControlName="phone" placeholder="Número de teléfono">
+          <div class="error-message" *ngIf="patientForm.get('emergencyContact.phone')?.invalid && (patientForm.get('emergencyContact.phone')?.touched || patientForm.get('emergencyContact.phone')?.dirty)">
+            <small *ngIf="patientForm.get('emergencyContact.phone')?.errors?.['required']">Este campo es obligatorio.</small>
+            <small *ngIf="patientForm.get('emergencyContact.phone')?.errors?.['minlength'] || patientForm.get('emergencyContact.phone')?.errors?.['maxlength']">Debe tener 8 dígitos.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" formControlName="email" placeholder="ejemplo@correo.com">
+          <div class="error-message" *ngIf="patientForm.get('emergencyContact.email')?.invalid && (patientForm.get('emergencyContact.email')?.touched || patientForm.get('emergencyContact.email')?.dirty)">
+            <small *ngIf="patientForm.get('emergencyContact.email')?.errors?.['email']">Debe ser un correo válido.</small>
+          </div>
+        </div>
+
+        <div class="form-group emergency-address">
+          <label>Dirección</label>
+          <input type="text" formControlName="address" placeholder="Dirección del contacto">
+        </div>
+      </div>
+    </section>
+
     <div class="form-group full-width">
       <label>Notas Adicionales</label>
       <textarea class="" 

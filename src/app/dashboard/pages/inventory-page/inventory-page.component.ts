@@ -8,7 +8,15 @@ import { DrawerContents } from '../../interface/drawer-content.enum';
 import { Article } from '../../interface/article.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../auth/services/auth.service';
+import { Permission } from '../../../auth/permissions/permissions';
 import { trackById, trackBySelf } from '../../../shared/utils/track-by';
+
+type InventoryTab = {
+  id: string
+  label: string
+  readOnly: boolean
+  permission?: Permission
+}
 
 @Component({
   selector: 'app-inventory-page',
@@ -53,16 +61,20 @@ export class InventoryPageComponent implements OnInit {
     this.authService.hasPermission('inventory.update')
   )
   public canTransferInventory = computed(() =>
-    this.authService.hasPermission('inventory.transfer')
+    this.authService.hasPermission('inventory.transfer') &&
+    this.inventoryTabs().some((tab) => tab.id !== '1')
   )
   private destroyRef = inject(DestroyRef)
 
-  public inventoryTabs = [
+  private readonly allInventoryTabs: InventoryTab[] = [
     { id: '1', label: 'General', readOnly: false },
-    { id: '2', label: 'Emergencia', readOnly: true },
-    { id: '3', label: 'Quirofano', readOnly: true },
-    { id: '4', label: 'Hospitalización', readOnly: true }
+    { id: '2', label: 'Emergencia', readOnly: true, permission: 'visits.emergency.read' },
+    { id: '3', label: 'Quirofano', readOnly: true, permission: 'visits.operating_room.read' },
+    { id: '4', label: 'Hospitalización', readOnly: true, permission: 'visits.hospitalization.read' }
   ]
+  public inventoryTabs = computed(() => this.allInventoryTabs.filter(
+    (tab) => !tab.permission || this.authService.hasPermission(tab.permission)
+  ))
 
   constructor() {
     this.searchTermSubject.pipe(
@@ -75,10 +87,10 @@ export class InventoryPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectTab(this.inventoryTabs[0])
+    this.selectTab(this.inventoryTabs()[0])
   }
 
-  public selectTab(tab: { id: string; label: string; readOnly: boolean }) {
+  public selectTab(tab: InventoryTab) {
     this.subinventoryId = tab.id
     this.headerText = 'Inventario General'
     this.subHeaderText = `Fichero: ${tab.label}`

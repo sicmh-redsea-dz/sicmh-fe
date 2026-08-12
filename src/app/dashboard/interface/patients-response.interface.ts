@@ -18,6 +18,16 @@ export interface Patient {
   idNumber  : string;
   lastName  : string;
   birthDate : string;
+  emergencyContact: EmergencyContact | null;
+}
+
+export interface EmergencyContact {
+  id: number;
+  name: string;
+  relationship: string;
+  phone: string;
+  email: string;
+  address: string;
 }
 
 export interface ShortPatient {
@@ -32,6 +42,7 @@ export interface AddedUser {
 }
 
 export interface FormPatient {
+  id        : string
   birthdate : string
   firstName : string
   lastName  : string
@@ -40,4 +51,11 @@ export interface FormPatient {
   phone     : string
   email     : string
   notes     : string
+  emergencyContact: {
+    name: string
+    relationship: string
+    phone: string
+    email: string
+    address: string
+  }
 }

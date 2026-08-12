@@ -14,7 +14,7 @@
     <button
         type="button"
         class="tab-btn"
-        *ngFor="let tab of inventoryTabs; trackBy: trackById"
+        *ngFor="let tab of inventoryTabs(); trackBy: trackById"
         [class.active]="subinventoryId === tab.id"
         (click)="selectTab(tab)"
     >

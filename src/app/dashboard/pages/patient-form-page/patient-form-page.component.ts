@@ -32,7 +32,14 @@ export class PatientFormPageComponent implements OnInit {
     phone     : ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
     email     : ['', [Validators.required, Validators.email]],
     address   : ['', [Validators.required, Validators.minLength(5)]],
-    notes     : ['']
+    notes     : [''],
+    emergencyContact: this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      relationship: ['', [Validators.required, Validators.minLength(2)]],
+      phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
+      email: ['', [Validators.email]],
+      address: ['']
+    })
   })
 
   ngOnInit(): void {
@@ -96,7 +103,14 @@ export class PatientFormPageComponent implements OnInit {
       gender: patient.gender,
       phone: patient.phone,
       email: patient.email,
-      address: patient.address
+      address: patient.address,
+      emergencyContact: {
+        name: patient.emergencyContact?.name ?? '',
+        relationship: patient.emergencyContact?.relationship ?? '',
+        phone: patient.emergencyContact?.phone ?? '',
+        email: patient.emergencyContact?.email ?? '',
+        address: patient.emergencyContact?.address ?? ''
+      }
     })
   }
 

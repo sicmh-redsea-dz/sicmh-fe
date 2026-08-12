@@ -78,6 +78,40 @@
   width: 100%;
 }
 
+.emergency-contact-section {
+  margin: 0.5rem 0 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 0.75rem;
+  background: var(--surface-muted, #f8fafc);
+}
+
+.section-heading {
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 0.25rem;
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.emergency-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1.25rem;
+}
+
+.emergency-address {
+  grid-column: 1 / -1;
+}
+
 .patient-form label {
   display: block;
   font-weight: bold;
@@ -190,6 +224,14 @@
 @media (max-width: 768px) {
   .form-content {
     flex-direction: column;
+  }
+
+  .emergency-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-address {
+    grid-column: auto;
   }
 }
 

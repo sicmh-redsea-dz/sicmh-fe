@@ -35,6 +35,29 @@
       </div>
     </div>
 
+    <div class="patient-details" *ngIf="patient.emergencyContact as contact">
+      <div class="detail-row">
+        <span>Contacto de emergencia</span>
+        <span>{{ contact.name }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Parentesco</span>
+        <span>{{ contact.relationship }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Teléfono de emergencia</span>
+        <span>{{ contact.phone }}</span>
+      </div>
+      <div class="detail-row" *ngIf="contact.email">
+        <span>Correo del contacto</span>
+        <span>{{ contact.email }}</span>
+      </div>
+      <div class="detail-row" *ngIf="contact.address">
+        <span>Dirección del contacto</span>
+        <span>{{ contact.address }}</span>
+      </div>
+    </div>
+
     <app-attachment-list [readOnly]="true" [patientId]="patientId()"></app-attachment-list>
 
     <button class="edit-link" type="button" (click)="goToEdit()">
