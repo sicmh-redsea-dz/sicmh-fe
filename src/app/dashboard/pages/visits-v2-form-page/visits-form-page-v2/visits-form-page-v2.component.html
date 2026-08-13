@@ -19,7 +19,7 @@
 
     <div class="input-row">
       <div class="input-group date-group">
-        <label class="required">Date</label>
+        <label>Date</label>
         <input type="date" 
               formControlName="date"/>
         <small class="error-text" *ngIf="visitForm.get('date')?.invalid && (visitForm.get('date')?.touched || visitForm.get('date')?.dirty)">
@@ -82,7 +82,7 @@
       <div formGroupName="standard">
         <div class="textareas-row">
           <div class="textarea-group">
-            <label class="required">Motivo de consulta/ingreso</label>
+            <label>Motivo de consulta/ingreso</label>
             <textarea 
               formControlName="chiefComplaint"
               placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
@@ -92,7 +92,7 @@
           </div>
 
           <div class="textarea-group">
-            <label class="required">Padecimiento actual</label>
+            <label>Padecimiento actual</label>
             <textarea 
               formControlName="currentIllness"
               placeholder="Resume el padecimiento actual del paciente."></textarea>
@@ -103,7 +103,7 @@
         </div>
 
         <div class="textarea-full">
-          <label class="required">Exploración física</label>
+          <label>Exploración física</label>
           <textarea 
             formControlName="physicalExam"
             placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
@@ -114,7 +114,7 @@
 
         <div class="textareas-row">
           <div class="textarea-group">
-            <label class="required">Alergias</label>
+            <label>Alergias</label>
             <textarea
               formControlName="allergies"
               placeholder="Alergias conocidas del paciente."></textarea>
@@ -124,7 +124,7 @@
           </div>
 
           <div class="textarea-group">
-            <label class="required">Medicamentos actuales</label>
+            <label>Medicamentos actuales</label>
             <textarea
               formControlName="currentMeds"
               placeholder="Medicamentos que consume actualmente."></textarea>
@@ -143,7 +143,7 @@
     <div class="input-columns">
       <div class="left-column">
         <div class="number-input-group">
-          <label class="required">Presion</label>
+          <label>Presion</label>
           <div class="number-input">
             <input type="text" 
                   formControlName="pressure" 
@@ -157,7 +157,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label class="required">Temperatura</label>
+          <label>Temperatura</label>
           <div class="number-input">
             <input type="number"
                   formControlName="temperature"
@@ -187,7 +187,7 @@
           </div>
         </div>
         <div class="number-input-group">
-          <label class="required">Glucometria</label>
+          <label>Glucometria</label>
           <div class="number-input">
             <input type="number"
                   formControlName="glucometry"
@@ -203,7 +203,7 @@
           </small>
         </div>
         <div class="number-input-group">
-          <label class="required">Oxigenacion</label>
+          <label>Oxigenacion</label>
           <div class="number-input">
             <input type="number"
                   formControlName="oxygenation"
@@ -276,7 +276,7 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label class="required">Patologicos</label>
+        <label>Patologicos</label>
         <textarea
           formControlName="pathologicalHst"
           placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
@@ -286,7 +286,7 @@
       </div>
 
       <div class="textarea-group">
-        <label class="required">Familiares</label>
+        <label>Familiares</label>
         <textarea
           formControlName="familyHst"
           placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
@@ -298,7 +298,7 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label class="required">Quirurgicos</label>
+        <label>Quirurgicos</label>
         <textarea
           formControlName="surgicalHst"
           placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
@@ -308,7 +308,7 @@
       </div>
 
       <div class="textarea-group">
-        <label class="required">Habitos</label>
+        <label>Habitos</label>
         <textarea
           formControlName="backgroundHst"
           placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
@@ -324,7 +324,7 @@
 
     <div class="textareas-row">
       <div class="textarea-group">
-        <label class="required">Diagnostico</label>
+        <label>Diagnostico</label>
         <textarea formControlName="diagnosis"
                   placeholder="Escribe aquí el diagnóstico detallado del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('diagnosis')?.invalid && (visitForm.get('diagnosis')?.touched || visitForm.get('diagnosis')?.dirty)">
@@ -333,7 +333,7 @@
       </div>
     
       <div class="textarea-group">
-        <label class="required">Tratamiento</label>
+        <label>Tratamiento</label>
         <textarea formControlName="treatment"
                   placeholder="Describe el plan de tratamiento y medicamentos recomendados."></textarea>
         <small class="error-text" *ngIf="visitForm.get('treatment')?.invalid && (visitForm.get('treatment')?.touched || visitForm.get('treatment')?.dirty)">
@@ -351,7 +351,7 @@
 
           <div class="input-row">
             <div class="input-group">
-              <label class="required">Triage</label>
+              <label>Triage</label>
               <select formControlName="triageLevel">
                 <option value="">Selecciona un nivel</option>
                 <option value="Rojo">Rojo</option>
@@ -365,7 +365,7 @@
             </div>
 
             <div class="input-group">
-              <label class="required">Modo de llegada</label>
+              <label>Modo de llegada</label>
               <select formControlName="arrivalMode">
                 <option value="">Selecciona una opción</option>
                 <option value="Ambulancia">Ambulancia</option>
@@ -379,7 +379,7 @@
             </div>
 
             <div class="input-group">
-              <label class="required">Destino</label>
+              <label>Destino</label>
               <select formControlName="disposition">
                 <option value="">Selecciona un destino</option>
                 <option value="Alta">Alta</option>
@@ -421,7 +421,7 @@
 
           <div class="textareas-row">
             <div class="textarea-group">
-              <label class="required">Diagnostico preoperatorio</label>
+              <label>Diagnostico preoperatorio</label>
               <textarea formControlName="preOpDiagnosis"
                         placeholder="Diagnóstico previo a la cirugía."></textarea>
               <small class="error-text" *ngIf="visitForm.get('expediente.module.preOpDiagnosis')?.invalid && (visitForm.get('expediente.module.preOpDiagnosis')?.touched || visitForm.get('expediente.module.preOpDiagnosis')?.dirty)">
@@ -430,7 +430,7 @@
             </div>
 
             <div class="textarea-group">
-              <label class="required">Diagnostico postoperatorio</label>
+              <label>Diagnostico postoperatorio</label>
               <textarea formControlName="postOpDiagnosis"
                         placeholder="Diagnóstico posterior a la cirugía."></textarea>
               <small class="error-text" *ngIf="visitForm.get('expediente.module.postOpDiagnosis')?.invalid && (visitForm.get('expediente.module.postOpDiagnosis')?.touched || visitForm.get('expediente.module.postOpDiagnosis')?.dirty)">
@@ -440,7 +440,7 @@
           </div>
 
           <div class="textarea-full">
-            <label class="required">Procedimiento quirurgico</label>
+            <label>Procedimiento quirurgico</label>
             <textarea formControlName="procedure"
                       placeholder="Describe el procedimiento realizado."></textarea>
             <small class="error-text" *ngIf="visitForm.get('expediente.module.procedure')?.invalid && (visitForm.get('expediente.module.procedure')?.touched || visitForm.get('expediente.module.procedure')?.dirty)">
@@ -450,21 +450,21 @@
 
           <div class="input-row">
             <div class="input-group">
-              <label class="required">Tipo de anestesia</label>
+              <label>Tipo de anestesia</label>
               <input type="text" formControlName="anesthesiaType" placeholder="Ej. General" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.anesthesiaType')?.invalid && (visitForm.get('expediente.module.anesthesiaType')?.touched || visitForm.get('expediente.module.anesthesiaType')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
             <div class="input-group">
-              <label class="required">Inicio de cirugía</label>
+              <label>Inicio de cirugía</label>
               <input type="time" formControlName="surgeryStart" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryStart')?.invalid && (visitForm.get('expediente.module.surgeryStart')?.touched || visitForm.get('expediente.module.surgeryStart')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
             <div class="input-group">
-              <label class="required">Fin de cirugía</label>
+              <label>Fin de cirugía</label>
               <input type="time" formControlName="surgeryEnd" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryEnd')?.invalid && (visitForm.get('expediente.module.surgeryEnd')?.touched || visitForm.get('expediente.module.surgeryEnd')?.dirty)">
                 Este campo es obligatorio.
@@ -494,7 +494,7 @@
 
           <div class="textareas-row">
             <div class="textarea-group">
-              <label class="required">Diagnostico de ingreso</label>
+              <label>Diagnostico de ingreso</label>
               <textarea formControlName="admissionDiagnosis"
                         placeholder="Diagnóstico principal de ingreso."></textarea>
               <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionDiagnosis')?.invalid && (visitForm.get('expediente.module.admissionDiagnosis')?.touched || visitForm.get('expediente.module.admissionDiagnosis')?.dirty)">
@@ -503,7 +503,7 @@
             </div>
 
             <div class="textarea-group">
-              <label class="required">Motivo de ingreso</label>
+              <label>Motivo de ingreso</label>
               <textarea formControlName="admissionReason"
                         placeholder="Motivo clínico del ingreso."></textarea>
               <small class="error-text" *ngIf="visitForm.get('expediente.module.admissionReason')?.invalid && (visitForm.get('expediente.module.admissionReason')?.touched || visitForm.get('expediente.module.admissionReason')?.dirty)">
@@ -514,7 +514,7 @@
 
           <div class="input-row">
             <div class="input-group">
-              <label class="required">Servicio</label>
+              <label>Servicio</label>
               <input type="text" formControlName="service" placeholder="Ej. Medicina interna" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.service')?.invalid && (visitForm.get('expediente.module.service')?.touched || visitForm.get('expediente.module.service')?.dirty)">
                 Este campo es obligatorio.
@@ -549,7 +549,7 @@
           </div>
 
           <div class="textarea-full">
-            <label class="required">Resumen de evolución</label>
+            <label>Resumen de evolución</label>
             <textarea formControlName="evolutionSummary"
                       placeholder="Resumen de evolución durante la estancia."></textarea>
             <small class="error-text" *ngIf="visitForm.get('expediente.module.evolutionSummary')?.invalid && (visitForm.get('expediente.module.evolutionSummary')?.touched || visitForm.get('expediente.module.evolutionSummary')?.dirty)">
@@ -579,7 +579,7 @@
 
     <div class="inventory-block">
       <div class="form-group">
-        <label class="required">Inventario</label>
+        <label>Inventario</label>
         <select name="stock" (change)="handleChange($event)">
           <option value="">Selecciona un elemento</option>
           @for( s of listOfStockItems(); track $index ) {
@@ -610,7 +610,7 @@
     </div>
 
     <div class="textarea-full">
-      <label class="required">Notas</label>
+      <label>Notas</label>
       <textarea formControlName="notes"
                 placeholder="Añade aquí cualquier información adicional o seguimiento de la visita."></textarea>
       <small class="error-text" *ngIf="visitForm.get('notes')?.invalid && (visitForm.get('notes')?.touched || visitForm.get('notes')?.dirty)">
@@ -626,6 +626,9 @@
     ></app-attachment-list>
 
     <div class="form-actions">
+      <button class="secondary-btn" type="button" [routerLink]="['/dashboard', backRoute]">
+        Regresar
+      </button>
       <button class="submit-btn"
               [disabled]="visitForm.invalid || isSaving"
               type="submit">

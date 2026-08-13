@@ -63,31 +63,31 @@ export class VisitsFormPageV2Component implements OnInit {
   public visitForm: FormGroup = this.fb.group({
     patient     : ['', [Validators.required]],
     doctor      : ['', [Validators.required]],
-    date        : ['', [Validators.required]],
-    notes       : ['', [Validators.required]],
-    pressure    : ['', [Validators.required, pressureValidator()]],
-    oxygenation : ['', [Validators.required]],
-    temperature : ['', [Validators.required]],
-    glucometry  : ['', [Validators.required]],
+    date        : [''],
+    notes       : [''],
+    pressure    : ['', [pressureValidator()]],
+    oxygenation : [''],
+    temperature : [''],
+    glucometry  : [''],
     weight      : [''],
     height      : [''],
     BMI         : [''],
     fatPercentage: [''],
     visceralFat : [''],
     ageAccordingToWeight: [''],
-    diagnosis   : ['', [Validators.required]],
-    treatment   : ['', [Validators.required]],
-    pathologicalHst: ['', [Validators.required]],
-    familyHst   : ['', [Validators.required]],
-    surgicalHst : ['', [Validators.required]],
-    backgroundHst: ['', [Validators.required]],
+    diagnosis   : [''],
+    treatment   : [''],
+    pathologicalHst: [''],
+    familyHst   : [''],
+    surgicalHst : [''],
+    backgroundHst: [''],
     expediente  : this.fb.group({
       standard: this.fb.group({
-        chiefComplaint: ['', [Validators.required]],
-        currentIllness: ['', [Validators.required]],
-        physicalExam: ['', [Validators.required]],
-        allergies: ['', [Validators.required]],
-        currentMeds: ['', [Validators.required]],
+        chiefComplaint: [''],
+        currentIllness: [''],
+        physicalExam: [''],
+        allergies: [''],
+        currentMeds: [''],
       }),
       module: this.fb.group({
         followUpPlan: [''],
@@ -334,24 +334,11 @@ export class VisitsFormPageV2Component implements OnInit {
       }
     })
 
-    const requiredByOrigin: Record<string, string[]> = {
-      emergency: ['triageLevel', 'arrivalMode', 'disposition'],
-      oroom: ['preOpDiagnosis', 'postOpDiagnosis', 'procedure', 'anesthesiaType', 'surgeryStart', 'surgeryEnd'],
-      hospitalization: ['admissionDiagnosis', 'admissionReason', 'service', 'bed', 'evolutionSummary']
+    if (this.origin === 'hospitalization') {
+      const bedControl = moduleGroup.get('bed')
+      bedControl?.setValidators([this.bedSelectionValidator()])
+      bedControl?.updateValueAndValidity({ emitEvent: false })
     }
-
-    const requiredFields = requiredByOrigin[this.origin] ?? []
-    requiredFields.forEach((field) => {
-      const control = moduleGroup.get(field)
-      if (control) {
-        const validators: ValidatorFn[] = [Validators.required]
-        if (field === 'bed') {
-          validators.push(this.bedSelectionValidator())
-        }
-        control.setValidators(validators)
-        control.updateValueAndValidity({ emitEvent: false })
-      }
-    })
   }
 
   private bedSelectionValidator(): ValidatorFn {
@@ -521,7 +508,7 @@ export class VisitsFormPageV2Component implements OnInit {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
                 this.clearDraft()
-                this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
+                this.router.navigateByUrl(`/dashboard/${this.backRoute}/edit-visit/${visitId}`)
               })
           })
         },
@@ -610,7 +597,7 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleEditVisit( visit: FormVisitWithStock ) {
-    visit.date =  visit.date.split('T')[0]
+    visit.date = (visit.date || formatNewDate(new Date())).split('T')[0]
     const payload: FormVisitWithStock = this.includeSubinventoryInPayload
       ? {
         ...visit,
@@ -626,11 +613,9 @@ export class VisitsFormPageV2Component implements OnInit {
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
+            this.isSaving = false
+            this.clearDraft()
             Swal.fire('Success', 'New visit edited!', 'success')
-              .then(() => {
-                this.clearDraft()
-                this.router.navigateByUrl(`/dashboard/${this.backRoute}`)
-              })
           } else {
             this.isSaving = false
           }
@@ -711,8 +696,7 @@ export class VisitsFormPageV2Component implements OnInit {
     this.selectedStockItems.forEach((item) => {
       this.stockItemsArray.push(
         this.fb.control(
-          {id: item.id, qty: item.currentQuantity}, 
-          [Validators.required]
+          {id: item.id, qty: item.currentQuantity}
         )
       )
     })

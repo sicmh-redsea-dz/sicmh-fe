@@ -52,35 +52,35 @@ export class VisitsFormPageComponent implements OnInit {
   public visitForm: FormGroup = this.fb.group({
     ageAccordingToWeight: [''],
     BMI           : [''],
-    date          : ['', [Validators.required]],
-    diagnosis     : ['', [Validators.required]],
+    date          : [''],
+    diagnosis     : [''],
     doctor        : ['', [Validators.required]],
     fatPercentage : [''],
-    glucometry    : ['', [Validators.required]],
+    glucometry    : [''],
     height        : [''],
     notes         : [''],
-    oxygenation   : ['', [Validators.required]],
+    oxygenation   : [''],
     patient       : ['', [Validators.required]],
-    pressure      : ['', [Validators.required, pressureValidator()]],
-    temperature   : ['', [Validators.required]],
-    treatment     : ['', [Validators.required]],
-    pathologicalHst: ['', [Validators.required]],
-    familyHst     : ['', [Validators.required]],
-    surgicalHst   : ['', [Validators.required]],
-    backgroundHst : ['', [Validators.required]],
+    pressure      : ['', [pressureValidator()]],
+    temperature   : [''],
+    treatment     : [''],
+    pathologicalHst: [''],
+    familyHst     : [''],
+    surgicalHst   : [''],
+    backgroundHst : [''],
     visceralFat   : [''],
     weight        : [''],
     expediente    : this.fb.group({
       standard: this.fb.group({
-        chiefComplaint: ['', [Validators.required]],
-        currentIllness: ['', [Validators.required]],
-        physicalExam: ['', [Validators.required]],
-        allergies: ['', [Validators.required]],
-        currentMeds: ['', [Validators.required]],
+        chiefComplaint: [''],
+        currentIllness: [''],
+        physicalExam: [''],
+        allergies: [''],
+        currentMeds: [''],
       }),
       module: this.fb.group({
-        followUpPlan: ['', [Validators.required]],
-        referrals: ['', [Validators.required]],
+        followUpPlan: [''],
+        referrals: [''],
       })
     }),
     stockItems    : this.fb.array([])
@@ -292,8 +292,7 @@ export class VisitsFormPageComponent implements OnInit {
     this.selectedStockItems.forEach((item) => {
       this.stockItemsArray.push(
         this.fb.control(
-          {id: item.id, qty: item.currentQuantity},
-          [Validators.required]
+          {id: item.id, qty: item.currentQuantity}
         )
       )
     })
@@ -319,7 +318,7 @@ export class VisitsFormPageComponent implements OnInit {
           this.uploadPendingAttachments(Number(visit.patient), visitId, () => {
             Swal.fire('Success', 'New visit added!', 'success')
               .then(() => {
-                this.router.navigateByUrl('/dashboard/visits')
+                this.router.navigateByUrl(`/dashboard/visits/edit-visit/${visitId}`)
               })
           })
         },
@@ -408,17 +407,15 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleEditVisit( visit: FormVisitWithStock ) {
-    visit.date =  visit.date.split('T')[0]
+    visit.date = (visit.date || formatNewDate(new Date())).split('T')[0]
     const payload = { ...visit, origin: 'visits' }
     this.isSaving = true
     this.visitsService.editVisit(this.selectedVisit()?.id!, payload )
       .subscribe({
         next: ( visit ) => {
           if( visit ) {
+            this.isSaving = false
             Swal.fire('Success', 'New visit edited!', 'success')
-              .then(() => {
-                this.router.navigateByUrl('/dashboard/visits')
-              })
           } else {
             this.isSaving = false
           }

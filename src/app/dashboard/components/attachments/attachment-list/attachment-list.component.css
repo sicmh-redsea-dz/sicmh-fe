@@ -38,6 +38,8 @@
   cursor: pointer;
   background: #f9fafb;
   user-select: none;
+  color: inherit;
+  font-family: inherit;
 }
 
 .upload-btn:hover {
@@ -47,6 +49,11 @@
 .upload-btn.disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .state-text {

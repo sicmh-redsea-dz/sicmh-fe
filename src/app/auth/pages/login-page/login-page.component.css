@@ -152,3 +152,6 @@
     align-items: center;
     padding-top: 3rem;
 }
+
+.password-help { margin-top: -0.5rem; text-align: right; }
+.password-help a { color: var(--secondary-color); text-decoration: none; }

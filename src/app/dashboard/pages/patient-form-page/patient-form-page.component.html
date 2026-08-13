@@ -19,7 +19,7 @@
 
       <div class="form-column">
         <div class="form-group">
-          <label class="required">Tipo de identificación</label>
+          <label>Tipo de identificación</label>
           <select formControlName="identificationType">
             <option value="identidad">Identidad</option>
             <option value="pasaporte">Pasaporte</option>
@@ -89,7 +89,7 @@
 
       <div class="form-column">
         <div class="form-group">
-          <label for="phone" class="required">Teléfono</label>
+          <label for="phone">Teléfono</label>
           <input  class="" 
                   type="tel" 
                   formControlName="phone" 
@@ -111,7 +111,7 @@
         </div>
 
         <div class="form-group">
-          <label class="required">Dirección</label>
+          <label>Dirección</label>
           <input  class=""
                   type="text"
                   formControlName="address" 
@@ -133,7 +133,7 @@
 
       <div class="emergency-contact-grid">
         <div class="form-group">
-          <label class="required">Nombre completo</label>
+          <label>Nombre completo</label>
           <input type="text" formControlName="name" placeholder="Nombre del contacto">
           <div class="error-message" *ngIf="patientForm.get('emergencyContact.name')?.invalid && (patientForm.get('emergencyContact.name')?.touched || patientForm.get('emergencyContact.name')?.dirty)">
             <small *ngIf="patientForm.get('emergencyContact.name')?.errors?.['required']">Este campo es obligatorio.</small>
@@ -142,7 +142,7 @@
         </div>
 
         <div class="form-group">
-          <label class="required">Parentesco</label>
+          <label>Parentesco</label>
           <input type="text" formControlName="relationship" placeholder="Ej. madre, cónyuge, hermano">
           <div class="error-message" *ngIf="patientForm.get('emergencyContact.relationship')?.invalid && (patientForm.get('emergencyContact.relationship')?.touched || patientForm.get('emergencyContact.relationship')?.dirty)">
             <small *ngIf="patientForm.get('emergencyContact.relationship')?.errors?.['required']">Este campo es obligatorio.</small>
@@ -151,7 +151,7 @@
         </div>
 
         <div class="form-group">
-          <label class="required">Teléfono</label>
+          <label>Teléfono</label>
           <input type="tel" formControlName="phone" placeholder="Número de teléfono">
           <div class="error-message" *ngIf="patientForm.get('emergencyContact.phone')?.invalid && (patientForm.get('emergencyContact.phone')?.touched || patientForm.get('emergencyContact.phone')?.dirty)">
             <small *ngIf="patientForm.get('emergencyContact.phone')?.errors?.['required']">Este campo es obligatorio.</small>

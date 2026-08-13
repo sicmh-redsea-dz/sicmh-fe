@@ -82,6 +82,8 @@ export class VisitsPageComponent implements OnInit {
       this.managementLink = '/dashboard/o-room/rooms'
       this.managementLabel = 'Gestionar quirófanos'
     }
+
+    this.getVisits()
   }
 
   private modulePermission(action: 'read' | 'update'): Permission {
@@ -98,12 +100,6 @@ export class VisitsPageComponent implements OnInit {
   public getVisits(searchTerm?: string) {
     const search = (searchTerm ?? this.searchTerm).trim()
 
-    if ( !search ) {
-      this.visits = []
-      this.totalRegistries = 0
-      return
-    }
-    
     this.visitsService.getAllVisits({
       limit: this.limit, 
       offset: this.offset, 

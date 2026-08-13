@@ -7,6 +7,8 @@ import { RegisterPageComponent } from './pages/register-page/register-page.compo
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ForcePasswordPageComponent } from './pages/force-password-page/force-password-page.component';
+import { ForgotPasswordPageComponent } from './pages/forgot-password-page/forgot-password-page.component';
+import { ResetPasswordPageComponent } from './pages/reset-password-page/reset-password-page.component';
 
 
 @NgModule({
@@ -15,6 +17,8 @@ import { ForcePasswordPageComponent } from './pages/force-password-page/force-pa
     RegisterPageComponent,
     AuthLayoutComponent,
     ForcePasswordPageComponent,
+    ForgotPasswordPageComponent,
+    ResetPasswordPageComponent,
   ],
   imports: [
     CommonModule,

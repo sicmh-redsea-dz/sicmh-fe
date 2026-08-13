@@ -72,6 +72,18 @@ export class AuthService {
       )
   }
 
+  requestPasswordReset(email: string, codigoEmpresa: string): Observable<string> {
+    const url = `${this.baseUrl}/auth/forgot-password`
+    return this.http.post<{ message: string }>(url, { email, codigoEmpresa })
+      .pipe(map((response) => response.message))
+  }
+
+  resetPassword(token: string, newPassword: string, codigoEmpresa: string): Observable<string> {
+    const url = `${this.baseUrl}/auth/reset-password`
+    return this.http.post<{ message: string }>(url, { token, newPassword, codigoEmpresa })
+      .pipe(map((response) => response.message))
+  }
+
   checkAuthStatus(): Observable<boolean> {
     const url = `${this.baseUrl}/auth/check-token`
     const token = localStorage.getItem('token')

@@ -18,6 +18,18 @@ interface UploadParams {
   recordId?: number | null
 }
 
+export interface AttachmentCaptureSession {
+  token: string
+  captureUrl: string
+  qrDataUrl: string
+  expiresAt: string
+}
+
+export interface AttachmentCaptureStatus {
+  status: 'pending' | 'uploaded' | 'expired'
+  image?: { dataUrl: string; fileName: string }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -97,6 +109,21 @@ export class AttachmentsService {
         map(({ data }) => data.url),
         catchError(( err ) => throwError(() => formatApiError(err)))
       )
+  }
+
+  public createCaptureSession(): Observable<AttachmentCaptureSession> {
+    return this.http.post<{ data: AttachmentCaptureSession }>(`${this.baseUrl}/app/patients/attachment-capture`, {})
+      .pipe(map(({ data }) => data), catchError((err) => throwError(() => formatApiError(err))))
+  }
+
+  public getCaptureStatus(token: string): Observable<AttachmentCaptureStatus> {
+    return this.http.get<{ data: AttachmentCaptureStatus }>(`${this.baseUrl}/app/patients/attachment-capture/${token}`)
+      .pipe(map(({ data }) => data), catchError((err) => throwError(() => formatApiError(err))))
+  }
+
+  public deleteCaptureSession(token: string): Observable<boolean> {
+    return this.http.delete(`${this.baseUrl}/app/patients/attachment-capture/${token}`)
+      .pipe(map(() => true), catchError((err) => throwError(() => formatApiError(err))))
   }
 
   public uploadPrescriptionAsset(type: 'signature' | 'stamp', file: File): Observable<string> {

@@ -24,20 +24,20 @@ export class PatientFormPageComponent implements OnInit {
   private destroyRef = inject( DestroyRef )
 
   public patientForm = this.fb.group({
-    identificationType: this.fb.control<IdentificationType>('identidad', [Validators.required]),
+    identificationType: this.fb.control<IdentificationType>('identidad'),
     id        : ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]+$/)]],
     firstName : ['', [Validators.required, Validators.minLength(2)]],
     lastName  : ['', [Validators.required, Validators.minLength(2)]],
     birthdate : ['', [Validators.required]],
     gender    : ['', [Validators.required]],
-    phone     : ['', [Validators.required]],
+    phone     : [''],
     email     : ['', [Validators.email]],
-    address   : ['', [Validators.required, Validators.minLength(5)]],
+    address   : ['', [Validators.minLength(5)]],
     notes     : [''],
     emergencyContact: this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      relationship: ['', [Validators.required, Validators.minLength(2)]],
-      phone: ['', [Validators.required]],
+      name: ['', [Validators.minLength(2)]],
+      relationship: ['', [Validators.minLength(2)]],
+      phone: [''],
       email: ['', [Validators.email]],
       address: ['']
     })
@@ -152,4 +152,5 @@ export class PatientFormPageComponent implements OnInit {
         },
       })
   }
+
 }

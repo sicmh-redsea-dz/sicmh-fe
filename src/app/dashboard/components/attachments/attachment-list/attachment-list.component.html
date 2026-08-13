@@ -33,6 +33,15 @@
         (change)="onFileSelected($event, 'in_app_camera')"
       >
     </label>
+    <button
+      type="button"
+      class="upload-btn"
+      [disabled]="isUploading || isQrLoading"
+      (click)="openQrCapture()"
+    >
+      <i class="ph ph-qr-code"></i>
+      {{ isQrLoading ? 'Generando QR...' : 'Desde celular' }}
+    </button>
   </div>
 
   <div class="state-text" *ngIf="isUploading">Subiendo archivo...</div>

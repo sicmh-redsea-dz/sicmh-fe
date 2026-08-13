@@ -5,6 +5,7 @@ import { SettingsService } from '../../../services/settings-service/settings.ser
 import { RoleOption, SettingsUser } from '../../../interface/settings.interface'
 import { trackById } from '../../../../shared/utils/track-by'
 import { AuthService } from '../../../../auth/services/auth.service'
+import { finalize } from 'rxjs'
 
 @Component({
   selector: 'app-staff-management',
@@ -58,6 +59,9 @@ export class StaffManagementComponent implements OnInit {
 
     this.submitting = true
     this.settingsService.createUser(payload)
+      .pipe(finalize(() => {
+        this.submitting = false
+      }))
       .subscribe({
         next: (result) => {
           const extra = result.tempPassword
@@ -67,10 +71,7 @@ export class StaffManagementComponent implements OnInit {
           this.staffForm.reset()
           this.loadUsers()
         },
-        error: (err) => Swal.fire('Error', err, 'error'),
-        complete: () => {
-          this.submitting = false
-        }
+        error: (err) => Swal.fire('Error', err, 'error')
       })
   }
 

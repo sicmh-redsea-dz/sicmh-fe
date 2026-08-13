@@ -1,6 +1,7 @@
 import { Component, inject, Input, OnDestroy } from '@angular/core'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
-import { concatMap, from, map, Observable, of, toArray } from 'rxjs'
+import { concatMap, from, interval, map, Observable, of, Subscription, switchMap, toArray } from 'rxjs'
+import Swal from 'sweetalert2'
 import { AttachmentsService } from '../../../services/attachments-service/attachments.service'
 import { AttachmentSource, ClinicalAttachment } from '../../../interface/clinical-attachments.interface'
 import { trackById, trackByIndex } from '../../../../shared/utils/track-by'
@@ -45,8 +46,10 @@ export class AttachmentListComponent implements OnDestroy {
   public uploadLabel = ''
   public previews = new Map<number, AttachmentPreview>()
   public loadingPreviewId: number | null = null
+  public isQrLoading = false
 
   private _patientId: number | null = null
+  private capturePolling: Subscription | null = null
 
   @Input() set patientId(value: number | string | null | undefined) {
     const id = Number(value)
@@ -57,6 +60,7 @@ export class AttachmentListComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopCapturePolling()
     this.clearPreviews()
   }
 
@@ -87,29 +91,34 @@ export class AttachmentListComponent implements OnDestroy {
     input.value = ''
     if (!file) return
 
-    const label = this.uploadLabel.trim() || file.name
-    this.uploadLabel = ''
+    this.addFile(file, source)
+  }
 
-    if (this.deferred) {
-      this.queuedFiles = [...this.queuedFiles, { file, label, source }]
-      return
-    }
-
-    if (!this._patientId) return
-    this.isUploading = true
+  public openQrCapture(): void {
+    if (this.isQrLoading || this.isUploading) return
+    this.isQrLoading = true
     this.errorMessage = null
-
-    this.attachmentsService.uploadAttachment(this._patientId, {
-      file, label, source, recordId: this.recordId
-    }).subscribe({
-      next: (created) => {
-        this.attachments = [created, ...this.attachments]
-        this.isUploading = false
+    this.attachmentsService.createCaptureSession().subscribe({
+      next: (session) => {
+        this.isQrLoading = false
+        Swal.fire({
+          title: 'Agregar foto desde el celular',
+          html: '<p>Escanea el código, toma la foto y presiona <b>Enviar foto</b> en tu teléfono.</p>',
+          imageUrl: session.qrDataUrl,
+          imageAlt: 'Código QR para tomar una foto',
+          confirmButtonText: 'Cancelar',
+          footer: `<small>El código vence a las ${new Date(session.expiresAt).toLocaleTimeString()}</small>`,
+          didOpen: () => this.startCapturePolling(session.token),
+          willClose: () => {
+            this.stopCapturePolling()
+            this.clearCaptureSession(session.token)
+          },
+        })
       },
       error: (err: string) => {
+        this.isQrLoading = false
         this.errorMessage = err
-        this.isUploading = false
-      }
+      },
     })
   }
 
@@ -212,5 +221,75 @@ export class AttachmentListComponent implements OnDestroy {
   private clearPreviews(): void {
     this.previews.forEach((preview) => URL.revokeObjectURL(preview.objectUrl))
     this.previews.clear()
+  }
+
+  private addFile(file: File, source: AttachmentSource): void {
+    const label = this.uploadLabel.trim() || file.name
+    this.uploadLabel = ''
+    if (this.deferred) {
+      this.queuedFiles = [...this.queuedFiles, { file, label, source }]
+      return
+    }
+    if (!this._patientId) return
+    this.isUploading = true
+    this.errorMessage = null
+    this.attachmentsService.uploadAttachment(this._patientId, { file, label, source, recordId: this.recordId }).subscribe({
+      next: (created) => {
+        this.attachments = [created, ...this.attachments]
+        this.isUploading = false
+      },
+      error: (err: string) => {
+        this.errorMessage = err
+        this.isUploading = false
+      },
+    })
+  }
+
+  private startCapturePolling(token: string): void {
+    this.stopCapturePolling()
+    this.capturePolling = interval(1500).pipe(
+      switchMap(() => this.attachmentsService.getCaptureStatus(token))
+    ).subscribe({
+      next: (status) => {
+        if (status.status === 'expired') {
+          this.stopCapturePolling()
+          Swal.fire('QR expirado', 'Genera un código nuevo para continuar.', 'info')
+          return
+        }
+        if (status.status !== 'uploaded' || !status.image) return
+        try {
+          const file = this.dataUrlToFile(status.image.dataUrl, status.image.fileName || 'foto-desde-celular.jpg')
+          this.addFile(file, 'in_app_camera')
+          Swal.close()
+        } catch {
+          this.errorMessage = 'No se pudo procesar la foto recibida desde el celular.'
+          Swal.close()
+        }
+      },
+      error: (err: string) => {
+        this.stopCapturePolling()
+        this.errorMessage = err
+        Swal.close()
+      },
+    })
+  }
+
+  private stopCapturePolling(): void {
+    this.capturePolling?.unsubscribe()
+    this.capturePolling = null
+  }
+
+  private clearCaptureSession(token: string): void {
+    this.attachmentsService.deleteCaptureSession(token).subscribe({ error: () => undefined })
+  }
+
+  private dataUrlToFile(dataUrl: string, fileName: string): File {
+    const [header, encoded] = dataUrl.split(',')
+    const mime = header.match(/^data:([^;]+);base64$/)?.[1]
+    if (!mime || !encoded) throw new Error('Invalid data URL')
+    const binary = atob(encoded)
+    const bytes = new Uint8Array(binary.length)
+    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
+    return new File([bytes], fileName, { type: mime })
   }
 }
