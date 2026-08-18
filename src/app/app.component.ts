@@ -35,14 +35,14 @@ export class AppComponent {
           this.router.navigateByUrl('/auth/force-password');
           break;
         }
-        if (currentUrl.startsWith('/auth')) {
+        if (currentUrl.startsWith('/auth') && !currentUrl.startsWith('/auth/reset-password')) {
           this.router.navigateByUrl('/dashboard');
         }
         break;
       case AuthStatus.notAuthenticated:
-        if (!currentUrl.startsWith('/auth')) {
-          this.router.navigateByUrl('/auth/login');
-        }
+        // Route guards own unauthenticated redirects. Redirecting here races
+        // the router during direct/deep-link startup, when router.url may
+        // still be '/', and can incorrectly replace /auth/reset-password.
         break;
     }
     

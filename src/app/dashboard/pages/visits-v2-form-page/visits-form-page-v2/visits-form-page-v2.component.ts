@@ -15,6 +15,7 @@ import { pressureValidator } from '../../../helpers/visits-form/visits-form-page
 import { BedRecord, BedModule } from '../../../interface/bed-management.interface';
 import { AttachmentListComponent } from '../../../components/attachments/attachment-list/attachment-list.component';
 import { trackById } from '../../../../shared/utils/track-by';
+import { ConsentManagerComponent } from '../../../components/consents/consent-manager/consent-manager.component';
 
 type StockItemPayload = {
   id: number
@@ -35,6 +36,7 @@ type FormVisitWithStock = FormVisit & {
 export class VisitsFormPageV2Component implements OnInit {
   public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
+  @ViewChild('consentManager') consentManager?: ConsentManagerComponent
 
   public title = ''
   public subtitle = ''
@@ -505,11 +507,13 @@ export class VisitsFormPageV2Component implements OnInit {
       .subscribe({
         next: ( visitId ) => {
           this.uploadPendingAttachments(Number(payload.patient), visitId, () => {
-            Swal.fire('Success', 'New visit added!', 'success')
-              .then(() => {
-                this.clearDraft()
-                this.router.navigateByUrl(`/dashboard/${this.backRoute}/edit-visit/${visitId}`)
-              })
+            this.finalizePendingConsents(Number(visitId), () => {
+              Swal.fire('Success', 'New visit added!', 'success')
+                .then(() => {
+                  this.clearDraft()
+                  this.router.navigateByUrl(`/dashboard/${this.backRoute}/edit-visit/${visitId}`)
+                })
+            })
           })
         },
         error: ( message ) => {
@@ -517,6 +521,15 @@ export class VisitsFormPageV2Component implements OnInit {
           Swal.fire('Error', message, 'error')
         }
       })
+  }
+
+  private finalizePendingConsents(visitId: number, done: () => void) {
+    const manager = this.consentManager
+    if (!manager?.hasQueuedConsents) { done(); return }
+    manager.finalizeQueued(visitId).subscribe({
+      next: () => done(),
+      error: (message: string) => Swal.fire('Advertencia', `La visita se guardó, pero no se pudo adjuntar el consentimiento: ${message}`, 'warning').then(() => done())
+    })
   }
 
   private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {

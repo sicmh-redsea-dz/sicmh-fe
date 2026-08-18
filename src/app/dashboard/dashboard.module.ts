@@ -32,6 +32,7 @@ import { PatientMovementsPageComponent } from './pages/patient-movements-page/pa
 import { AttachmentListComponent } from './components/attachments/attachment-list/attachment-list.component';
 import { EmpresaComponent } from './pages/settings-page/empresa/empresa.component';
 import { PrescriptionPageComponent } from './pages/prescription-page/prescription-page.component';
+import { ConsentManagerComponent } from './components/consents/consent-manager/consent-manager.component';
 
 
 @NgModule({
@@ -62,7 +63,8 @@ import { PrescriptionPageComponent } from './pages/prescription-page/prescriptio
     PatientMovementsPageComponent,
     AttachmentListComponent,
     EmpresaComponent,
-    PrescriptionPageComponent
+    PrescriptionPageComponent,
+    ConsentManagerComponent
   ],
   imports: [
     CommonModule,

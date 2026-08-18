@@ -84,4 +84,39 @@
       </div>
     </div>
   </section>
+
+  <section class="card consents-card">
+    <div class="card-header consent-heading">
+      <div class="title">
+        <i class="ph-bold ph-file-text"></i>
+        <div>
+          <h3>Consentimientos</h3>
+          <span>Crea los textos que podrán seleccionarse manualmente en cada visita.</span>
+        </div>
+      </div>
+      <button class="save-btn" type="button" (click)="newConsent()" [disabled]="!canUpdateCompany"><i class="ph ph-plus"></i> Nuevo consentimiento</button>
+    </div>
+    <div class="consent-editor" *ngIf="consentEditorOpen">
+      <label>Nombre del consentimiento</label>
+      <input type="text" [(ngModel)]="consentName" maxlength="160" placeholder="Ej. Consentimiento general">
+      <label>Contenido</label>
+      <textarea [(ngModel)]="consentContent" maxlength="60000" rows="14" placeholder="Copia y pega aquí el texto completo del consentimiento..."></textarea>
+      <small>Los saltos de línea y párrafos se conservarán en el PDF.</small>
+      <div class="editor-actions">
+        <button class="cancel-btn" type="button" (click)="cancelConsentEditor()" [disabled]="savingConsent">Cancelar</button>
+        <button class="save-btn" type="button" (click)="saveConsent()" [disabled]="savingConsent || !consentName.trim() || !consentContent.trim()">{{ savingConsent ? 'Guardando...' : (editingConsentId ? 'Guardar nueva versión' : 'Crear plantilla') }}</button>
+      </div>
+    </div>
+    <div class="consent-list" *ngIf="!consentEditorOpen">
+      <div class="consent-row" *ngFor="let template of consentTemplates" [class.inactive]="!template.is_active">
+        <div class="consent-row-icon"><i class="ph ph-file-text"></i></div>
+        <div class="consent-row-copy"><strong>{{ template.name }}</strong><span>Versión {{ template.current_version }} · {{ template.is_active ? 'Activa' : 'Inactiva' }}</span><p>{{ template.content }}</p></div>
+        <div class="consent-row-actions">
+          <button type="button" class="cancel-btn" (click)="editConsent(template)" [disabled]="!canUpdateCompany">Editar</button>
+          <button type="button" class="status-btn" (click)="toggleConsent(template)" [disabled]="!canUpdateCompany">{{ template.is_active ? 'Desactivar' : 'Activar' }}</button>
+        </div>
+      </div>
+      <p class="empty-consents" *ngIf="!consentTemplates.length">Todavía no se han creado plantillas de consentimiento.</p>
+    </div>
+  </section>
 </div>

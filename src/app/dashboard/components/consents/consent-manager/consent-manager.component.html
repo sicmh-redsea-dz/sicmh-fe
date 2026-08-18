@@ -1,0 +1,93 @@
+<section class="consent-card" *ngIf="templatesAvailable">
+  <div>
+    <h4><i class="ph ph-file-text"></i> Consentimientos</h4>
+    <p *ngIf="visitId">{{ instances.length ? instances.length + ' registro(s) en esta visita' : 'Gestiona la aceptación del paciente.' }}</p>
+    <p *ngIf="!visitId && !queuedConsents.length">Selecciona paciente y médico; el consentimiento se adjuntará al guardar la visita.</p>
+    <p *ngIf="!visitId && queuedConsents.length">{{ queuedConsents.length }} consentimiento(s) listo(s) para adjuntar al guardar.</p>
+  </div>
+  <button type="button" (click)="open()" [disabled]="!canOpen">{{ canOpen ? 'Gestionar' : 'Selecciona paciente y médico' }}</button>
+</section>
+
+<div class="overlay" *ngIf="panelOpen" (click)="close()">
+  <aside class="panel" [class.document-open]="context" (click)="$event.stopPropagation()">
+    <header class="panel-header">
+      <button type="button" class="icon-btn" *ngIf="context" (click)="back()"><i class="ph ph-arrow-left"></i></button>
+      <div><h3>{{ context ? context.template.name : 'Consentimientos' }}</h3><p>{{ context ? 'Revisa el documento antes de aceptar.' : 'Selecciona una plantilla.' }}</p></div>
+      <button type="button" class="icon-btn close" (click)="close()"><i class="ph ph-x"></i></button>
+    </header>
+
+    <div class="loading" *ngIf="loading">Cargando...</div>
+
+    <div class="template-list" *ngIf="!loading && !context">
+      <button type="button" class="template-row" *ngFor="let template of templates" (click)="select(template)">
+        <span class="template-icon"><i class="ph ph-file-text"></i></span>
+        <span class="template-copy"><strong>{{ template.name }}</strong><small>Versión {{ template.current_version }}</small></span>
+        <span class="status" [class.accepted]="statusFor(template.id) === 'Aceptado' || statusFor(template.id) === 'Listo para guardar'" [class.printed]="statusFor(template.id) === 'Impreso' || statusFor(template.id) === 'Impresión lista'">{{ statusFor(template.id) }}</span>
+        <i class="ph ph-caret-right"></i>
+      </button>
+      <p class="empty" *ngIf="!templates.length">No hay plantillas activas configuradas en Empresa.</p>
+
+      <div class="printed-list" *ngIf="instances.length">
+        <h4>Historial de esta visita</h4>
+        <div class="instance" *ngFor="let instance of instances">
+          <div><strong>{{ instance.template_name }}</strong><small>Versión {{ instance.template_version }} · {{ instance.created_at | date:'short' }}</small></div>
+          <span class="status accepted" *ngIf="instance.status === 'accepted'">Aceptado</span>
+          <label class="upload-signed" *ngIf="instance.status === 'printed'">
+            Cargar firmado
+            <input hidden type="file" accept="application/pdf,image/jpeg,image/png,image/webp" (change)="uploadSigned($event, instance)" [disabled]="saving">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="document-shell" *ngIf="context as document">
+      <article class="document">
+        <header class="document-header">
+          <img [src]="document.logoUrl" alt="Logo de la empresa">
+          <strong>{{ document.clinicName }}</strong>
+          <h2>{{ document.template.name }}</h2>
+        </header>
+        <div class="patient-grid">
+          <span><b>Paciente:</b> {{ document.patientName }}</span><span><b>Edad:</b> {{ document.patientAge ?? 'No registrada' }}</span>
+          <span><b>Identidad:</b> {{ document.patientIdentification || 'No registrada' }}</span><span><b>Teléfono:</b> {{ document.patientPhone || 'No registrado' }}</span>
+          <span><b>Fecha:</b> {{ today | date:'longDate' }}</span><span><b>No. visita:</b> {{ document.visitId }}</span>
+        </div>
+        <div class="consent-body">{{ document.template.content }}</div>
+        <div class="declaration">Declaro haber leído, comprendido y aceptado el contenido de este consentimiento.</div>
+
+        <div class="guardian" *ngIf="isMinor">
+          <h4>Datos del encargado</h4>
+          <div class="guardian-grid">
+            <input [(ngModel)]="guardian.name" placeholder="Nombre completo">
+            <input [(ngModel)]="guardian.identification" placeholder="Número de identidad">
+            <input [(ngModel)]="guardian.relationship" placeholder="Parentesco">
+            <input [(ngModel)]="guardian.phone" placeholder="Teléfono">
+          </div>
+        </div>
+
+        <div class="accept-options" *ngIf="canAcceptElectronic">
+          <button type="button" [class.active]="acceptanceMode === 'checkbox'" (click)="setMode('checkbox')">Checkbox</button>
+          <button type="button" [class.active]="acceptanceMode === 'drawn_signature'" (click)="setMode('drawn_signature')">Firma dibujada</button>
+        </div>
+        <label class="check-row" *ngIf="canAcceptElectronic && acceptanceMode === 'checkbox'">
+          <input type="checkbox" [(ngModel)]="acceptedChecked"> Confirmo la aceptación del consentimiento.
+        </label>
+        <div class="signature-pad" *ngIf="canAcceptElectronic && acceptanceMode === 'drawn_signature'">
+          <canvas #signatureCanvas></canvas>
+          <button type="button" (click)="clearSignature()">Limpiar firma</button>
+        </div>
+        <div class="doctor-assets" [class.missing]="!canAcceptElectronic">
+          <ng-container *ngIf="canAcceptElectronic; else missingAssets">
+            <img [src]="document.signatureUrl" alt="Firma del médico"><img [src]="document.stampUrl" alt="Sello del médico">
+            <span>{{ document.doctorName }}</span>
+          </ng-container>
+          <ng-template #missingAssets><i class="ph ph-warning"></i><span>El médico no tiene firma y sello completos. Utiliza la impresión para firma física.</span></ng-template>
+        </div>
+      </article>
+      <footer class="document-actions">
+        <button type="button" class="secondary" (click)="print()" [disabled]="saving"><i class="ph ph-printer"></i> Imprimir para firma</button>
+        <button type="button" class="primary" *ngIf="canAcceptElectronic" (click)="accept()" [disabled]="saving">{{ saving ? 'Generando PDF...' : 'Aceptar y guardar PDF' }}</button>
+      </footer>
+    </div>
+  </aside>
+</div>

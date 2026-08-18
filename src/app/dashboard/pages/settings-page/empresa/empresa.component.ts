@@ -3,6 +3,8 @@ import Swal from 'sweetalert2'
 import { AttachmentsService } from '../../../services/attachments-service/attachments.service'
 import { SettingsService } from '../../../services/settings-service/settings.service'
 import { AuthService } from '../../../../auth/services/auth.service'
+import { ConsentsService } from '../../../services/consents-service/consents.service'
+import { ConsentTemplate } from '../../../interface/consent.interface'
 
 const ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_LOGO_BYTES = 5 * 1024 * 1024
@@ -16,6 +18,7 @@ export class EmpresaComponent implements OnDestroy {
   private attachmentsService = inject(AttachmentsService)
   private settingsService = inject(SettingsService)
   private authService = inject(AuthService)
+  private consentsService = inject(ConsentsService)
   public canUpdateCompany = this.authService.hasPermission('settings.company.update')
 
   public tenantCode = localStorage.getItem('codigoEmpresa') ?? ''
@@ -26,6 +29,12 @@ export class EmpresaComponent implements OnDestroy {
   public saving = false
   public clinicName = ''
   public savingName = false
+  public consentTemplates: ConsentTemplate[] = []
+  public consentEditorOpen = false
+  public editingConsentId: number | null = null
+  public consentName = ''
+  public consentContent = ''
+  public savingConsent = false
 
   constructor() {
     if (this.tenantCode) {
@@ -36,6 +45,7 @@ export class EmpresaComponent implements OnDestroy {
       next: ({ name }) => this.clinicName = name,
       error: (message: string) => Swal.fire('Error', message, 'error')
     })
+    this.loadConsents()
   }
 
   ngOnDestroy(): void {
@@ -104,6 +114,61 @@ export class EmpresaComponent implements OnDestroy {
       },
       error: (message: string) => Swal.fire('Error', message, 'error'),
       complete: () => this.savingName = false
+    })
+  }
+
+  newConsent(): void {
+    if (!this.canUpdateCompany) return
+    this.editingConsentId = null
+    this.consentName = ''
+    this.consentContent = ''
+    this.consentEditorOpen = true
+  }
+
+  editConsent(template: ConsentTemplate): void {
+    if (!this.canUpdateCompany) return
+    this.editingConsentId = template.id
+    this.consentName = template.name
+    this.consentContent = template.content
+    this.consentEditorOpen = true
+  }
+
+  cancelConsentEditor(): void {
+    this.consentEditorOpen = false
+    this.editingConsentId = null
+    this.consentName = ''
+    this.consentContent = ''
+  }
+
+  saveConsent(): void {
+    if (!this.canUpdateCompany || this.savingConsent || !this.consentName.trim() || !this.consentContent.trim()) return
+    this.savingConsent = true
+    const request = this.editingConsentId
+      ? this.consentsService.updateTemplate(this.editingConsentId, this.consentName, this.consentContent)
+      : this.consentsService.createTemplate(this.consentName, this.consentContent)
+    request.subscribe({
+      next: () => {
+        this.savingConsent = false
+        this.cancelConsentEditor()
+        this.loadConsents()
+        Swal.fire('Éxito', 'Plantilla de consentimiento guardada.', 'success')
+      },
+      error: (message: string) => { this.savingConsent = false; Swal.fire('Error', message, 'error') }
+    })
+  }
+
+  toggleConsent(template: ConsentTemplate): void {
+    if (!this.canUpdateCompany) return
+    this.consentsService.setTemplateActive(template.id, !template.is_active).subscribe({
+      next: () => this.loadConsents(),
+      error: (message: string) => Swal.fire('Error', message, 'error')
+    })
+  }
+
+  private loadConsents(): void {
+    this.consentsService.listTemplates(true).subscribe({
+      next: (templates) => this.consentTemplates = templates,
+      error: (message: string) => Swal.fire('Error', message, 'error')
     })
   }
 

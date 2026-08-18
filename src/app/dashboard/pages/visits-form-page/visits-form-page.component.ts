@@ -14,6 +14,7 @@ import { pressureValidator } from '../../helpers/visits-form/visits-form-page.he
 import { AttachmentListComponent } from '../../components/attachments/attachment-list/attachment-list.component';
 import { trackById } from '../../../shared/utils/track-by';
 import { AuthService } from '../../../auth/services/auth.service';
+import { ConsentManagerComponent } from '../../components/consents/consent-manager/consent-manager.component';
 
 type FormVisitWithStock = FormVisit & {
   stockItems?: { id: number; qty: number }[]
@@ -29,6 +30,7 @@ const CONSULTA_SUBINVENTORY_ID = 1
 export class VisitsFormPageComponent implements OnInit {
   public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
+  @ViewChild('consentManager') consentManager?: ConsentManagerComponent
 
   public title = ''
   public subtitle = ''
@@ -316,10 +318,10 @@ export class VisitsFormPageComponent implements OnInit {
       .subscribe({
         next: ( visitId ) => {
           this.uploadPendingAttachments(Number(visit.patient), visitId, () => {
-            Swal.fire('Success', 'New visit added!', 'success')
-              .then(() => {
-                this.router.navigateByUrl(`/dashboard/visits/edit-visit/${visitId}`)
-              })
+            this.finalizePendingConsents(Number(visitId), () => {
+              Swal.fire('Success', 'New visit added!', 'success')
+                .then(() => this.router.navigateByUrl(`/dashboard/visits/edit-visit/${visitId}`))
+            })
           })
         },
         error: ( message ) => {
@@ -327,6 +329,15 @@ export class VisitsFormPageComponent implements OnInit {
           Swal.fire('Error', message, 'error')
         }
       })
+  }
+
+  private finalizePendingConsents(visitId: number, done: () => void) {
+    const manager = this.consentManager
+    if (!manager?.hasQueuedConsents) { done(); return }
+    manager.finalizeQueued(visitId).subscribe({
+      next: () => done(),
+      error: (message: string) => Swal.fire('Advertencia', `La visita se guardó, pero no se pudo adjuntar el consentimiento: ${message}`, 'warning').then(() => done())
+    })
   }
 
   private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {

@@ -318,6 +318,15 @@
       </div>
     </div>
 
+    <app-consent-manager
+      #consentManager
+      [visitId]="caller === 'nv' ? null : selectedVisit()?.id ?? null"
+      [patientId]="visitForm.get('patient')?.value || null"
+      [doctorId]="visitForm.get('doctor')?.value || null"
+      [visitDate]="visitForm.get('date')?.value || null"
+      (changed)="attachmentList.reload()"
+    ></app-consent-manager>
+
     <div class="fancy-divider">
       <span>intervencion</span>
     </div>
@@ -624,6 +633,7 @@
       [recordId]="caller === 'nv' ? null : selectedVisit()?.id ?? null"
       [patientId]="caller === 'nv' ? null : selectedVisit()?.patientId"
     ></app-attachment-list>
+
 
     <div class="form-actions">
       <button class="secondary-btn" type="button" [routerLink]="['/dashboard', backRoute]">

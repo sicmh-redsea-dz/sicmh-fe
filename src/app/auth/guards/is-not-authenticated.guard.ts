@@ -9,6 +9,10 @@ export const isNotAuthenticatedGuard: CanActivateFn = (route, state) => {
   const router      = inject(Router);
   const status      = authService.authStatus();
 
+  // A password-reset link must remain reachable even when another tab or
+  // device left a valid session in localStorage.
+  if (state.url.startsWith('/auth/reset-password')) return true;
+
   if (status === AuthStatus.authenticated) return router.parseUrl('/dashboard');
 
   if (status === AuthStatus.checking) {
