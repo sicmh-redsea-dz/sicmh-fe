@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Swal from 'sweetalert2';
 
@@ -91,21 +91,23 @@ export class BedsManagementPageComponent implements OnInit {
       })
 
     this.doctorSearchControl.valueChanges.pipe(
-      debounceTime(600),
+      debounceTime(250),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap((term) => {
         const cleanTerm = term.trim() || ''
-        if (cleanTerm.length === 0) {
-          this.assignmentForm.get('doctor')?.setValue('')
+        this.assignmentForm.get('doctor')?.setValue('')
+        if (cleanTerm.length < 2) {
           this.searchDocResults = []
           this.showDocDropdown = false
+          this.isDocLoading = false
           return
         }
         this.isDocLoading = true
-        this.searchDocResults = []
       }),
-      switchMap((term: string) => this.visitsService.searchDoctors(term.trim())),
+      switchMap((term: string) => term.trim().length < 2
+        ? of([])
+        : this.visitsService.searchDoctors(term.trim())),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (results) => {
@@ -118,21 +120,23 @@ export class BedsManagementPageComponent implements OnInit {
     })
 
     this.patientSearchControl.valueChanges.pipe(
-      debounceTime(600),
+      debounceTime(250),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap((term) => {
         const cleanTerm = term.trim() || ''
-        if (cleanTerm.length === 0) {
-          this.assignmentForm.get('patient')?.setValue('')
+        this.assignmentForm.get('patient')?.setValue('')
+        if (cleanTerm.length < 2) {
           this.searchPatResults = []
           this.showPatDropdown = false
+          this.isPatLoading = false
           return
         }
         this.isPatLoading = true
-        this.searchPatResults = []
       }),
-      switchMap((term: string) => this.visitsService.searchPatients(term.trim())),
+      switchMap((term: string) => term.trim().length < 2
+        ? of([])
+        : this.visitsService.searchPatients(term.trim())),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (results) => {

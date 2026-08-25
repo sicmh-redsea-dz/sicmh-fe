@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
@@ -114,22 +114,23 @@ export class VisitsFormPageComponent implements OnInit {
     }
 
     this.doctorSearchControl.valueChanges.pipe(
-      debounceTime( 600 ),
+      debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
-        if ( cleanTerm.length === 0 ) {
-          this.visitForm.get('doctor')?.setValue(0)
+        this.visitForm.get('doctor')?.setValue('')
+        if ( cleanTerm.length < 2 ) {
           this.searchDocResults = []
           this.showDocDropdown = false
+          this.isDocLoading = false
           return
         }
         this.isDocLoading = true
-        this.searchDocResults = []
-        
       }),
-      switchMap(( term: string ) => this.visitsService.searchDoctors( term.trim() )),
+      switchMap(( term: string ) => term.trim().length < 2
+        ? of([])
+        : this.visitsService.searchDoctors( term.trim() )),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
@@ -142,22 +143,23 @@ export class VisitsFormPageComponent implements OnInit {
     })
 
     this.patientSearchControl.valueChanges.pipe(
-      debounceTime( 600 ),
+      debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
-        if ( cleanTerm.length === 0 ) {
-          this.visitForm.get('patient')?.setValue(0)
+        this.visitForm.get('patient')?.setValue('')
+        if ( cleanTerm.length < 2 ) {
           this.searchPatResults = []
           this.showPatDropdown = false
+          this.isPatLoading = false
           return
         }
         this.isPatLoading = true
-        this.searchPatResults = []
-        
       }),
-      switchMap(( term: string ) => this.visitsService.searchPatients( term.trim() )),
+      switchMap(( term: string ) => term.trim().length < 2
+        ? of([])
+        : this.visitsService.searchPatients( term.trim() )),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
@@ -209,10 +211,10 @@ export class VisitsFormPageComponent implements OnInit {
    private initializeAutocompleteValues(): void {
       if (this.caller !== 'nv' && this.selectedVisit()) {
         if (this.selectedVisit()?.docName)
-          this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName))
+          this.doctorSearchControl.setValue(String(this.selectedVisit()?.docName), { emitEvent: false })
         
         if (this.selectedVisit()?.patientName)
-          this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName))
+          this.patientSearchControl.setValue(String(this.selectedVisit()?.patientName), { emitEvent: false })
       }
     }
 

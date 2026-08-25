@@ -4,6 +4,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { Permission } from '../../../auth/permissions/permissions';
 import { AttachmentsService } from '../../services/attachments-service/attachments.service';
 import { trackByIndex } from '../../../shared/utils/track-by';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -38,6 +39,7 @@ export class SidebarComponent {
     .filter((item): item is SidebarItem => item !== null)
  })
  private attachmentsService = inject( AttachmentsService )
+ private router = inject( Router )
  public toggledStates:boolean[] = []
  public toggledSidebar:boolean = false
  public settingsOpen:boolean = false
@@ -131,5 +133,6 @@ export class SidebarComponent {
 
   public onLogout() {
     this.authService.logout()
+    void this.router.navigateByUrl('/auth/login', { replaceUrl: true })
   }
 }

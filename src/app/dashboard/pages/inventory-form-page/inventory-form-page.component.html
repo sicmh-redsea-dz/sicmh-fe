@@ -27,7 +27,6 @@
                   placeholder="Nombre del articulo">
           <div class="error-message" *ngIf="articleForm.get('prodName')?.touched && articleForm.get('prodName')?.invalid">
             <small *ngIf="articleForm.get('prodName')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="articleForm.get('prodName')?.errors?.['maxlength']">Máximo 20 caracteres permitidos.</small>
           </div>
         </div>
 

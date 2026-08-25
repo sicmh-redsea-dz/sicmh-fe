@@ -24,7 +24,7 @@ public title = ''
   public articleForm: FormGroup = this.fb.group({
     prodDesc      : ['', []],
     prodMinStock  : ['', []],
-    prodName      : ['', [Validators.required, Validators.maxLength(20)]],
+    prodName      : ['', [Validators.required]],
     prodQty       : ['', [Validators.required, Validators.min(0)]],
     prodUnitPrice : ['', [Validators.required, Validators.min(0)]],
   })
