@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Swal from 'sweetalert2';
 
@@ -62,6 +62,7 @@ export class BedsManagementPageComponent implements OnInit {
 
   public isDocLoading = false
   public isPatLoading = false
+  public patientSearchError = ''
 
   public showDocDropdown = false
   public showPatDropdown = false
@@ -125,6 +126,7 @@ export class BedsManagementPageComponent implements OnInit {
       filter((term): term is string => term !== null),
       tap((term) => {
         const cleanTerm = term.trim() || ''
+        this.patientSearchError = ''
         this.assignmentForm.get('patient')?.setValue('')
         if (cleanTerm.length < 2) {
           this.searchPatResults = []
@@ -134,16 +136,18 @@ export class BedsManagementPageComponent implements OnInit {
         }
         this.isPatLoading = true
       }),
-      switchMap((term: string) => term.trim().length < 2
-        ? of([])
-        : this.visitsService.searchPatients(term.trim())),
+      switchMap((term: string) => {
+        if (term.trim().length < 2) return of({ results: [] as ShortPatient[], error: '' })
+        return this.visitsService.searchPatients(term.trim()).pipe(
+          map((results) => ({ results, error: '' })),
+          catchError((error) => of({ results: [] as ShortPatient[], error: String(error) }))
+        )
+      }),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: (results) => {
+      next: ({ results, error }) => {
         this.searchPatResults = results
-        this.isPatLoading = false
-      },
-      error: () => {
+        this.patientSearchError = error
         this.isPatLoading = false
       }
     })

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
@@ -99,6 +99,7 @@ export class VisitsFormPageComponent implements OnInit {
 
   public isDocLoading: boolean = false
   public isPatLoading: boolean = false
+  public patientSearchError = ''
 
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
@@ -148,6 +149,7 @@ export class VisitsFormPageComponent implements OnInit {
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
+        this.patientSearchError = ''
         this.visitForm.get('patient')?.setValue('')
         if ( cleanTerm.length < 2 ) {
           this.searchPatResults = []
@@ -157,16 +159,18 @@ export class VisitsFormPageComponent implements OnInit {
         }
         this.isPatLoading = true
       }),
-      switchMap(( term: string ) => term.trim().length < 2
-        ? of([])
-        : this.visitsService.searchPatients( term.trim() )),
+      switchMap(( term: string ) => {
+        if (term.trim().length < 2) return of({ results: [] as ShortPatient[], error: '' })
+        return this.visitsService.searchPatients(term.trim()).pipe(
+          map((results) => ({ results, error: '' })),
+          catchError((error) => of({ results: [] as ShortPatient[], error: String(error) }))
+        )
+      }),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: ( results ) => {
+      next: ({ results, error }) => {
         this.searchPatResults = results
-        this.isPatLoading = false
-      },
-      error: () => {
+        this.patientSearchError = error
         this.isPatLoading = false
       }
     })

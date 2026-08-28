@@ -121,6 +121,7 @@
         <div class="form-group">
           <label>Origen</label>
           <select formControlName="source">
+            <option *ngIf="sources.length === 0" [ngValue]="null" disabled>Sin orígenes configurados</option>
             <option *ngFor="let s of sources; trackBy: trackBySelf" [value]="s">{{ $any(SOURCE_LABELS)[s] || s }}</option>
           </select>
         </div>

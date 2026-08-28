@@ -68,6 +68,9 @@
             {{ patient.name }}
           </li>
         </ul>
+        <small class="error-text" *ngIf="patientSearchError">
+          {{ patientSearchError }} Intenta nuevamente.
+        </small>
         <small class="error-text" *ngIf="visitForm.get('patient')?.invalid && (visitForm.get('patient')?.touched || visitForm.get('patient')?.dirty)">
           Selecciona un paciente.
         </small>

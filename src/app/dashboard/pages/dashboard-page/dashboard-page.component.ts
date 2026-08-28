@@ -55,7 +55,7 @@ export class DashboardPageComponent implements AfterViewInit {
     titulo:                   ['', Validators.required],
     tipo:                     ['consulta', Validators.required],
     estado:                   ['pendiente', Validators.required],
-    source:                   ['en_persona', Validators.required],
+    source:                   [null, Validators.required],
     personalId:               [null],
     pacienteIdentificacion:   [null],
     nombrePaciente:           [null],
@@ -121,7 +121,15 @@ export class DashboardPageComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.schedulingService.getDoctors().subscribe({ next: docs => this.doctors = docs })
-    this.schedulingService.getSources().subscribe({ next: srcs => this.sources = srcs })
+    this.schedulingService.getSources().subscribe({
+      next: srcs => {
+        this.sources = srcs
+        const sourceControl = this.citaForm.get('source')
+        const current = sourceControl?.value
+        if (!current || !srcs.includes(current)) sourceControl?.setValue(srcs[0] ?? null)
+      },
+      error: err => Swal.fire('Error', formatApiError(err), 'error'),
+    })
   }
 
   // ── Dashboard data ────────────────────────────────────────────────────
@@ -151,7 +159,7 @@ export class DashboardPageComponent implements AfterViewInit {
   // ── Modal: open / close ───────────────────────────────────────────────
   openCreateModal() {
     this.editingCita = null
-    this.citaForm.reset({ tipo: 'consulta', estado: 'pendiente', source: 'en_persona' })
+    this.citaForm.reset({ tipo: 'consulta', estado: 'pendiente', source: this.sources[0] ?? null })
     this.showModal = true
   }
 

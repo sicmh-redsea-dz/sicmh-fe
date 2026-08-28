@@ -104,6 +104,9 @@
                     {{ patient.name }}
                   </li>
                 </ul>
+                <small class="error-text" *ngIf="patientSearchError">
+                  {{ patientSearchError }} Intenta nuevamente.
+                </small>
                 <small class="error-text" *ngIf="assignmentForm.get('patient')?.touched && assignmentForm.get('patient')?.hasError('required')">
                   Selecciona un paciente.
                 </small>

@@ -1,8 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { formatApiError } from '../../../shared/utils/api-error'
 import { environment } from '../../../../environments/environment';
-import { catchError, finalize, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, tap, throwError, timeout } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { ShortPatient } from '../../interface/patients-response.interface';
 import { Histories, SimpleVisit, Visit, Stock, PrescriptionContext } from '../../interface/visits-service.interface'
@@ -104,12 +104,29 @@ export class VisitsService {
     if (inFlight) return inFlight
 
     const url: string = `${this.baseUrl}/app/visits/search/patients`
+    const traceId = this.createPatientSearchTraceId()
+    const startedAt = performance.now()
     const params = new HttpParams()
       .set('term', cleanTerm)
+    const headers = new HttpHeaders().set('X-Trace-Id', traceId)
 
-    const request$ = this.http.get<any>(url, { params })
+    console.info('[patient-search]', {
+      event: 'started',
+      traceId,
+      termLength: cleanTerm.length
+    })
+
+    const request$ = this.http.get<any>(url, { params, headers, observe: 'response' })
       .pipe(
-        map(({ data })=> {
+        timeout(12000),
+        tap((response) => console.info('[patient-search]', {
+          event: 'completed',
+          traceId,
+          durationMs: Math.round(performance.now() - startedAt),
+          serverTiming: response.headers.get('Server-Timing')
+        })),
+        map((response)=> {
+          const { data } = response.body
           const { patients } = data
           return patients as ShortPatient[]
         }),
@@ -118,7 +135,17 @@ export class VisitsService {
           results
         })),
         catchError(( err ) => {
-          return throwError(() => formatApiError(err))
+          console.error('[patient-search]', {
+            event: 'failed',
+            traceId,
+            durationMs: Math.round(performance.now() - startedAt),
+            status: err?.status ?? null,
+            error: err?.name ?? 'unknown'
+          })
+          const message = err?.name === 'TimeoutError'
+            ? 'La búsqueda de pacientes tardó demasiado.'
+            : 'No se pudo completar la búsqueda de pacientes.'
+          return throwError(() => `${message} Código de seguimiento: ${traceId}`)
         }),
         finalize(() => this.patientSearchInFlight.delete(cacheKey)),
         shareReplay({ bufferSize: 1, refCount: false })
@@ -134,6 +161,10 @@ export class VisitsService {
       .toLocaleLowerCase('es')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
+  }
+
+  private createPatientSearchTraceId(): string {
+    return `ps-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
   }
 
   public getAllVisits(args: Delimiters): Observable<any> {
