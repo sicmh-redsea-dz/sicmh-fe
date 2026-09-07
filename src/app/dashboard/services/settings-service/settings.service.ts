@@ -72,7 +72,7 @@ export class SettingsService {
       )
   }
 
-  public updateUserRole(userId: number, roleId: number): Observable<boolean> {
+  public updateUserRole(userId: string, roleId: string): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}/role`
     return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { roleId }, {})
       .pipe(
@@ -84,7 +84,7 @@ export class SettingsService {
   public createUser(payload: {
     name: string
     email: string
-    roleId: number
+    roleId: string
     profile?: UserProfile
   }): Observable<InviteResult> {
     const url = `${this.baseUrl}/app/settings/users`
@@ -122,16 +122,16 @@ export class SettingsService {
       )
   }
 
-  public updateUserPermissions(userId: number, grants: string[], revokes: string[]): Observable<boolean> {
+  public updateUserPermissions(userId: string, grants: string[], revokes: string[]): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/permissions/users/${userId}`
-    return this.http.patch<ApiResponse<{ userId: number }>>(url, { grants, revokes }, {})
+    return this.http.patch<ApiResponse<{ userId: string }>>(url, { grants, revokes }, {})
       .pipe(
         map(() => true),
         catchError((err) => throwError(() => formatApiError(err)))
       )
   }
 
-  public deleteUser(userId: number): Observable<boolean> {
+  public deleteUser(userId: string): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}`
     return this.http.delete<ApiResponse<{ deleted: boolean }>>(url, {})
       .pipe(
@@ -140,7 +140,7 @@ export class SettingsService {
       )
   }
 
-  public changeUserPassword(userId: number, newPassword: string): Observable<boolean> {
+  public changeUserPassword(userId: string, newPassword: string): Observable<boolean> {
     const url = `${this.baseUrl}/app/settings/users/${userId}/password`
     return this.http.patch<ApiResponse<{ updated: boolean }>>(url, { newPassword }, {})
       .pipe(

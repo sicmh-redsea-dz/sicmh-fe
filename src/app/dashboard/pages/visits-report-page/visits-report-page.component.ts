@@ -22,7 +22,7 @@ export class VisitsReportPageComponent implements OnInit {
     const origin = this.route.snapshot.data?.['origin'] ?? 'visits'
     this.backRoute = origin === 'oroom' ? 'o-room' : origin
 
-    const id = Number(this.route.snapshot.paramMap.get('id'))
+    const id = this.route.snapshot.paramMap.get('id')
     if (!id) return
 
     this.visitsService.getVisit(id)

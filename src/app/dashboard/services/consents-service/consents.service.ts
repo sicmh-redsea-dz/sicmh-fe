@@ -23,17 +23,17 @@ export class ConsentsService {
       .pipe(map((response) => response.data), tap(() => this.availableTemplates$ = undefined), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  updateTemplate(id: number, name: string, content: string): Observable<ConsentTemplate> {
+  updateTemplate(id: string | number, name: string, content: string): Observable<ConsentTemplate> {
     return this.http.put<ApiResponse<ConsentTemplate>>(`${this.baseUrl}/app/settings/consents/${id}`, { name, content })
       .pipe(map((response) => response.data), tap(() => this.availableTemplates$ = undefined), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  setTemplateActive(id: number, active: boolean): Observable<boolean> {
+  setTemplateActive(id: string | number, active: boolean): Observable<boolean> {
     return this.http.patch<ApiResponse<{ updated: boolean }>>(`${this.baseUrl}/app/settings/consents/${id}/status`, { active })
       .pipe(map((response) => response.data.updated), tap(() => this.availableTemplates$ = undefined), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  listVisitConsents(visitId: number): Observable<ConsentInstance[]> {
+  listVisitConsents(visitId: string | number): Observable<ConsentInstance[]> {
     return this.http.get<ApiResponse<ConsentInstance[]>>(`${this.baseUrl}/app/visits/${visitId}/consents`)
       .pipe(map((response) => response.data), catchError((error) => throwError(() => formatApiError(error))))
   }
@@ -50,36 +50,36 @@ export class ConsentsService {
     return this.availableTemplates$
   }
 
-  getContext(visitId: number, templateId: number): Observable<ConsentDocumentContext> {
+  getContext(visitId: string | number, templateId: string | number): Observable<ConsentDocumentContext> {
     return this.http.get<ApiResponse<ConsentDocumentContext>>(`${this.baseUrl}/app/visits/${visitId}/consents/${templateId}/context`)
       .pipe(map((response) => response.data), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  getDraftContext(patientId: number, doctorId: number, date: string | null, templateId: number): Observable<ConsentDocumentContext> {
+  getDraftContext(patientId: string | number, doctorId: string | number, date: string | null, templateId: string | number): Observable<ConsentDocumentContext> {
     return this.http.get<ApiResponse<ConsentDocumentContext>>(`${this.baseUrl}/app/visits/consent-templates/${templateId}/context`, {
       params: { patientId, doctorId, date: date || '' }
     }).pipe(map((response) => response.data), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  printDraft(patientId: number, doctorId: number, date: string | null, templateId: number): Observable<HttpResponse<Blob>> {
+  printDraft(patientId: string | number, doctorId: string | number, date: string | null, templateId: string | number): Observable<HttpResponse<Blob>> {
     return this.http.post(`${this.baseUrl}/app/visits/consent-templates/${templateId}/print`, { patientId, doctorId, date }, { observe: 'response', responseType: 'blob' })
       .pipe(catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  accept(visitId: number, templateId: number, payload: Record<string, unknown>): Observable<{ id: number; attachmentId: number }> {
-    return this.http.post<ApiResponse<{ id: number; attachmentId: number }>>(`${this.baseUrl}/app/visits/${visitId}/consents/${templateId}/accept`, payload)
+  accept(visitId: string | number, templateId: string | number, payload: Record<string, unknown>): Observable<{ id: string; attachmentId: string }> {
+    return this.http.post<ApiResponse<{ id: string; attachmentId: string }>>(`${this.baseUrl}/app/visits/${visitId}/consents/${templateId}/accept`, payload)
       .pipe(map((response) => response.data), catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  print(visitId: number, templateId: number, expectedTemplateVersion?: number): Observable<HttpResponse<Blob>> {
+  print(visitId: string | number, templateId: string | number, expectedTemplateVersion?: number): Observable<HttpResponse<Blob>> {
     return this.http.post(`${this.baseUrl}/app/visits/${visitId}/consents/${templateId}/print`, { expectedTemplateVersion }, { observe: 'response', responseType: 'blob' })
       .pipe(catchError((error) => throwError(() => formatApiError(error))))
   }
 
-  uploadPhysical(visitId: number, instanceId: number, file: File): Observable<{ id: number; attachmentId: number }> {
+  uploadPhysical(visitId: string | number, instanceId: string | number, file: File): Observable<{ id: string; attachmentId: string }> {
     const body = new FormData()
     body.append('file', file)
-    return this.http.post<ApiResponse<{ id: number; attachmentId: number }>>(`${this.baseUrl}/app/visits/${visitId}/consents/instances/${instanceId}/physical`, body)
+    return this.http.post<ApiResponse<{ id: string; attachmentId: string }>>(`${this.baseUrl}/app/visits/${visitId}/consents/instances/${instanceId}/physical`, body)
       .pipe(map((response) => response.data), catchError((error) => throwError(() => formatApiError(error))))
   }
 }

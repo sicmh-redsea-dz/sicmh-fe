@@ -1,5 +1,5 @@
 export interface ConsentTemplate {
-  id: number
+  id: string
   name: string
   current_version: number
   content: string
@@ -9,25 +9,26 @@ export interface ConsentTemplate {
 }
 
 export interface ConsentInstance {
-  id: number
-  template_id: number
+  id: string
+  template_id: string
   template_name: string
   template_version: number
   status: 'printed' | 'accepted'
   acceptance_method: 'checkbox' | 'drawn_signature' | 'physical' | null
   signer_name: string | null
-  attachment_id: number | null
+  attachment_id: string | null
   accepted_at: string | null
   created_at: string
 }
 
 export interface ConsentDocumentContext {
-  visitId: number | null
-  patientId: number
+  visitId: string | null
+  patientId: string
   patientName: string
   patientAge: number | null
   patientPhone: string | null
   patientIdentification: string | null
+  doctorId: string
   doctorName: string
   clinicName: string
   logoUrl: string

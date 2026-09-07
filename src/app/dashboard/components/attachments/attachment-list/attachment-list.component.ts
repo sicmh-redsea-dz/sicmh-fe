@@ -31,7 +31,7 @@ export class AttachmentListComponent implements OnDestroy {
   /** Hides upload and delete controls — view/download only. */
   @Input() readOnly = false
   /** Attachments are tied to this historia médica when uploading/listing. */
-  @Input() recordId: number | null = null
+  @Input() recordId: string | number | null = null
   /**
    * Deferred mode: selected files are held locally instead of uploaded.
    * The parent calls uploadQueued() once the visit exists.
@@ -44,16 +44,15 @@ export class AttachmentListComponent implements OnDestroy {
   public isUploading = false
   public errorMessage: string | null = null
   public uploadLabel = ''
-  public previews = new Map<number, AttachmentPreview>()
-  public loadingPreviewId: number | null = null
+  public previews = new Map<string, AttachmentPreview>()
+  public loadingPreviewId: string | null = null
   public isQrLoading = false
 
-  private _patientId: number | null = null
+  private _patientId: string | null = null
   private capturePolling: Subscription | null = null
 
   @Input() set patientId(value: number | string | null | undefined) {
-    const id = Number(value)
-    const normalized = id > 0 ? id : null
+    const normalized = this.normalizeId(value)
     if (normalized === this._patientId) return
     this._patientId = normalized
     if (normalized && !this.deferred) this.reload()
@@ -130,7 +129,7 @@ export class AttachmentListComponent implements OnDestroy {
    * Uploads every queued file against the given patient + historia médica.
    * Called by the parent form right after the visit is created.
    */
-  public uploadQueued(patientId: number, recordId: number | null): Observable<number> {
+  public uploadQueued(patientId: string | number, recordId: string | number | null): Observable<number> {
     if (this.queuedFiles.length === 0) return of(0)
     const queue = [...this.queuedFiles]
 
@@ -243,6 +242,13 @@ export class AttachmentListComponent implements OnDestroy {
         this.isUploading = false
       },
     })
+  }
+
+  private normalizeId(value: number | string | null | undefined): string | null {
+    if (value === null || value === undefined) return null
+    const normalized = String(value).trim()
+    if (!normalized || normalized === '0' || normalized === 'NaN') return null
+    return normalized
   }
 
   private startCapturePolling(token: string): void {

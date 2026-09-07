@@ -129,14 +129,16 @@ export class AuthService {
     this._currentUser.update((current) => current ? { ...current, ...patch } : current)
   }
 
-  public completePasswordChange(): Observable<boolean> {
+  public completePasswordChange(newPassword: string): Observable<boolean> {
     const url = `${this.baseUrl}/auth/complete-password-change`
     const token = localStorage.getItem('token')
     if (!token) return of(false)
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    return this.http.post(url, {}, { headers })
+    return this.http.post<{ updated: boolean; user: User; token: string }>(url, { newPassword }, { headers })
       .pipe(
-        map(() => {
+        map(({ user, token: nextToken }) => {
+          const codigoEmpresa = localStorage.getItem('codigoEmpresa') ?? ''
+          this.setAuthentication(user, nextToken, codigoEmpresa)
           this._mustChangePassword.set(false)
           return true
         }),

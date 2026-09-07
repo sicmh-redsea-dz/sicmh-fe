@@ -61,7 +61,7 @@ export class BillingPageComponent {
   public bodyContent: Invoice[] = []
   public reportSummary: BillingSummary | null = null
   public reportLedger: BillingLedgerItem[] = []
-  public selectedPatientId: number | null = null
+  public selectedPatientId: string | null = null
   public patientSearch = ''
   public reportFilters = {
     from: '',
@@ -151,7 +151,7 @@ export class BillingPageComponent {
     this.billingView = view
   }
 
-  public selectPatientFilter(patientId: number) {
+  public selectPatientFilter(patientId: string) {
     this.selectedPatientId = this.selectedPatientId === patientId ? null : patientId
   }
 

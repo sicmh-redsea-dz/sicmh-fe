@@ -36,7 +36,7 @@ export class PermissionsComponent implements OnInit {
   public permissions: string[] = []
 
   public selectedRoleKey = ''
-  public selectedUserId: number | null = null
+  public selectedUserId: string | null = null
   public saving = false
 
   public permissionGroups: PermissionGroup[] = [
@@ -261,7 +261,7 @@ export class PermissionsComponent implements OnInit {
       return this.roleOverrides[key]
     }
 
-    const id = this.selectedUserId || 0
+    const id = this.selectedUserId || ''
     if (!this.userOverrides[id]) {
       this.userOverrides[id] = { grants: [], revokes: [] }
     }
@@ -282,7 +282,7 @@ export class PermissionsComponent implements OnInit {
       })
   }
 
-  private persistUserOverride(userId: number, override: PermissionOverride) {
+  private persistUserOverride(userId: string, override: PermissionOverride) {
     this.saving = true
     this.settingsService.updateUserPermissions(userId, override.grants ?? [], override.revokes ?? [])
       .subscribe({

@@ -9,7 +9,7 @@ export interface Data {
 }
 
 export interface Patient {
-  id        : number;
+  id        : string;
   phone     : string;
   name      : string;
   email     : string | null;
@@ -23,7 +23,7 @@ export interface Patient {
 }
 
 export interface EmergencyContact {
-  id: number;
+  id: string;
   name: string;
   relationship: string;
   phone: string;
@@ -32,7 +32,7 @@ export interface EmergencyContact {
 }
 
 export interface ShortPatient {
-  id        : number;
+  id        : string;
   name      : string;
 }
 

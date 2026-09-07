@@ -8,13 +8,13 @@ import { BillingInvoiceSnapshot, BillingReport } from '../../interface/billing.i
 export interface BillingReportFilters {
   from?: string
   to?: string
-  patientIds?: number[]
+  patientIds?: string[]
   station?: string
   status?: string
 }
 
 export interface ManualChargePayload {
-  patientId: number
+  patientId: string
   patientName?: string
   encounterId?: string
   invoiceNumber?: string
@@ -28,7 +28,7 @@ export interface ManualChargePayload {
 }
 
 export interface MovementPayload {
-  patientId: number
+  patientId: string
   patientName?: string
   fromStation?: string
   toStation: string

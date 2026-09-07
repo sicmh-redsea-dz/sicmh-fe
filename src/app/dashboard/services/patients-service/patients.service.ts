@@ -41,7 +41,7 @@ export class PatientsService {
       )
   }
 
-  public getPatient( patientId:number ): Observable<Patient | null> {
+  public getPatient( patientId:string | number ): Observable<Patient | null> {
       const url: string = `${this.baseUrl}/app/patients/${patientId}`
       return this.http.get<AddedUser>( url, {} )
         .pipe(
@@ -64,7 +64,7 @@ export class PatientsService {
       )
   }
 
-  public editPatient(patient: FormPatient, patientId: number): Observable<AddedUser | null> {
+  public editPatient(patient: FormPatient, patientId: string | number): Observable<AddedUser | null> {
     const url: string = `${this.baseUrl}/app/patients/${patientId}`
     const body = {...patient}
     return this.http.patch<AddedUser>(url, body, {})
@@ -75,7 +75,7 @@ export class PatientsService {
       )
   }
 
-  public deletePatient(id: number): Observable<boolean> {
+  public deletePatient(id: string | number): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/patients/${id}`
     return this.http.delete(url, {})
       .pipe(

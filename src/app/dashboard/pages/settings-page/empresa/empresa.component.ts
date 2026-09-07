@@ -31,7 +31,7 @@ export class EmpresaComponent implements OnDestroy {
   public savingName = false
   public consentTemplates: ConsentTemplate[] = []
   public consentEditorOpen = false
-  public editingConsentId: number | null = null
+  public editingConsentId: string | null = null
   public consentName = ''
   public consentContent = ''
   public savingConsent = false

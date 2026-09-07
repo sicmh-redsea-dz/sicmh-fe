@@ -38,7 +38,7 @@ export class MyProfileComponent implements OnInit {
   public saving = false
   public rolesLabel = ''
   public tenantCode = localStorage.getItem('codigoEmpresa') ?? ''
-  public userId = 0
+  public userId = ''
   public signatureUrl: string | null = null
   public stampUrl: string | null = null
   public signatureFailed = false
@@ -50,7 +50,7 @@ export class MyProfileComponent implements OnInit {
     const current = this.authService.currentUser()
     if (current) {
       this.rolesLabel = current.roles?.[0] ?? ''
-      this.userId = Number(current._id)
+      this.userId = current._id
       this.refreshAssetUrls()
     }
     this.loadProfile()

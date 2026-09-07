@@ -14,9 +14,9 @@ interface BedPayload {
 
 interface AssignPayload {
   assignmentId?: string
-  patientId: number
+  patientId: string
   patientName: string
-  doctorId?: number
+  doctorId?: string
   doctorName?: string
   reason?: string
   notes?: string
@@ -47,7 +47,7 @@ export class BedsService {
       )
   }
 
-  public updateBed(module: BedModule, bedId: number, payload: BedPayload): Observable<BedRecord[]> {
+  public updateBed(module: BedModule, bedId: string | number, payload: BedPayload): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}`
     return this.http.patch<any>(url, payload, {})
       .pipe(
@@ -56,7 +56,7 @@ export class BedsService {
       )
   }
 
-  public assignBed(module: BedModule, bedId: number, payload: AssignPayload): Observable<BedRecord[]> {
+  public assignBed(module: BedModule, bedId: string | number, payload: AssignPayload): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}/assign`
     return this.http.post<any>(url, payload, {})
       .pipe(
@@ -65,7 +65,7 @@ export class BedsService {
       )
   }
 
-  public releaseBed(module: BedModule, bedId: number, payload?: { reason?: string; status?: BedStatus }): Observable<BedRecord[]> {
+  public releaseBed(module: BedModule, bedId: string | number, payload?: { reason?: string; status?: BedStatus }): Observable<BedRecord[]> {
     const url = `${this.baseUrl}/app/beds/${module}/${bedId}/release`
     return this.http.post<any>(url, payload ?? {}, {})
       .pipe(

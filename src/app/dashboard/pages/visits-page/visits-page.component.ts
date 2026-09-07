@@ -131,7 +131,7 @@ export class VisitsPageComponent implements OnInit {
     this.getVisits()
   }
 
-  public handleSelectedVisit(id: number) {
+  public handleSelectedVisit(id: string) {
     if (!this.canEditVisit()) return
     let urlFragment = this.urlSegment
     return this.router.navigateByUrl(`dashboard/${urlFragment}/edit-visit/${id?.toString()}`)
@@ -237,7 +237,7 @@ export class VisitsPageComponent implements OnInit {
     return ''
   }
 
-  public deleteSelectedVisit(id: number) {
+  public deleteSelectedVisit(id: string) {
     if (!this.canDeleteVisit()) return
     Swal.fire({
       title: 'Estas seguro?',
@@ -256,7 +256,7 @@ export class VisitsPageComponent implements OnInit {
     })
   }
 
-  private deleteVisit(id: number) {
+  private deleteVisit(id: string) {
     this.visitsService.deleteVisit( id )
       .subscribe({
         next: ( result ) => {

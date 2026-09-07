@@ -14,9 +14,9 @@ interface RoomPayload {
 
 interface AssignPayload {
   assignmentId?: string
-  patientId: number
+  patientId: string
   patientName: string
-  doctorId?: number
+  doctorId?: string
   doctorName?: string
   procedure?: string
   anesthesiaType?: string
@@ -49,7 +49,7 @@ export class OrRoomsService {
       )
   }
 
-  public updateRoom(roomId: number, payload: RoomPayload): Observable<OrRoomRecord[]> {
+  public updateRoom(roomId: string | number, payload: RoomPayload): Observable<OrRoomRecord[]> {
     const url = `${this.baseUrl}/app/or-rooms/${roomId}`
     return this.http.patch<any>(url, payload, {})
       .pipe(
@@ -58,7 +58,7 @@ export class OrRoomsService {
       )
   }
 
-  public assignRoom(roomId: number, payload: AssignPayload): Observable<OrRoomRecord[]> {
+  public assignRoom(roomId: string | number, payload: AssignPayload): Observable<OrRoomRecord[]> {
     const url = `${this.baseUrl}/app/or-rooms/${roomId}/assign`
     return this.http.post<any>(url, payload, {})
       .pipe(
@@ -67,7 +67,7 @@ export class OrRoomsService {
       )
   }
 
-  public releaseRoom(roomId: number, payload?: { reason?: string; status?: OrRoomStatus }): Observable<OrRoomRecord[]> {
+  public releaseRoom(roomId: string | number, payload?: { reason?: string; status?: OrRoomStatus }): Observable<OrRoomRecord[]> {
     const url = `${this.baseUrl}/app/or-rooms/${roomId}/release`
     return this.http.post<any>(url, payload ?? {}, {})
       .pipe(

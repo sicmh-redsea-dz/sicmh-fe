@@ -11,7 +11,7 @@ export interface DataN {
 }
 
 export interface VisitN {
-  id:            number;
+  id:            string;
   doctorName:    string;
   patientName:    string;
   lastVisitDate: string;
@@ -38,12 +38,12 @@ export interface Data {
 }
 
 export interface Doctor {
-  id:   number;
+  id:   string;
   name: string;
 }
 
 export interface Patient {
-  id:   number;
+  id:   string;
   name: string;
 }
 
@@ -56,7 +56,7 @@ export interface Stock {
 }
 
 export interface Visits {
-  id:            number;
+  id:            string;
   doctorName:    string;
   patientName:   string;
   lastVisitDate: string;
@@ -64,14 +64,14 @@ export interface Visits {
 }
 
 export interface FormVisit{
-  id?                 : number,
+  id?                 : string,
   BMI                 : number,
   date                : string,
   notes               : string,
   height              : number,
   weight              : number,
-  doctor              : number,
-  patient             : number,
+  doctor              : string,
+  patient             : string,
   pressure            : string,
   diagnosis           : string,
   treatment           : string,
@@ -98,14 +98,14 @@ export interface SelectedVisit {
 }
 
 export interface Visit {
-  id:                   number;
+  id:                   string;
   BMI:                  string;
   date:                 Date;
   notes:                string;
   height:               string;
   weight:               string;
-  doctor:               number;
-  patient:              number;
+  doctor:               string;
+  patient:              string;
   pressure:             string;
   diagnosis:            string;
   treatment:            string;

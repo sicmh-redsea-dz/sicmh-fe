@@ -15,7 +15,7 @@ interface UploadParams {
   file: File
   label: string
   source: AttachmentSource
-  recordId?: number | null
+  recordId?: string | number | null
 }
 
 export interface AttachmentCaptureSession {
@@ -36,10 +36,10 @@ export interface AttachmentCaptureStatus {
 export class AttachmentsService {
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )
-  public getAttachments( patientId: number, recordId?: number | null ): Observable<ClinicalAttachment[]> {
+  public getAttachments( patientId: string | number, recordId?: string | number | null ): Observable<ClinicalAttachment[]> {
     const url = `${this.baseUrl}/app/patients/${patientId}/attachments`
     let params = new HttpParams()
-    if (recordId) params = params.set('recordId', recordId)
+    if (recordId !== undefined && recordId !== null && recordId !== '') params = params.set('recordId', String(recordId))
 
     return this.http.get<AttachmentListResponse>( url, { params } )
       .pipe(
@@ -48,13 +48,13 @@ export class AttachmentsService {
       )
   }
 
-  public uploadAttachment( patientId: number, params: UploadParams ): Observable<ClinicalAttachment> {
+  public uploadAttachment( patientId: string | number, params: UploadParams ): Observable<ClinicalAttachment> {
     const url = `${this.baseUrl}/app/patients/${patientId}/attachments`
     const body = new FormData()
     body.append('file', params.file, params.file.name)
     body.append('label', params.label)
     body.append('source', params.source)
-    if (params.recordId) body.append('recordId', String(params.recordId))
+    if (params.recordId !== undefined && params.recordId !== null && params.recordId !== '') body.append('recordId', String(params.recordId))
 
     return this.http.post<AttachmentUploadResponse>( url, body, {} )
       .pipe(
@@ -65,7 +65,7 @@ export class AttachmentsService {
 
   // Inline rendering (img/embed) cannot send the Authorization header on its
   // own, so the file is fetched as a Blob and rendered through an object URL.
-  public getViewBlob( attachmentId: number ): Observable<Blob> {
+  public getViewBlob( attachmentId: string | number ): Observable<Blob> {
     const url = `${this.baseUrl}/app/attachments/${attachmentId}/view`
     return this.http.get( url, { responseType: 'blob' } )
       .pipe(
@@ -90,7 +90,7 @@ export class AttachmentsService {
       )
   }
 
-  public deleteAttachment( attachmentId: number ): Observable<boolean> {
+  public deleteAttachment( attachmentId: string | number ): Observable<boolean> {
     const url = `${this.baseUrl}/app/attachments/${attachmentId}`
     return this.http.delete( url, {} )
       .pipe(
@@ -136,7 +136,7 @@ export class AttachmentsService {
       )
   }
 
-  public prescriptionAssetUrl(tenantCode: string, userId: number, type: 'signature' | 'stamp'): string {
+  public prescriptionAssetUrl(tenantCode: string, userId: string, type: 'signature' | 'stamp'): string {
     return `${environment.publicAssetsBaseUrl}/${tenantCode}/users/${userId}/${type}.png`
   }
 

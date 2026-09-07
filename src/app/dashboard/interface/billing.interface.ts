@@ -6,9 +6,9 @@ export interface BillingReport {
 
 export interface BillingInvoiceSnapshot {
   invoice: {
-    id: number
+    id: string
     invoiceNumber: string
-    patientId: number
+    patientId: string
     patientName: string
     doctorName: string
     date: string
@@ -52,7 +52,7 @@ export interface BillingSummary {
 
 export interface BillingLedgerItem {
   id: string
-  patientId: number
+  patientId: string
   patientName: string
   station?: string
   category: string
@@ -65,15 +65,15 @@ export interface BillingLedgerItem {
   source: string
   reference?: {
     invoiceNumber?: string
-    visitId?: number
+    visitId?: string
     movementId?: string
-    productId?: number
+    productId?: string
   }
 }
 
 export interface BillingMovement {
   id: string
-  patientId: number
+  patientId: string
   patientName: string
   fromStation?: string
   toStation: string
@@ -84,7 +84,7 @@ export interface BillingMovement {
 }
 
 export interface BillingPatientSummary {
-  patientId: number
+  patientId: string
   patientName: string
   invoiceTotal: number
   inventoryTotal: number

@@ -7,7 +7,7 @@ export interface Data {
 }
 
 export interface Invoice {
-  FacturaID:    number;
+  FacturaID:    string;
   Paciente:     string;
   Doctor:       string;
   FechaFactura: string;
@@ -23,7 +23,7 @@ export interface InvoiceForm {
   pMethod: string;
   patient: string;
   amount: string;
-  service: number[];
+  service: string[];
   elderlyDiscount?: number;
   promCode?: string;
   discount?: number;

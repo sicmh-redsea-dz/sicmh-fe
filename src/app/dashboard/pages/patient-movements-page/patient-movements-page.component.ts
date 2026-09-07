@@ -20,7 +20,7 @@ export class PatientMovementsPageComponent implements OnInit {
   private patientsService = inject(PatientsService)
   private destroyRef = inject(DestroyRef)
 
-  public patientId = 0
+  public patientId = ''
   public patientName = ''
   public patientIdNumber = ''
   public currentStation = 'consulta'
@@ -58,7 +58,7 @@ export class PatientMovementsPageComponent implements OnInit {
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        const id = Number(params.get('id'))
+        const id = params.get('id')
         if (!id) return
         this.patientId = id
         this.loadPatient()

@@ -20,20 +20,20 @@ interface Options {
 }
 
 type PatientOption = {
-  id: number
+  id: string
   name: string
   idNumber?: string
   birthDate?: string
 }
 
 type DoctorOption = {
-  id: number
+  id: string
   name: string
   specialty?: string
 }
 
 type ServiceOption = {
-  id: number
+  id: string
   serviceName?: string
   serviceDescription?: string
   servicePrice?: number
@@ -231,8 +231,8 @@ export class InvoiceComponent implements OnInit {
   public onAddService() {
     if (this.isReadOnly || !this.isDrawerSetToUpd() || this.serviceSaving) return
 
-    const service = this.options.services.find((item) => Number(item.id) === Number(this.selectedServiceId)) as ServiceOption | undefined
-    const patientId = Number(this.invoiceForm.get('patient')?.value || 0)
+    const service = this.options.services.find((item) => String(item.id) === this.selectedServiceId) as ServiceOption | undefined
+    const patientId = String(this.invoiceForm.get('patient')?.value || '').trim()
     if (!service || !patientId) return
 
     const description = this.getServiceName(service)
@@ -375,7 +375,7 @@ export class InvoiceComponent implements OnInit {
     this.invoiceForm.get('description')?.disable({ emitEvent: false })
   }
 
-  private resolvePatientLabel(patientId: number) {
+  private resolvePatientLabel(patientId: string) {
     if (!patientId) return
     this.patientsService.getPatient(patientId)
       .subscribe({
@@ -393,7 +393,7 @@ export class InvoiceComponent implements OnInit {
       })
   }
 
-  private resolveDoctorLabel(doctorId: number) {
+  private resolveDoctorLabel(doctorId: string) {
     if (!doctorId) return
     const found = this.options.doctors.find((doc) => doc.id === doctorId)
     if (found) {
@@ -678,7 +678,7 @@ export class InvoiceComponent implements OnInit {
     this.invoiceForm.get('elderlyDiscountPercent')?.setValue(elderlyPercent)
   }
 
-  private applyElderlyDiscountForPatient(patientId: number, birthDate?: string) {
+  private applyElderlyDiscountForPatient(patientId: string, birthDate?: string) {
     if (birthDate) {
       this.applyElderlyDiscount(birthDate)
       return
@@ -687,11 +687,11 @@ export class InvoiceComponent implements OnInit {
     this.patientsService.getPatient(patientId)
       .subscribe({
         next: (patient) => {
-          if (Number(this.invoiceForm.get('patient')?.value) !== Number(patientId)) return
+          if (String(this.invoiceForm.get('patient')?.value || '') !== patientId) return
           this.applyElderlyDiscount(patient?.birthDate)
         },
         error: () => {
-          if (Number(this.invoiceForm.get('patient')?.value) !== Number(patientId)) return
+          if (String(this.invoiceForm.get('patient')?.value || '') !== patientId) return
           this.applyElderlyDiscount()
         }
       })

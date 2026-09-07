@@ -169,7 +169,7 @@ export class DashboardPageComponent implements AfterViewInit {
       titulo:                 cita.Titulo,
       tipo:                   cita.Tipo,
       estado:                 cita.Estado,
-      source:                 cita.Source ?? 'en_persona',
+      source:                 cita.Source ?? 'manual',
       personalId:             cita.PersonalID              ?? null,
       pacienteIdentificacion: cita.PacienteIdentificacion  ?? null,
       nombrePaciente:         cita.NombrePaciente          ?? null,

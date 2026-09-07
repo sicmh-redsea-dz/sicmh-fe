@@ -1,10 +1,10 @@
 export type CitaTipo   = 'consulta' | 'cirugia' | 'hospitalizacion' | 'seguimiento' | 'otro'
 export type CitaEstado = 'pendiente' | 'confirmada' | 'cancelada' | 'completada'
 export type RecursoTipo = 'quirofano' | 'cama'
-export type CitaSource = 'en_persona' | 'llamada'
+export type CitaSource = 'manual' | 'chatbot' | 'google_calendar' | 'en_persona' | 'llamada'
 
 export interface Cita {
-  CitaID:          number
+  CitaID:          string
   Titulo:          string
   Descripcion?:    string | null
   Inicio:          string
@@ -17,18 +17,18 @@ export interface Cita {
   ExternalId?:        string | null
   ChatbotSesionID?:   string | null
   Notas?:             string | null
-  PersonalID?:              number | null
+  PersonalID?:              string | null
   NombreDoctor?:            string | null
-  PacienteID?:              number | null
+  PacienteID?:              string | null
   PacienteIdentificacion?:  string | null
   NombrePaciente?:          string | null
-  CreadoPor?:      number | null
+  CreadoPor?:      string | null
   CreadoEn?:       string
   ActualizadoEn?:  string
 }
 
 export interface Doctor {
-  id:          number
+  id:          string
   nombre:      string
   especialidad: string
 }
@@ -57,6 +57,9 @@ export const ESTADO_LABELS: Record<CitaEstado, string> = {
 }
 
 export const SOURCE_LABELS: Record<CitaSource, string> = {
+  manual: 'Manual',
+  chatbot: 'Chatbot',
+  google_calendar: 'Google Calendar',
   en_persona: 'En persona',
   llamada:    'Llamada',
 }

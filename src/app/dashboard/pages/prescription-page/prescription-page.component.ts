@@ -21,7 +21,7 @@ export class PrescriptionPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.backRoute = this.route.snapshot.queryParamMap.get('back') || 'visits'
-    const id = Number(this.route.snapshot.paramMap.get('id'))
+    const id = this.route.snapshot.paramMap.get('id')
     if (!id) return
     this.visitsService.getPrescription(id).subscribe({
       next: (data) => this.prescription = data,

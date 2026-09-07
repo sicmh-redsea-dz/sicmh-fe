@@ -97,13 +97,13 @@ export class PatientsPageComponent {
     this.getPatients()
   }
 
-  public handleSelectedPatient( patientId: number) {
+  public handleSelectedPatient( patientId: string) {
     if (!this.canEditPatient()) return
     this.patientService.getPatient(patientId)
       .subscribe({
         next: (patient) => {
           const {id} = patient!
-          return this.router.navigateByUrl(`dashboard/patients/${id.toString()}`)
+          return this.router.navigateByUrl(`dashboard/patients/${id}`)
         }, 
         error: (err) => {
           Swal.fire('Error', err, 'error')
@@ -115,7 +115,7 @@ export class PatientsPageComponent {
     this.drawerService.isDrawerOpen.set(true)
     this.drawerService.contentToDisplay.set(DrawerContents.PATIENT_VIEW)
     this.drawerService.setToUpdate.set(false)
-    this.drawerService.setPatientId.set(patient.id.toString())
+    this.drawerService.setPatientId.set(patient.id)
     this.drawerService.drawerTexts.set({
       header: `${patient.name} ${patient.lastName}`,
       btnText: ''
@@ -126,7 +126,7 @@ export class PatientsPageComponent {
     this.router.navigateByUrl(`dashboard/patients/${patient.id}/movements`)
   }
 
-  public deleteSelectedPatient(id: number) {
+  public deleteSelectedPatient(id: string) {
     if (!this.canDeletePatient()) return
     Swal.fire({
       title: 'Estas seguro?',
@@ -144,7 +144,7 @@ export class PatientsPageComponent {
     })
   }
 
-  private deletePatient(id: number) {
+  private deletePatient(id: string) {
     this.patientService.deletePatient(id)
       .subscribe({
         next: ( result ) => {

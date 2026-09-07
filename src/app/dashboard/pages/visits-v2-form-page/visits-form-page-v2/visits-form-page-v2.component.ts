@@ -18,9 +18,9 @@ import { trackById } from '../../../../shared/utils/track-by';
 import { ConsentManagerComponent } from '../../../components/consents/consent-manager/consent-manager.component';
 
 type StockItemPayload = {
-  id: number
+  id: string
   qty: number
-  subinventoryId?: number
+  subinventoryId?: string
 }
 
 type FormVisitWithStock = FormVisit & {
@@ -43,9 +43,9 @@ export class VisitsFormPageV2Component implements OnInit {
   public caller = ''
   public actionButtonText = ''
   public origin = 'emergency'
-  public stockSearchId = 2
+  public stockSearchId: string | number = '2'
   public includeSubinventoryInPayload = true
-  public payloadSubinventoryId = 2
+  public payloadSubinventoryId = '2'
   public backRoute = 'emergency'
   public titleNew = 'Registro de emergencia'
   public subtitleNew = 'Agrega los detalles de emergencia médica.'
@@ -163,9 +163,9 @@ export class VisitsFormPageV2Component implements OnInit {
       } = data;
 
       if (origin) this.origin = origin;
-      if (stockSearchId) this.stockSearchId = stockSearchId;
+      if (stockSearchId) this.stockSearchId = String(stockSearchId);
       if (includeSubinventoryInPayload !== undefined) this.includeSubinventoryInPayload = includeSubinventoryInPayload;
-      if (payloadSubinventoryId) this.payloadSubinventoryId = payloadSubinventoryId;
+      if (payloadSubinventoryId) this.payloadSubinventoryId = String(payloadSubinventoryId);
       if (titleNew) this.titleNew = titleNew;
       if (subtitleNew) this.subtitleNew = subtitleNew;
       if (titleEdit) this.titleEdit = titleEdit;
@@ -262,7 +262,7 @@ export class VisitsFormPageV2Component implements OnInit {
       .subscribe( params => {
         const id = params.get('id')
         if ( !id ) return
-        this.handleSelectedVisit( +id )
+        this.handleSelectedVisit( id )
       })
 
     this.route.queryParamMap
@@ -512,8 +512,13 @@ export class VisitsFormPageV2Component implements OnInit {
     this.visitsService.createVisit( payload, this.origin )
       .subscribe({
         next: ( visitId ) => {
-          this.uploadPendingAttachments(Number(payload.patient), visitId, () => {
-            this.finalizePendingConsents(Number(visitId), () => {
+          if (!visitId) {
+            this.isSaving = false
+            Swal.fire('Error', 'La visita se guardó sin devolver un identificador válido.', 'error')
+            return
+          }
+          this.uploadPendingAttachments(payload.patient, visitId, () => {
+            this.finalizePendingConsents(visitId, () => {
               Swal.fire('Success', 'New visit added!', 'success')
                 .then(() => {
                   this.clearDraft()
@@ -529,7 +534,7 @@ export class VisitsFormPageV2Component implements OnInit {
       })
   }
 
-  private finalizePendingConsents(visitId: number, done: () => void) {
+  private finalizePendingConsents(visitId: string, done: () => void) {
     const manager = this.consentManager
     if (!manager?.hasQueuedConsents) { done(); return }
     manager.finalizeQueued(visitId).subscribe({
@@ -538,7 +543,7 @@ export class VisitsFormPageV2Component implements OnInit {
     })
   }
 
-  private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {
+  private uploadPendingAttachments(patientId: string, recordId: string | null, done: () => void) {
     const list = this.attachmentList
     if (!list || !list.hasQueuedFiles || !patientId) {
       done()
@@ -553,7 +558,7 @@ export class VisitsFormPageV2Component implements OnInit {
     })
   }
 
-  public handleSelectedVisit( id: number ) {
+  public handleSelectedVisit( id: string ) {
     this.visitsService.getVisit(id)
       .subscribe({
         next: () => {
@@ -690,21 +695,21 @@ export class VisitsFormPageV2Component implements OnInit {
     const stockItems = this.listOfStockItems() ?? []
     this.stockItemsArray.markAsTouched()
     if (this.selectedStockItems.length === 0){
-      const existingItem = stockItems.find((item: any) => item.id === parseInt(value));
+      const existingItem = stockItems.find((item: any) => item.id === value);
       if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
     } 
     else {
-      const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
+      const existingItem = this.selectedStockItems.find((item: any) => item.id === value);
       if (!existingItem) {
-        const matched = stockItems.find((item: any) => item.id === parseInt(value))
+        const matched = stockItems.find((item: any) => item.id === value)
         if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
       }
     }
     this.loadDataOfStockArray()
   }
 
-  public removeListItem(id: number, idx: number) {
-    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== +id)
+  public removeListItem(id: string, idx: number) {
+    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== id)
     this.stockItemsArray.removeAt(idx)
     this.stockItemsArray.markAsTouched()
     this.loadDataOfStockArray()

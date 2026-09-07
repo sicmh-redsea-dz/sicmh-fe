@@ -11,23 +11,23 @@ export interface UserProfile {
 }
 
 export interface SettingsUser {
-  id: number
+  id: string
   name: string
   email: string
-  roleId?: number
+  roleId?: string
   roleName?: string
   isActive?: boolean
   profile?: UserProfile
 }
 
 export interface RoleOption {
-  id: number
+  id: string
   name: string
   key?: string
 }
 
 export interface InviteResult {
-  userId: number
+  userId: string
   emailSent: boolean
   tempPassword?: string
 }
@@ -40,5 +40,5 @@ export interface PermissionOverride {
 export type RolePermissionsMap = Record<string, PermissionOverride>
 
 export interface UserPermissionsMap {
-  [userId: number]: PermissionOverride
+  [userId: string]: PermissionOverride
 }

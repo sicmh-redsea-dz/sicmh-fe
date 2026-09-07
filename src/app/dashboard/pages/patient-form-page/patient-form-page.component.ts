@@ -16,7 +16,7 @@ export class PatientFormPageComponent implements OnInit {
   public title = 'Registro de Pacientes'
   public actionButtonText = 'Guardar'
   public isEditMode = false
-  private patientId: number | null = null
+  private patientId: string | null = null
   private fb = inject( FormBuilder ).nonNullable
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )
@@ -49,12 +49,12 @@ export class PatientFormPageComponent implements OnInit {
         map((params) => params.get('id')),
         tap((id) => {
           if (id)
-            this.setEditMode(Number(id))
+            this.setEditMode(id)
           else
             this.setCreateMode()
         }),
         filter((id): id is string => id !== null),
-        switchMap((id) => this.patientService.getPatient(Number(id))),
+        switchMap((id) => this.patientService.getPatient(id)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((patient) => {
@@ -80,9 +80,9 @@ export class PatientFormPageComponent implements OnInit {
     return date.toISOString().split('T')[0]
   }
 
-  private setEditMode(id: number) {
+  private setEditMode(id: string) {
     this.isEditMode = true
-    this.patientId = Number.isNaN(id) ? null : id
+    this.patientId = id.trim() ? id : null
     this.title = 'Editar Paciente'
     this.actionButtonText = 'Actualizar'
   }
@@ -116,7 +116,7 @@ export class PatientFormPageComponent implements OnInit {
     })
   }
 
-  private handleEditPatient( patient: FormPatient, patientId: number | null ) {
+  private handleEditPatient( patient: FormPatient, patientId: string | null ) {
     if (patientId === null) return
     this.patientService.editPatient(patient, patientId)
       .subscribe({

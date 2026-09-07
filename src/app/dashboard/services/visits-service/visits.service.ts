@@ -38,7 +38,7 @@ export class VisitsService {
     this.getDoctorsCatalog().subscribe({ error: () => undefined })
   }
 
-  public searchStockItems( term: number ): Observable<any> {
+  public searchStockItems( term: string | number ): Observable<any> {
     const url: string = `${this.baseUrl}/app/visits/search/stock-items`
     const params = new HttpParams()
       .set('term', term)
@@ -187,7 +187,7 @@ export class VisitsService {
       )
   }
 
-  public getVisit(id: number): Observable<Visit> {
+  public getVisit(id: string | number): Observable<Visit> {
     const url: string = `${this.baseUrl}/app/visits/${id}`
     return this.http.get<any>(url, {})
       .pipe(
@@ -202,7 +202,7 @@ export class VisitsService {
       )
   }
 
-  public getPrescription(id: number): Observable<PrescriptionContext> {
+  public getPrescription(id: string | number): Observable<PrescriptionContext> {
     const url = `${this.baseUrl}/app/visits/${id}/prescription`
     return this.http.get<{ data: PrescriptionContext }>(url, {})
       .pipe(
@@ -211,7 +211,7 @@ export class VisitsService {
       )
   }
 
-  public editVisit(id: number, visit: FormVisit): Observable<boolean> {
+  public editVisit(id: string | number, visit: FormVisit): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/visits/edit/${id}`
     const body = {...visit}
     return this.http.patch(url, body, {})
@@ -225,10 +225,10 @@ export class VisitsService {
       )
   }
 
-  public createVisit(visit: FormVisit, origin: string): Observable<number | null> {
+  public createVisit(visit: FormVisit, origin: string): Observable<string | null> {
     const url: string = `${this.baseUrl}/app/visits/create`
     const body = {...visit, origin}
-    return this.http.post<{ data?: { visit?: number } }>(url, body, {})
+    return this.http.post<{ data?: { visit?: string } }>(url, body, {})
       .pipe(
         map(( resp ) => resp?.data?.visit ?? null),
         catchError(( err ) => {
@@ -237,7 +237,7 @@ export class VisitsService {
       )
   }
 
-  public deleteVisit(id: number): Observable<boolean> {
+  public deleteVisit(id: string | number): Observable<boolean> {
     const url: string = `${this.baseUrl}/app/visits/${id}`
     return this.http.delete(url, {})
       .pipe(

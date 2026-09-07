@@ -25,11 +25,11 @@ export class PatientViewComponent {
     effect(() => {
       const id = this.patientId()
       if (!id) return
-      this.loadPatient(Number(id))
+      this.loadPatient(id)
     })
   }
 
-  private loadPatient(patientId: number) {
+  private loadPatient(patientId: string) {
     this.isLoading = true
     this.patientsService.getPatient(patientId).subscribe({
       next: (patient) => {

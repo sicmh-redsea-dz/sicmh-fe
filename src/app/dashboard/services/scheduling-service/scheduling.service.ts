@@ -15,7 +15,7 @@ export class SchedulingService {
       .pipe(map(({ data }) => data.map(this.toEventInput)))
   }
 
-  getCita(id: number): Observable<Cita> {
+  getCita(id: string): Observable<Cita> {
     return this.http
       .get<{ data: Cita }>(`${this.base}/events/${id}`, {})
       .pipe(map(({ data }) => data))
@@ -27,13 +27,13 @@ export class SchedulingService {
       .pipe(map(({ data }) => data))
   }
 
-  update(id: number, body: Partial<Cita>): Observable<Cita> {
+  update(id: string, body: Partial<Cita>): Observable<Cita> {
     return this.http
       .patch<{ data: Cita }>(`${this.base}/events/${id}`, body, {})
       .pipe(map(({ data }) => data))
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.base}/events/${id}`, {})
   }

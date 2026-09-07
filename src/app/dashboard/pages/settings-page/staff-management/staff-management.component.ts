@@ -48,7 +48,7 @@ export class StaffManagementComponent implements OnInit {
     const payload = {
       name: this.staffForm.get('name')?.value || '',
       email: this.staffForm.get('email')?.value || '',
-      roleId: Number(this.staffForm.get('roleId')?.value),
+      roleId: String(this.staffForm.get('roleId')?.value || ''),
       profile: {
         phone: this.staffForm.get('phone')?.value || '',
         identification: this.staffForm.get('identification')?.value || '',

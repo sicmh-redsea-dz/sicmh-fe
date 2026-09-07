@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
-import { Auth, updatePassword } from '@angular/fire/auth'
 import { Router } from '@angular/router'
 import Swal from 'sweetalert2'
 import { AuthService } from '../../services/auth.service'
@@ -13,7 +12,6 @@ import { firstValueFrom } from 'rxjs'
 })
 export class ForcePasswordPageComponent {
   private fb = inject(FormBuilder)
-  private auth = inject(Auth)
   private router = inject(Router)
   private authService = inject(AuthService)
 
@@ -36,8 +34,8 @@ export class ForcePasswordPageComponent {
       return
     }
 
-    const user = this.auth.currentUser
-    if (!user) {
+    const currentUser = this.authService.currentUser()
+    if (!currentUser) {
       Swal.fire('Error', 'Sesión inválida. Vuelve a iniciar sesión.', 'error')
       this.router.navigateByUrl('/auth/login')
       return
@@ -45,9 +43,8 @@ export class ForcePasswordPageComponent {
 
     this.saving = true
     try {
-      await updatePassword(user, password)
-      await firstValueFrom(this.authService.completePasswordChange())
-      await user.getIdToken(true)
+      const updated = await firstValueFrom(this.authService.completePasswordChange(password))
+      if (!updated) throw new Error('No se pudo actualizar la contraseña.')
       Swal.fire('Listo', 'Contraseña actualizada con éxito.', 'success')
       this.router.navigateByUrl('/dashboard')
     } catch (err: any) {

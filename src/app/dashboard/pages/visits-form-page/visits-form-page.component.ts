@@ -17,10 +17,10 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { ConsentManagerComponent } from '../../components/consents/consent-manager/consent-manager.component';
 
 type FormVisitWithStock = FormVisit & {
-  stockItems?: { id: number; qty: number }[]
+  stockItems?: { id: string; qty: number }[]
 }
 
-const CONSULTA_SUBINVENTORY_ID = 1
+const CONSULTA_SUBINVENTORY_ID = '1'
 
 @Component({
   selector: 'app-visits-form-page',
@@ -180,7 +180,7 @@ export class VisitsFormPageComponent implements OnInit {
       .subscribe( params => {
         const id = params.get('id')
         if ( !id ) return
-        this.handleSelectedVisit( +id )
+        this.handleSelectedVisit( id )
       })
     
     this.route.url
@@ -275,21 +275,21 @@ export class VisitsFormPageComponent implements OnInit {
     const stockItems = this.listOfStockItems() ?? []
     this.stockItemsArray.markAsTouched()
     if (this.selectedStockItems.length === 0){
-      const existingItem = stockItems.find((item: any) => item.id === parseInt(value));
+      const existingItem = stockItems.find((item: any) => item.id === value);
       if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
     }
     else {
-      const existingItem = this.selectedStockItems.find((item: any) => item.id === parseInt(value));
+      const existingItem = this.selectedStockItems.find((item: any) => item.id === value);
       if (!existingItem) {
-        const matched = stockItems.find((item: any) => item.id === parseInt(value))
+        const matched = stockItems.find((item: any) => item.id === value)
         if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
       }
     }
     this.loadDataOfStockArray()
   }
 
-  public removeListItem(id: number, idx: number) {
-    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== +id)
+  public removeListItem(id: string, idx: number) {
+    this.selectedStockItems = this.selectedStockItems.filter((item) => item.id !== id)
     this.stockItemsArray.removeAt(idx)
     this.stockItemsArray.markAsTouched()
     this.loadDataOfStockArray()
@@ -323,8 +323,13 @@ export class VisitsFormPageComponent implements OnInit {
     this.visitsService.createVisit( visit, 'visits' )
       .subscribe({
         next: ( visitId ) => {
-          this.uploadPendingAttachments(Number(visit.patient), visitId, () => {
-            this.finalizePendingConsents(Number(visitId), () => {
+          if (!visitId) {
+            this.isSaving = false
+            Swal.fire('Error', 'La visita se guardó sin devolver un identificador válido.', 'error')
+            return
+          }
+          this.uploadPendingAttachments(visit.patient, visitId, () => {
+            this.finalizePendingConsents(visitId, () => {
               Swal.fire('Success', 'New visit added!', 'success')
                 .then(() => this.router.navigateByUrl(`/dashboard/visits/edit-visit/${visitId}`))
             })
@@ -337,7 +342,7 @@ export class VisitsFormPageComponent implements OnInit {
       })
   }
 
-  private finalizePendingConsents(visitId: number, done: () => void) {
+  private finalizePendingConsents(visitId: string, done: () => void) {
     const manager = this.consentManager
     if (!manager?.hasQueuedConsents) { done(); return }
     manager.finalizeQueued(visitId).subscribe({
@@ -346,7 +351,7 @@ export class VisitsFormPageComponent implements OnInit {
     })
   }
 
-  private uploadPendingAttachments(patientId: number, recordId: number | null, done: () => void) {
+  private uploadPendingAttachments(patientId: string, recordId: string | null, done: () => void) {
     const list = this.attachmentList
     if (!list || !list.hasQueuedFiles || !patientId) {
       done()
@@ -361,7 +366,7 @@ export class VisitsFormPageComponent implements OnInit {
     })
   }
 
-  public handleSelectedVisit( id: number ) {
+  public handleSelectedVisit( id: string ) {
     this.visitsService.getVisit( id )
       .subscribe({
         next: () => {

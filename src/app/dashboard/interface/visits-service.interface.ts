@@ -15,7 +15,7 @@ export interface Data {
 }
 
 export interface SimpleVisit {
-    id:            number
+    id:            string
     doctorName:    string
     patientName:   string
     patientId:     string
@@ -34,13 +34,13 @@ export interface SimpleVisit {
 }
 
 export interface Staff {
-    id:         number
+    id:         string
     name:       string
     specialty:  string
 }
 
 export interface Stock {
-    id:                 number
+    id:                 string
     productName:        string
     productDescription: string
     productQuantity:    number
@@ -54,7 +54,7 @@ export interface Stock {
 }
 
 export interface Patients {
-    id:       number
+    id:       string
     name:     string
     lastName: string
     birthDate:Date
@@ -80,13 +80,13 @@ export interface Visit {
     diagnosis:          string | null
     glucoseLevel:       string
     height:             string
-    id:                 number
+    id:                 string
     invoiceId:          string
     lastVisitDate:      Date
     notes:              string
     oxygenSaturation:   number
-    patientId:          number
-    staffId:            number
+    patientId:          string
+    staffId:            string
     temperature:        string
     treatment:          string | null
     visceralFat:        string | null
@@ -103,21 +103,21 @@ export interface Visit {
     docName: string
     patientName: string
 
-    usedInventory : { stockId: number, stockQty: number}[]
+    usedInventory : { stockId: string, stockQty: number}[]
     expediente?: ExpedientePayload | null
 }
 
 export interface PrescriptionContext {
-    visitId: number
+    visitId: string
     visitDate: string
     treatment: string | null
     diagnosis: string | null
-    patientId: number
+    patientId: string
     patientName: string
     patientBirthDate: string | null
     patientIdentification: string | null
-    doctorId: number
-    doctorUserId: number | null
+    doctorId: string
+    doctorUserId: string | null
     doctorName: string
     doctorSpecialty: string | null
     doctorPosition: string | null

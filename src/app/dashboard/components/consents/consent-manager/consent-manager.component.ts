@@ -5,12 +5,12 @@ import { ConsentsService } from '../../../services/consents-service/consents.ser
 import { Observable, concatMap, from, map, of, throwError, toArray } from 'rxjs'
 
 interface QueuedConsent {
-  templateId: number
+  templateId: string
   templateName: string
   kind: 'electronic' | 'printed'
   payload?: Record<string, unknown>
-  patientId: number
-  doctorId: number
+  patientId: string
+  doctorId: string
   templateVersion: number
 }
 
@@ -20,9 +20,9 @@ interface QueuedConsent {
   styleUrl: './consent-manager.component.css'
 })
 export class ConsentManagerComponent implements OnInit, AfterViewChecked {
-  @Input() visitId: number | null = null
-  @Input() patientId: number | null = null
-  @Input() doctorId: number | null = null
+  @Input() visitId: string | null = null
+  @Input() patientId: string | null = null
+  @Input() doctorId: string | null = null
   @Input() visitDate: string | null = null
   @Output() changed = new EventEmitter<void>()
   @ViewChild('signatureCanvas') signatureCanvas?: ElementRef<HTMLCanvasElement>
@@ -175,10 +175,11 @@ export class ConsentManagerComponent implements OnInit, AfterViewChecked {
     this.hasInk = false
   }
 
-  statusFor(templateId: number): string {
-    const queued = this.queuedConsents.find((item) => item.templateId === templateId)
+  statusFor(templateId: string | number): string {
+    const normalizedTemplateId = String(templateId)
+    const queued = this.queuedConsents.find((item) => item.templateId === normalizedTemplateId)
     if (queued) return queued.kind === 'electronic' ? 'Listo para guardar' : 'Impresión lista'
-    const instance = this.instances.find((item) => item.template_id === templateId)
+    const instance = this.instances.find((item) => item.template_id === normalizedTemplateId)
     return instance?.status === 'accepted' ? 'Aceptado' : instance?.status === 'printed' ? 'Impreso' : 'Disponible'
   }
 
@@ -187,10 +188,12 @@ export class ConsentManagerComponent implements OnInit, AfterViewChecked {
   get canOpen(): boolean { return !!this.visitId || (!!this.patientId && !!this.doctorId) }
   get hasQueuedConsents(): boolean { return this.queuedConsents.length > 0 }
 
-  finalizeQueued(visitId: number): Observable<number> {
+  finalizeQueued(visitId: string | number): Observable<number> {
     if (!this.queuedConsents.length) return of(0)
     const queue = [...this.queuedConsents]
-    if (queue.some((item) => item.patientId !== Number(this.patientId) || item.doctorId !== Number(this.doctorId))) {
+    const currentPatientId = this.normalizeId(this.patientId)
+    const currentDoctorId = this.normalizeId(this.doctorId)
+    if (!currentPatientId || !currentDoctorId || queue.some((item) => item.patientId !== currentPatientId || item.doctorId !== currentDoctorId)) {
       return throwError(() => 'El paciente o médico cambió después de preparar el consentimiento. Debe prepararse nuevamente.')
     }
     return from(queue).pipe(
@@ -242,5 +245,11 @@ export class ConsentManagerComponent implements OnInit, AfterViewChecked {
     canvas.onpointerup = () => { this.drawing = false }
     canvas.onpointercancel = () => { this.drawing = false }
     this.canvasReady = true
+  }
+
+  private normalizeId(value: string | number | null | undefined): string | null {
+    if (value === null || value === undefined) return null
+    const normalized = String(value).trim()
+    return normalized ? normalized : null
   }
 }

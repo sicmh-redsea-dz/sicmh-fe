@@ -272,9 +272,9 @@ export class OrRoomsManagementPageComponent implements OnInit {
     const doctorName = this.selectedDoctor?.name || this.doctorSearchControl.value || ''
     const payload = {
       assignmentId: this.assignmentForm.value.assignmentId || undefined,
-      patientId: Number(this.assignmentForm.value.patient),
+      patientId: String(this.assignmentForm.value.patient || '').trim(),
       patientName: patientName.trim(),
-      doctorId: this.assignmentForm.value.doctor ? Number(this.assignmentForm.value.doctor) : undefined,
+      doctorId: this.assignmentForm.value.doctor ? String(this.assignmentForm.value.doctor).trim() : undefined,
       doctorName: doctorName.trim() || undefined,
       procedure: this.assignmentForm.value.procedure?.trim() || undefined,
       anesthesiaType: this.assignmentForm.value.anesthesiaType?.trim() || undefined,
