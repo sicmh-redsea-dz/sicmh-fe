@@ -17,7 +17,7 @@
         (ngSubmit)="onHandleSubmit()">
     <p class="form-legend">Los campos marcados con <span>*</span> son obligatorios.</p>
 
-    <div class="input-row">
+    <div class="input-row admission-row">
       <div class="input-group date-group">
         <label>Date</label>
         <input type="date" 
@@ -74,6 +74,10 @@
         <small class="error-text" *ngIf="visitForm.get('patient')?.touched && visitForm.get('patient')?.hasError('required')">
           Selecciona un paciente.
         </small>
+      </div>
+      <div class="input-group age-group">
+        <label>Edad</label>
+        <output aria-live="polite">{{ patientAge === null ? '—' : patientAge + ' años' }}</output>
       </div>
     </div>
 

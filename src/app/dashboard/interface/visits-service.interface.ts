@@ -100,6 +100,7 @@ export interface Visit {
     surgicalHst: string | null
     backgroundHst: string | null
 
+    patientBirthDate?: string | null
     docName: string
     patientName: string
 

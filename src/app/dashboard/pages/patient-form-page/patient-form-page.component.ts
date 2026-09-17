@@ -1,3 +1,4 @@
+import { ageInYears } from '../../../shared/utils/age-in-years';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,6 +43,10 @@ export class PatientFormPageComponent implements OnInit {
       address: ['']
     })
   })
+
+  public get patientAge(): number | null {
+    return ageInYears(this.patientForm.controls.birthdate.value)
+  }
 
   ngOnInit(): void {
     this.activeRoute.paramMap

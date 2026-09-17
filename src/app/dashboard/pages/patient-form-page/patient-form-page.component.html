@@ -65,9 +65,10 @@
 
         <div class="form-group">
           <label class="required">Fecha de Nacimiento</label>
-          <input  class="" 
-                  type="date" 
-                  formControlName="birthdate">
+          <div class="birthdate-age-row">
+            <input type="date" formControlName="birthdate" aria-label="Fecha de nacimiento">
+            <span class="patient-age" aria-live="polite">Edad: {{ patientAge === null ? '—' : patientAge + ' años' }}</span>
+          </div>
           <div class="error-message" *ngIf="patientForm.get('birthdate')?.invalid && (patientForm.get('birthdate')?.touched || patientForm.get('birthdate')?.dirty)">
             <small *ngIf="patientForm.get('birthdate')?.errors?.['required']">Este campo es obligatorio.</small>
           </div>

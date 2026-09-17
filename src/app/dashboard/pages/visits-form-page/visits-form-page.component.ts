@@ -1,3 +1,4 @@
+import { ageInYears } from '../../../shared/utils/age-in-years';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
@@ -104,6 +105,17 @@ export class VisitsFormPageComponent implements OnInit {
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
 
+  public get patientAge(): number | null {
+    const patientId = this.visitForm.get('patient')?.value
+    if (!patientId) return null
+    const birthDate = this.selectedPatient?.id === Number(patientId)
+      ? this.selectedPatient.birthDate
+      : this.caller !== 'nv' && this.selectedVisit()?.patientId === Number(patientId)
+        ? this.selectedVisit()?.patientBirthDate
+        : null
+    return ageInYears(birthDate)
+  }
+
   ngOnInit(): void {
     if ( this.canManageInventory() ) {
       this.visitsService.searchStockItems( CONSULTA_SUBINVENTORY_ID )
@@ -144,6 +156,10 @@ export class VisitsFormPageComponent implements OnInit {
     })
 
     this.patientSearchControl.valueChanges.pipe(
+      tap(() => {
+        this.selectedPatient = null
+        this.visitForm.get('patient')?.setValue('')
+      }),
       debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),

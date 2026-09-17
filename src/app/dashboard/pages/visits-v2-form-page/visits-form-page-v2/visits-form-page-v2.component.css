@@ -595,3 +595,13 @@ select.ng-invalid.ng-dirty {
   0% { transform: translateY(-50%) rotate(0deg); } /* Mantenemos el centrado y añadimos rotación */
   100% { transform: translateY(-50%) rotate(360deg); }
 }
+
+.admission-row { gap: 0.75rem; }
+.admission-row > .input-group { min-width: 0; }
+.admission-row > .age-group { flex: 0 0 5.5rem; }
+.age-group output { padding: 0.5rem 0; font-size: 0.85rem; white-space: nowrap; color: var(--text-color); }
+@media (max-width: 768px) {
+  .admission-row { flex-wrap: wrap; }
+  .admission-row > .input-group { flex: 1 1 40%; }
+  .admission-row > .age-group { flex: 0 0 5.5rem; }
+}

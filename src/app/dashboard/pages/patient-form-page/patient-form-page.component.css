@@ -250,3 +250,7 @@ textarea.ng-dirty.ng-invalid {
   font-size: 0.8rem;
   margin-top: 4px;
 }
+
+.birthdate-age-row { display: flex; align-items: center; gap: 0.75rem; }
+.birthdate-age-row input { flex: 1; min-width: 0; width: auto; }
+.patient-age { white-space: nowrap; color: var(--text-color); font-size: 0.85rem; }

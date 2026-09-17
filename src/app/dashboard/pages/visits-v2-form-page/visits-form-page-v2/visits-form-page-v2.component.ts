@@ -6,6 +6,7 @@ import { BedsService } from '../../../services/beds-service/beds.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Doctor, FormVisit } from '../../../interface/visits-response.interface';
 import { Stock } from '../../../interface/visits-service.interface'
+import { ageInYears } from '../../../../shared/utils/age-in-years';
 import Swal from 'sweetalert2';
 
 import { formatNewDate, formatIncomingData } from '../../../../shared/utils/date-formatters';
@@ -147,6 +148,17 @@ export class VisitsFormPageV2Component implements OnInit {
   private bedModule: BedModule | null = null
   private shouldRestoreDraft = false
 
+  public get patientAge(): number | null {
+    const patientId = this.visitForm.get('patient')?.value
+    if (!patientId) return null
+    const birthDate = this.selectedPatient?.id === Number(patientId)
+      ? this.selectedPatient.birthDate
+      : this.caller !== 'nv' && this.selectedVisit()?.patientId === Number(patientId)
+        ? this.selectedVisit()?.patientBirthDate
+        : null
+    return ageInYears(birthDate)
+  }
+
   ngOnInit(): void {
     this.route.data
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -218,6 +230,10 @@ export class VisitsFormPageV2Component implements OnInit {
     })
 
     this.patientSearchControl.valueChanges.pipe(
+      tap(() => {
+        this.selectedPatient = null
+        this.visitForm.get('patient')?.setValue('')
+      }),
       debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
