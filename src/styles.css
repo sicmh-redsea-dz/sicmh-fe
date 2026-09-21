@@ -277,3 +277,11 @@ button:hover {
   color: var(--color-red);
   font-size: 0.75rem;
 }
+
+/* Keyboard focus for patient and doctor suggestions. */
+[data-autocomplete-option]:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background-color: #dbeafe;
+  color: #172554;
+}

@@ -1,3 +1,4 @@
+import { AutocompleteKeyboardDirective } from './directives/autocomplete-keyboard.directive';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -27,6 +28,7 @@ import { HasAnyPermissionDirective } from './directives/has-any-permission.direc
     FormatFullnamePipe,
     HasPermissionDirective,
     HasAnyPermissionDirective,
+    AutocompleteKeyboardDirective,
   ],
   imports: [
     CommonModule,
@@ -44,6 +46,7 @@ import { HasAnyPermissionDirective } from './directives/has-any-permission.direc
     FormatFullnamePipe,
     HasPermissionDirective,
     HasAnyPermissionDirective,
+    AutocompleteKeyboardDirective,
   ]
 })
 export class SharedModule {}

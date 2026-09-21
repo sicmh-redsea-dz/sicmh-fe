@@ -209,7 +209,6 @@ export class VisitsFormPageV2Component implements OnInit {
         this.visitForm.get('doctor')?.setValue('')
         if ( cleanTerm.length < 2 ) {
           this.searchDocResults = []
-          this.showDocDropdown = false
           this.isDocLoading = false
           return
         }
@@ -217,7 +216,7 @@ export class VisitsFormPageV2Component implements OnInit {
       }),
       switchMap(( term: string ) => term.trim().length < 2
         ? of([])
-        : this.visitsService.searchDoctors( term.trim() )),
+        : this.visitsService.searchDoctors( term.trim() ).pipe(catchError(() => of([])))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: ( results ) => {
@@ -243,7 +242,6 @@ export class VisitsFormPageV2Component implements OnInit {
         this.visitForm.get('patient')?.setValue('')
         if ( cleanTerm.length < 2 ) {
           this.searchPatResults = []
-          this.showPatDropdown = false
           this.isPatLoading = false
           return
         }
@@ -406,7 +404,6 @@ export class VisitsFormPageV2Component implements OnInit {
     const cleanTerm = term.trim().toLowerCase()
     if (!cleanTerm) {
       this.bedResults = []
-      this.showBedDropdown = false
       if (this.selectedBed) {
         this.selectedBed = null
         this.visitForm.get('expediente.module.bed')?.setValue('', { emitEvent: false })
@@ -422,7 +419,6 @@ export class VisitsFormPageV2Component implements OnInit {
       const haystack = `${bed.code} ${bed.area ?? ''}`.toLowerCase()
       return haystack.includes(cleanTerm)
     })
-    this.showBedDropdown = true
   }
 
   public selectBed(bed: BedRecord) {
@@ -436,10 +432,8 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleBedBlur() {
-    setTimeout(() => {
-      this.showBedDropdown = false
-      this.visitForm.get('expediente.module.bed')?.markAsTouched()
-    }, 200)
+    this.showBedDropdown = false
+    this.visitForm.get('expediente.module.bed')?.markAsTouched()
   }
 
   public get showCreateBed(): boolean {
@@ -485,11 +479,11 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleDocBlur() {
-    setTimeout(() => this.showDocDropdown = false, 200)
+    this.showDocDropdown = false
   }
 
   public handlePatBlur() {
-    setTimeout(() => this.showPatDropdown = false, 200)
+    this.showPatDropdown = false
   }
 
   get stockItemsArray(): FormArray {

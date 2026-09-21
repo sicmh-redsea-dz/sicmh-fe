@@ -100,7 +100,6 @@ export class BedsManagementPageComponent implements OnInit {
         this.assignmentForm.get('doctor')?.setValue('')
         if (cleanTerm.length < 2) {
           this.searchDocResults = []
-          this.showDocDropdown = false
           this.isDocLoading = false
           return
         }
@@ -108,7 +107,7 @@ export class BedsManagementPageComponent implements OnInit {
       }),
       switchMap((term: string) => term.trim().length < 2
         ? of([])
-        : this.visitsService.searchDoctors(term.trim())),
+        : this.visitsService.searchDoctors(term.trim()).pipe(catchError(() => of([])))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (results) => {
@@ -130,7 +129,6 @@ export class BedsManagementPageComponent implements OnInit {
         this.assignmentForm.get('patient')?.setValue('')
         if (cleanTerm.length < 2) {
           this.searchPatResults = []
-          this.showPatDropdown = false
           this.isPatLoading = false
           return
         }
@@ -336,11 +334,11 @@ export class BedsManagementPageComponent implements OnInit {
   }
 
   public handleDocBlur() {
-    setTimeout(() => this.showDocDropdown = false, 200)
+    this.showDocDropdown = false
   }
 
   public handlePatBlur() {
-    setTimeout(() => this.showPatDropdown = false, 200)
+    this.showPatDropdown = false
   }
 
   public goBack() {

@@ -38,13 +38,13 @@
     <div class="section-body">
       <div class="form-group search-group">
         <label class="required">Paciente</label>
-        <div class="search-box">
+        <div class="search-box" appAutocompleteKeyboard (autocompleteLeave)="onPatientBlur()">
           <input
             type="text"
             [value]="patientQuery"
             (input)="onPatientInput($any($event.target).value)"
             (focus)="onPatientFocus()"
-            (blur)="onPatientBlur()"
+
             placeholder="Buscar por nombre o identificación"
             autocomplete="off"
             [disabled]="isReadOnly"
@@ -58,14 +58,14 @@
           >
             x
           </button>
-          <div class="search-results" *ngIf="patientOpen">
+          <div class="search-results" role="listbox" *ngIf="patientOpen">
             <div class="search-loading" *ngIf="patientLoading">Buscando pacientes...</div>
             <ng-container *ngIf="!patientLoading">
               <button
                 class="search-item"
                 type="button"
                 *ngFor="let p of patientResults; trackBy: trackById"
-                (mousedown)="selectPatient(p)"
+                data-autocomplete-option tabindex="-1" role="option" (mousedown)="$event.preventDefault()" (click)="selectPatient(p)"
               >
                 <span>{{ p.name }}</span>
                 <small>{{ p.idNumber || 'Sin identificación' }}</small>
@@ -92,13 +92,13 @@
     <div class="section-body">
       <div class="form-group search-group">
         <label class="required">Doctor</label>
-        <div class="search-box">
+        <div class="search-box" appAutocompleteKeyboard (autocompleteLeave)="onDoctorBlur()">
           <input
             type="text"
             [value]="doctorQuery"
             (input)="onDoctorInput($any($event.target).value)"
             (focus)="onDoctorFocus()"
-            (blur)="onDoctorBlur()"
+
             placeholder="Buscar por nombre"
             autocomplete="off"
             [disabled]="isReadOnly"
@@ -112,14 +112,14 @@
           >
             x
           </button>
-          <div class="search-results" *ngIf="doctorOpen">
+          <div class="search-results" role="listbox" *ngIf="doctorOpen">
             <div class="search-loading" *ngIf="doctorLoading">Buscando doctores...</div>
             <ng-container *ngIf="!doctorLoading">
               <button
                 class="search-item"
                 type="button"
                 *ngFor="let d of doctorResults; trackBy: trackById"
-                (mousedown)="selectDoctor(d)"
+                data-autocomplete-option tabindex="-1" role="option" (mousedown)="$event.preventDefault()" (click)="selectDoctor(d)"
               >
                 <span>{{ d.name }}</span>
                 <small>{{ d.specialty || 'Sin especialidad' }}</small>

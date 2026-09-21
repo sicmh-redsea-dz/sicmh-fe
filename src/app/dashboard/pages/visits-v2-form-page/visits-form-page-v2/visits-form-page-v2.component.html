@@ -27,7 +27,7 @@
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handleDocBlur()">
         <label class="required">Doctor</label>
         <div class="autocomplete-wrapper">
           <input 
@@ -35,13 +35,13 @@
             placeholder="Buscar doctor..."
             [formControl]="doctorSearchControl"
             [value]="selectedDoctor?.name || ''"
-            (focus)="showDocDropdown = true"
-            (blur)="handleDocBlur()" 
+            (input)="showDocDropdown = true" (focus)="showDocDropdown = true"
+
           />
           <div *ngIf="isDocLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
-          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="selectDoctor(doctor)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showDocDropdown && searchDocResults.length > 0">
+          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" data-autocomplete-option tabindex="-1" role="option" (mousedown)="$event.preventDefault()" (click)="selectDoctor(doctor)">
             {{ doctor.name }}
           </li>
         </ul>
@@ -50,7 +50,7 @@
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handlePatBlur()">
         <label class="required">Paciente</label>
         <div class="autocomplete-wrapper">
           <input 
@@ -58,13 +58,13 @@
             placeholder="Buscar paciente..."
             [formControl]="patientSearchControl"
             [value]="selectedPatient?.name || ''"
-            (focus)="showPatDropdown = true"
-            (blur)="handlePatBlur()" 
+            (input)="showPatDropdown = true" (focus)="showPatDropdown = true"
+
           />
           <div *ngIf="isPatLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
-          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="selectPatient(patient)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showPatDropdown && searchPatResults.length > 0">
+          <li *ngFor="let patient of searchPatResults; trackBy: trackById" data-autocomplete-option tabindex="-1" role="option" (mousedown)="$event.preventDefault()" (click)="selectPatient(patient)">
             {{ patient.name }}
           </li>
         </ul>
@@ -544,7 +544,7 @@
                   type="text"
                   placeholder="Buscar cama disponible..."
                   [formControl]="bedSearchControl"
-                  (focus)="showBedDropdown = true"
+                  (input)="showBedDropdown = true" (focus)="showBedDropdown = true"
                   (blur)="handleBedBlur()"
                 />
                 <div *ngIf="isBedLoading" class="loader"></div>

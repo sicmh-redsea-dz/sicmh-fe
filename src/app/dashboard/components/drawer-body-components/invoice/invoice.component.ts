@@ -430,17 +430,13 @@ export class InvoiceComponent implements OnInit {
   }
 
   public onPatientBlur() {
-    window.setTimeout(() => {
-      this.patientOpen = false
-      this.invoiceForm.get('patient')?.markAsTouched()
-    }, 150)
+    this.patientOpen = false
+    this.invoiceForm.get('patient')?.markAsTouched()
   }
 
   public onDoctorBlur() {
-    window.setTimeout(() => {
-      this.doctorOpen = false
-      this.invoiceForm.get('doctor')?.markAsTouched()
-    }, 150)
+    this.doctorOpen = false
+    this.invoiceForm.get('doctor')?.markAsTouched()
   }
 
   public selectPatient(patient: PatientOption) {
