@@ -27,44 +27,46 @@
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group name-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handleDocBlur()">
         <label class="required">Doctor</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
             placeholder="Buscar doctor..."
             [formControl]="doctorSearchControl"
-            [value]="selectedDoctor?.name || ''"
-            (focus)="showDocDropdown = true"
-            (blur)="handleDocBlur()" 
+            (focus)="handleDocFocus()"
+
           />
           <div *ngIf="isDocLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
-          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="selectDoctor(doctor)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showDocDropdown && searchDocResults.length > 0">
+          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="$event.preventDefault()" (click)="selectDoctor(doctor)" data-autocomplete-option tabindex="-1" role="option">
             {{ doctor.name }}
           </li>
         </ul>
+        <small class="error-text" *ngIf="doctorSearchError">
+          {{ doctorSearchError }} Intenta nuevamente.
+        </small>
         <small class="error-text" *ngIf="visitForm.get('doctor')?.touched && visitForm.get('doctor')?.hasError('required')">
           Selecciona un doctor.
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group name-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handlePatBlur()">
         <label class="required">Paciente</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
             placeholder="Buscar paciente..."
             [formControl]="patientSearchControl"
-            [value]="selectedPatient?.name || ''"
+            [readonly]="caller !== 'nv' && !!selectedVisit()?.clinicalProfileSnapshot"
             (focus)="showPatDropdown = true"
-            (blur)="handlePatBlur()" 
+
           />
           <div *ngIf="isPatLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
-          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="selectPatient(patient)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showPatDropdown && searchPatResults.length > 0">
+          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="$event.preventDefault()" (click)="selectPatient(patient)" data-autocomplete-option tabindex="-1" role="option">
             {{ patient.name }}
           </li>
         </ul>
@@ -75,7 +77,22 @@
           Selecciona un paciente.
         </small>
       </div>
+      <div class="input-group age-group">
+        <label>Edad (a&#241;os)</label>
+        <input type="text" [value]="patientAge ?? ''" readonly aria-label="Edad del paciente en a&#241;os">
+      </div>
     </div>
+
+    <app-clinical-profile *ngIf="caller === 'nv'"
+      [patientId]="visitForm.get('patient')?.value || ''"
+      (reviewChange)="profileReview = $event"
+      (saveBlocked)="profileSaveBlocked = $event"></app-clinical-profile>
+
+    <p *ngIf="caller !== 'nv' && selectedVisit()?.clinicalProfileSnapshot as snapshot">
+      Ficha clínica revisada el {{ snapshot.reviewedAt | date:'dd/MM/yyyy HH:mm' }}.
+      Esta atención conserva la versión {{ snapshot.version }}; la ficha vigente se revisará en la próxima consulta.
+      Estado de alergias: {{ snapshot.data.allergyStatus === 'none_known' ? 'Sin alergias conocidas' : snapshot.data.allergyStatus === 'recorded' ? snapshot.data.allergies : 'Información aún no recabada' }}.
+    </p>
 
     <div formGroupName="expediente">
       <div class="fancy-divider">
@@ -85,17 +102,17 @@
       <div formGroupName="standard">
         <div class="textareas-row">
           <div class="textarea-group">
-            <label>Motivo de consulta/ingreso</label>
+            <label>Motivo de consulta y evolución actual</label>
             <textarea 
               formControlName="chiefComplaint"
-              placeholder="Describe el motivo principal de la consulta o ingreso."></textarea>
+              placeholder="Describe el motivo, inicio, duración y evolución de los síntomas."></textarea>
             <small class="error-text" *ngIf="visitForm.get('expediente.standard.chiefComplaint')?.touched && visitForm.get('expediente.standard.chiefComplaint')?.hasError('required')">
               Este campo es obligatorio.
             </small>
           </div>
 
-          <div class="textarea-group">
-            <label>Padecimiento actual</label>
+          <div class="textarea-group" *ngIf="caller !== 'nv' && visitForm.get('expediente.standard.currentIllness')?.value">
+            <label>Padecimiento actual (registro anterior)</label>
             <textarea 
               formControlName="currentIllness"
               placeholder="Resume el padecimiento actual del paciente."></textarea>
@@ -115,11 +132,14 @@
           </small>
         </div>
 
+        <details *ngIf="caller !== 'nv'">
+          <summary>Alergias y medicamentos documentados en esta atención</summary>
         <div class="textareas-row">
           <div class="textarea-group">
             <label>Alergias</label>
             <textarea
               formControlName="allergies"
+              [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
               placeholder="Alergias conocidas del paciente."></textarea>
             <small class="error-text" *ngIf="visitForm.get('expediente.standard.allergies')?.touched && visitForm.get('expediente.standard.allergies')?.hasError('required')">
               Este campo es obligatorio.
@@ -130,12 +150,14 @@
             <label>Medicamentos actuales</label>
             <textarea
               formControlName="currentMeds"
+              [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
               placeholder="Medicamentos que consume actualmente."></textarea>
             <small class="error-text" *ngIf="visitForm.get('expediente.standard.currentMeds')?.touched && visitForm.get('expediente.standard.currentMeds')?.hasError('required')">
               Este campo es obligatorio.
             </small>
           </div>
         </div>
+        </details>
       </div>
     </div>
 
@@ -275,6 +297,8 @@
       </div>
     </div>
 
+    <details *ngIf="caller !== 'nv'">
+      <summary>Antecedentes documentados en esta atención</summary>
     <div class="fancy-divider">
       <span>Antecedentes</span>
     </div>
@@ -284,6 +308,7 @@
         <label>Patologicos</label>
         <textarea
           formControlName="pathologicalHst"
+          [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
           placeholder="Escribe aquí el antecedente patológico del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('pathologicalHst')?.touched && visitForm.get('pathologicalHst')?.hasError('required')">
           Este campo es obligatorio.
@@ -294,6 +319,7 @@
         <label>Familiares</label>
         <textarea
           formControlName="familyHst"
+          [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
           placeholder="Escribe aquí el antecedente familiar del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('familyHst')?.touched && visitForm.get('familyHst')?.hasError('required')">
           Este campo es obligatorio.
@@ -306,6 +332,7 @@
         <label>Quirurgicos</label>
         <textarea
           formControlName="surgicalHst"
+          [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
           placeholder="Escribe aquí el antecedente quirúrgico del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('surgicalHst')?.touched && visitForm.get('surgicalHst')?.hasError('required')">
           Este campo es obligatorio.
@@ -316,12 +343,15 @@
         <label>Habitos</label>
         <textarea
           formControlName="backgroundHst"
+          [readonly]="!!selectedVisit()?.clinicalProfileSnapshot"
           placeholder="Escribe aquí el antecedente por habitos del paciente."></textarea>
         <small class="error-text" *ngIf="visitForm.get('backgroundHst')?.touched && visitForm.get('backgroundHst')?.hasError('required')">
           Este campo es obligatorio.
         </small>
       </div>
     </div>
+
+    </details>
 
     <app-consent-manager
       #consentManager
@@ -345,7 +375,7 @@
           Este campo es obligatorio.
         </small>
       </div>
-    
+
       <div class="textarea-group">
         <label>Tratamiento</label>
         <textarea formControlName="treatment"
@@ -355,7 +385,7 @@
         </small>
       </div>
     </div>
-    
+
     @if (canManageInventory()) {
       <div class="fancy-divider">
         <span>Inventario</span>
@@ -363,13 +393,11 @@
 
       <div class="inventory-block">
         <div class="form-group">
-          <label>Inventario</label>
-          <select name="stock" (change)="handleChange($event)">
-            <option value="">Selecciona un elemento</option>
-            @for( s of listOfStockItems(); track $index ) {
-              <option [value]="s.id">{{s.productName}}</option>
-            }
-          </select>
+          <app-inventory-picker
+            [items]="listOfStockItems()"
+            [selectedItems]="selectedStockItems"
+            (itemAdded)="addInventoryItem($event)"
+          ></app-inventory-picker>
           @if(selectedStockItems.length > 0) {
             <ul class="list">
               @for(ss of selectedStockItems; track $index) {
@@ -413,12 +441,15 @@
         </div>
 
         <div class="textarea-group">
-          <label>Referencias/Interconsultas</label>
+          <button type="button" (click)="showReferral = !showReferral">{{ showReferral ? 'Ocultar referencia' : 'Agregar referencia a especialista' }}</button>
+          <div *ngIf="showReferral">
+          <label>Referencia a especialista (opcional)</label>
           <textarea formControlName="referrals"
-                    placeholder="Referencias o interconsultas sugeridas."></textarea>
+                    placeholder="Especialista o centro de destino, motivo y prioridad de la referencia."></textarea>
           <small class="error-text" *ngIf="visitForm.get('expediente.module.referrals')?.touched && visitForm.get('expediente.module.referrals')?.hasError('required')">
             Este campo es obligatorio.
           </small>
+          </div>
         </div>
       </div>
     </div>
@@ -434,7 +465,7 @@
       <button class="secondary-btn" type="button" [routerLink]="['/dashboard', 'visits']">
         Regresar
       </button>
-      <button class="submit-btn" [disabled]="visitForm.invalid || isSaving" type="submit">
+      <button class="submit-btn" [disabled]="visitForm.invalid || isSaving || (caller === 'nv' && profileSaveBlocked)" type="submit">
         <i class="fa-solid fa-spinner fa-spin" *ngIf="isSaving"></i>
         {{ isSaving ? 'Guardando...' : actionButtonText }}
       </button>

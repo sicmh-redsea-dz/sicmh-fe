@@ -579,3 +579,10 @@ select.ng-invalid.ng-touched {
 .list li .icon:hover {
   color: #c82333;
 }
+
+/* Compact identity row; wrap on narrow screens without clipping autocomplete menus. */
+.input-row { flex-wrap: wrap; }
+.input-row > .name-group { flex: 1 1 14rem; min-width: 0; }
+.input-row > .date-group { flex: 0 1 10rem; min-width: 9rem; }
+.input-row > .age-group { flex: 0 0 6rem; }
+.age-group input { width: 100%; box-sizing: border-box; padding: .5rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--surface-muted); color: inherit; }

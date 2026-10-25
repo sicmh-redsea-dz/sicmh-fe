@@ -24,10 +24,10 @@
     <h3>Historia clínica</h3>
     <div class="grid">
       <div>
-        <label>Motivo de consulta/ingreso</label>
+        <label>Motivo de consulta / evolución actual</label>
         <p>{{ visit.expediente?.standard?.chiefComplaint || '-' }}</p>
       </div>
-      <div>
+      <div *ngIf="visit.expediente?.standard?.currentIllness">
         <label>Padecimiento actual</label>
         <p>{{ visit.expediente?.standard?.currentIllness || '-' }}</p>
       </div>
@@ -37,7 +37,7 @@
       </div>
       <div>
         <label>Alergias</label>
-        <p>{{ visit.expediente?.standard?.allergies || '-' }}</p>
+        <p>{{ allergySummary }}</p>
       </div>
       <div>
         <label>Medicamentos actuales</label>

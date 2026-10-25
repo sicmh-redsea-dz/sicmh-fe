@@ -1,3 +1,5 @@
+import { InventoryPickerComponent } from './components/inventory-picker/inventory-picker.component'
+import { ClinicalProfileComponent } from './components/clinical-profile/clinical-profile.component'
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FullCalendarModule }  from '@fullcalendar/angular';
@@ -67,12 +69,14 @@ import { ConsentManagerComponent } from './components/consents/consent-manager/c
     ConsentManagerComponent
   ],
   imports: [
+    ClinicalProfileComponent,
     CommonModule,
     DashboardRoutingModule,
     ReactiveFormsModule,
     FullCalendarModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    InventoryPickerComponent
   ]
 })
 export class DashboardModule { }

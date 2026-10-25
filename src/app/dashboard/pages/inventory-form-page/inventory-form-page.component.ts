@@ -14,7 +14,7 @@ export class InventoryFormPageComponent implements OnInit {
 public title = ''
   public caller = ''
   public actionButtonText = ''
-  public itemId: number | null = null
+  public itemId: string | null = null
   private fb = inject( FormBuilder )
   private router = inject( Router )
   private activeRoute = inject( ActivatedRoute )

@@ -47,7 +47,7 @@ export class InventoryPageComponent implements OnInit {
   private readonly invService = inject( InventoryService )
   public headerText: string = 'Inventario General'
   public subHeaderText: string = 'Fichero: General'
-  public subinventoryId: string = '1'
+  public subinventoryId: string = 'main'
   public showCreateButton: boolean = true
   public disableCreateButton: boolean = false
   public showTransferOpt: boolean = true
@@ -62,15 +62,15 @@ export class InventoryPageComponent implements OnInit {
   )
   public canTransferInventory = computed(() =>
     this.authService.hasPermission('inventory.transfer') &&
-    this.inventoryTabs().some((tab) => tab.id !== '1')
+    this.inventoryTabs().some((tab) => tab.id !== 'main')
   )
   private destroyRef = inject(DestroyRef)
 
   private readonly allInventoryTabs: InventoryTab[] = [
-    { id: '1', label: 'General', readOnly: false },
-    { id: '2', label: 'Emergencia', readOnly: true, permission: 'visits.emergency.read' },
-    { id: '3', label: 'Quirofano', readOnly: true, permission: 'visits.operating_room.read' },
-    { id: '4', label: 'Hospitalización', readOnly: true, permission: 'visits.hospitalization.read' }
+    { id: 'main', label: 'General', readOnly: false },
+    { id: 'emergency', label: 'Emergencia', readOnly: true, permission: 'visits.emergency.read' },
+    { id: 'operating_room', label: 'Quirofano', readOnly: true, permission: 'visits.operating_room.read' },
+    { id: 'hospitalization', label: 'Hospitalización', readOnly: true, permission: 'visits.hospitalization.read' }
   ]
   public inventoryTabs = computed(() => this.allInventoryTabs.filter(
     (tab) => !tab.permission || this.authService.hasPermission(tab.permission)

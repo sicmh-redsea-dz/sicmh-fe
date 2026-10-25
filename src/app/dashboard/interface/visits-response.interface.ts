@@ -64,6 +64,7 @@ export interface Visits {
 }
 
 export interface FormVisit{
+  clinicalProfileReview?: import('../components/clinical-profile/clinical-profile.component').ClinicalProfileReview,
   id?                 : string,
   BMI                 : number,
   date                : string,

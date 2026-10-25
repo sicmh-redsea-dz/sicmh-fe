@@ -250,3 +250,8 @@ textarea.ng-dirty.ng-invalid {
   font-size: 0.8rem;
   margin-top: 4px;
 }
+
+.birth-age-row { display: grid; grid-template-columns: minmax(0, 1fr) 8rem; gap: 1rem; align-items: start; }
+.birth-age-row > .form-group { flex: 1; min-width: 0; }
+.birth-age-row > .age-display label { white-space: nowrap; }
+.birth-age-row input { box-sizing: border-box; height: 3.25rem; }

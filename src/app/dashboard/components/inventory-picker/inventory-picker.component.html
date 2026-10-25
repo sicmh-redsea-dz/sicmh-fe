@@ -1,0 +1,29 @@
+<label [for]="inputId">Inventario</label>
+<div class="picker">
+  <input [id]="inputId" type="search" role="combobox" autocomplete="off"
+    placeholder="Buscar producto por nombre o descripción..."
+    [value]="query()" [attr.aria-expanded]="open()" [attr.aria-controls]="listId"
+    [attr.aria-activedescendant]="activeOptionId()" aria-autocomplete="list"
+    (input)="search($event)" (focus)="open.set(true)" (blur)="open.set(false)"
+    (keydown)="onKeydown($event)" />
+  @if (open()) {
+    <div class="dropdown">
+      <ul #list [id]="listId" role="listbox" aria-label="Productos del inventario">
+        @for (item of results().items; track item.id; let index = $index) {
+          <li role="option" [id]="listId + '-' + index" [attr.aria-selected]="activeIndex() === index"
+            [class.active]="activeIndex() === index" (mouseenter)="activeIndex.set(index)"
+            (mousedown)="$event.preventDefault()" (click)="choose(item)">
+            <span class="name">{{ item.productName }}</span>
+            <span class="meta">Disponible: {{ item.productQuantity }} · L. {{ item.productUnitPrice | number:'1.2-2' }}</span>
+          </li>
+        }
+      </ul>
+      @if (results().items.length === 0) {
+        <p class="message" role="status">{{ items() === null ? 'Cargando inventario...' : 'No hay productos para esta búsqueda.' }}</p>
+      }
+      @if (results().hasMore) {
+        <p class="message" role="status">Hay más resultados. Escribe para afinar la búsqueda.</p>
+      }
+    </div>
+  }
+</div>

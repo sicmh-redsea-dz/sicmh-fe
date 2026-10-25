@@ -31,11 +31,15 @@
           <label class="required">Número de identificación</label>
           <input  class=""
                   type="text" 
-                  formControlName="id" 
+                  formControlName="id"
+                  [attr.maxlength]="identificationMaxLength"
+                  [attr.inputmode]="patientForm.controls.identificationType.value === 'pasaporte' ? 'text' : 'numeric'"
+                  aria-describedby="identification-hint"
                   placeholder="Número o código alfanumérico">
+          <small id="identification-hint">{{ identificationHint }}</small>
            <div class="error-message" *ngIf="patientForm.get('id')?.invalid && (patientForm.get('id')?.touched || patientForm.get('id')?.dirty)">
             <small *ngIf="patientForm.get('id')?.errors?.['required']">Este campo es obligatorio.</small>
-            <small *ngIf="patientForm.get('id')?.errors?.['pattern']">Solo se permiten letras y números.</small>
+            <small *ngIf="patientForm.get('id')?.errors?.['pattern']">{{ identificationHint }}</small>
           </div>
         </div>
 
@@ -63,6 +67,7 @@
           </div>
         </div>
 
+        <div class="birth-age-row">
         <div class="form-group">
           <label class="required">Fecha de Nacimiento</label>
           <input  class="" 
@@ -70,6 +75,11 @@
                   formControlName="birthdate">
           <div class="error-message" *ngIf="patientForm.get('birthdate')?.invalid && (patientForm.get('birthdate')?.touched || patientForm.get('birthdate')?.dirty)">
             <small *ngIf="patientForm.get('birthdate')?.errors?.['required']">Este campo es obligatorio.</small>
+          </div>
+        </div>
+          <div class="form-group age-display">
+            <label>Edad (a&#241;os)</label>
+            <input type="text" [value]="patientAge ?? ''" readonly aria-label="Edad calculada en a&#241;os">
           </div>
         </div>
 

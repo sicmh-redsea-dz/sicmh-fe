@@ -27,44 +27,45 @@
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group name-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handleDocBlur()">
         <label class="required">Doctor</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
             placeholder="Buscar doctor..."
             [formControl]="doctorSearchControl"
-            [value]="selectedDoctor?.name || ''"
-            (focus)="showDocDropdown = true"
-            (blur)="handleDocBlur()" 
+            (focus)="handleDocFocus()"
+
           />
           <div *ngIf="isDocLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showDocDropdown && searchDocResults.length > 0">
-          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="selectDoctor(doctor)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showDocDropdown && searchDocResults.length > 0">
+          <li *ngFor="let doctor of searchDocResults; trackBy: trackById" (mousedown)="$event.preventDefault()" (click)="selectDoctor(doctor)" data-autocomplete-option tabindex="-1" role="option">
             {{ doctor.name }}
           </li>
         </ul>
+        <small class="error-text" *ngIf="doctorSearchError">
+          {{ doctorSearchError }} Intenta nuevamente.
+        </small>
         <small class="error-text" *ngIf="visitForm.get('doctor')?.invalid && (visitForm.get('doctor')?.touched || visitForm.get('doctor')?.dirty)">
           Selecciona un doctor.
         </small>
       </div>
 
-      <div class="input-group" style="position: relative;">
+      <div class="input-group name-group" style="position: relative;" appAutocompleteKeyboard (autocompleteLeave)="handlePatBlur()">
         <label class="required">Paciente</label>
         <div class="autocomplete-wrapper">
           <input 
             type="text"
             placeholder="Buscar paciente..."
             [formControl]="patientSearchControl"
-            [value]="selectedPatient?.name || ''"
             (focus)="showPatDropdown = true"
-            (blur)="handlePatBlur()" 
+
           />
           <div *ngIf="isPatLoading" class="loader"></div>
         </div>
-        <ul class="dropdown-list" *ngIf="showPatDropdown && searchPatResults.length > 0">
-          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="selectPatient(patient)">
+        <ul class="dropdown-list" role="listbox" *ngIf="showPatDropdown && searchPatResults.length > 0">
+          <li *ngFor="let patient of searchPatResults; trackBy: trackById" (mousedown)="$event.preventDefault()" (click)="selectPatient(patient)" data-autocomplete-option tabindex="-1" role="option">
             {{ patient.name }}
           </li>
         </ul>
@@ -74,6 +75,10 @@
         <small class="error-text" *ngIf="visitForm.get('patient')?.invalid && (visitForm.get('patient')?.touched || visitForm.get('patient')?.dirty)">
           Selecciona un paciente.
         </small>
+      </div>
+      <div class="input-group age-group">
+        <label>Edad (a&#241;os)</label>
+        <input type="text" [value]="patientAge ?? ''" readonly aria-label="Edad del paciente en a&#241;os">
       </div>
     </div>
 
@@ -343,7 +348,7 @@
           Este campo es obligatorio.
         </small>
       </div>
-    
+
       <div class="textarea-group">
         <label>Tratamiento</label>
         <textarea formControlName="treatment"
@@ -470,14 +475,14 @@
             </div>
             <div class="input-group">
               <label>Inicio de cirugía</label>
-              <input type="time" formControlName="surgeryStart" />
+              <input type="datetime-local" formControlName="surgeryStart" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryStart')?.invalid && (visitForm.get('expediente.module.surgeryStart')?.touched || visitForm.get('expediente.module.surgeryStart')?.dirty)">
                 Este campo es obligatorio.
               </small>
             </div>
             <div class="input-group">
               <label>Fin de cirugía</label>
-              <input type="time" formControlName="surgeryEnd" />
+              <input type="datetime-local" formControlName="surgeryEnd" />
               <small class="error-text" *ngIf="visitForm.get('expediente.module.surgeryEnd')?.invalid && (visitForm.get('expediente.module.surgeryEnd')?.touched || visitForm.get('expediente.module.surgeryEnd')?.dirty)">
                 Este campo es obligatorio.
               </small>
@@ -545,7 +550,7 @@
                 />
                 <div *ngIf="isBedLoading" class="loader"></div>
               </div>
-              <ul class="dropdown-list" *ngIf="showBedDropdown && bedResults.length > 0">
+              <ul class="dropdown-list" role="listbox" *ngIf="showBedDropdown && bedResults.length > 0">
                 <li *ngFor="let bed of bedResults; trackBy: trackById" (mousedown)="selectBed(bed)">
                   {{ bed.code }} <span *ngIf="bed.area">· {{ bed.area }}</span>
                 </li>
@@ -591,13 +596,11 @@
 
     <div class="inventory-block">
       <div class="form-group">
-        <label>Inventario</label>
-        <select name="stock" (change)="handleChange($event)">
-          <option value="">Selecciona un elemento</option>
-          @for( s of listOfStockItems(); track $index ) {
-            <option [value]="s.id">{{s.productName}}</option>
-          }
-        </select>
+        <app-inventory-picker
+            [items]="listOfStockItems()"
+            [selectedItems]="selectedStockItems"
+            (itemAdded)="addInventoryItem($event)"
+          ></app-inventory-picker>
         @if(selectedStockItems.length > 0) {
           <ul class="list">
             @for(ss of selectedStockItems; track $index) {

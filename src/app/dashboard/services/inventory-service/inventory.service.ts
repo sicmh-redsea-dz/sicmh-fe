@@ -82,7 +82,7 @@ export class InventoryService {
       )
   }
 
-  public updArticle( params: Record< string, any>, articId: number): Observable<any> {
+  public updArticle( params: Record< string, any>, articId: string): Observable<any> {
     const url = `${this.baseUrl}/app/inventory/edit-item/${articId}`
     return this.http.patch(url, params, {})
       .pipe(

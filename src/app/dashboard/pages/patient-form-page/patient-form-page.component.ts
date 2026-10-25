@@ -1,4 +1,5 @@
-import { FormBuilder, Validators } from '@angular/forms';
+import { ageInYears } from '../../../shared/utils/age-in-years';
+import { AbstractControl, FormBuilder, ValidatorFn, Validators } from '@angular/forms';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -6,6 +7,8 @@ import { filter, map, switchMap, tap } from 'rxjs';
 import { PatientsService } from '../../services/patients-service/patients.service';
 import { FormPatient, IdentificationType, Patient } from '../../interface/patients-response.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+const optionalEmail: ValidatorFn = control => Validators.email({ value: typeof control.value === 'string' ? control.value.trim() : control.value } as AbstractControl)
 
 @Component({
   selector: 'app-patient-form-page',
@@ -31,19 +34,39 @@ export class PatientFormPageComponent implements OnInit {
     birthdate : ['', [Validators.required]],
     gender    : ['', [Validators.required]],
     phone     : [''],
-    email     : ['', [Validators.email]],
-    address   : ['', [Validators.minLength(5)]],
+    email     : ['', [optionalEmail]],
+    address   : [''],
     notes     : [''],
     emergencyContact: this.fb.group({
-      name: ['', [Validators.minLength(2)]],
-      relationship: ['', [Validators.minLength(2)]],
+      name: [''],
+      relationship: [''],
       phone: [''],
-      email: ['', [Validators.email]],
+      email: ['', [optionalEmail]],
       address: ['']
     })
   })
 
+  public get patientAge(): number | null { return ageInYears(this.patientForm.controls.birthdate.value) }
+  public get identificationMaxLength(): number {
+    return this.patientForm.controls.identificationType.value === 'identidad' ? 13
+      : this.patientForm.controls.identificationType.value === 'carne_residencia' ? 19 : 50
+  }
+  public get identificationHint(): string {
+    const type = this.patientForm.controls.identificationType.value
+    return type === 'identidad' ? 'Exactamente 13 d\u00edgitos num\u00e9ricos.'
+      : type === 'carne_residencia' ? 'Solo n\u00fameros, hasta 19 d\u00edgitos.' : 'Letras y n\u00fameros, hasta 50 caracteres.'
+  }
+  private updateIdentificationValidators() {
+    const type = this.patientForm.controls.identificationType.value
+    const pattern = type === 'identidad' ? /^\d{13}$/ : type === 'carne_residencia' ? /^\d{1,19}$/ : /^[A-Za-z0-9]{1,50}$/
+    this.patientForm.controls.id.setValidators([Validators.required, Validators.pattern(pattern)])
+    this.patientForm.controls.id.updateValueAndValidity({ emitEvent: false })
+  }
+
   ngOnInit(): void {
+    this.updateIdentificationValidators()
+    this.patientForm.controls.identificationType.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateIdentificationValidators())
     this.activeRoute.paramMap
       .pipe(
         map((params) => params.get('id')),
@@ -106,6 +129,7 @@ export class PatientFormPageComponent implements OnInit {
       phone: patient.phone,
       email: patient.email ?? '',
       address: patient.address,
+      notes: patient.notes ?? '',
       emergencyContact: {
         name: patient.emergencyContact?.name ?? '',
         relationship: patient.emergencyContact?.relationship ?? '',

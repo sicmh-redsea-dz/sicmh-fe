@@ -73,6 +73,8 @@ export interface History {
 }
 
 export interface Visit {
+    clinicalProfileSnapshot?: { data: import('../components/clinical-profile/clinical-profile.component').ClinicalProfileData; version: number; reviewedAt: string; reviewedBy: string } | null
+    patientBirthDate?: string | null
     ageBasedOnWeight:   string | null
     bloodPressure:      string
     BMI:                string | null

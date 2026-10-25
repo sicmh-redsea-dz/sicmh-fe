@@ -9,6 +9,7 @@ export interface Data {
 }
 
 export interface Patient {
+  notes?: string;
   id        : string;
   phone     : string;
   name      : string;
@@ -32,6 +33,7 @@ export interface EmergencyContact {
 }
 
 export interface ShortPatient {
+  birthDate?: string | null;
   id        : string;
   name      : string;
 }

@@ -1,6 +1,9 @@
+import { clinicalDateTimeInput, clinicalDatesForApi } from '../../../helpers/visits-form/clinical-dates';
+import { ageInYears } from '../../../../shared/utils/age-in-years';
+import { doctorSuggestions } from '../../../helpers/visits-form/doctor-autocomplete'
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { BedsService } from '../../../services/beds-service/beds.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,9 +46,9 @@ export class VisitsFormPageV2Component implements OnInit {
   public caller = ''
   public actionButtonText = ''
   public origin = 'emergency'
-  public stockSearchId: string | number = '2'
+  public stockSearchId: string = 'emergency'
   public includeSubinventoryInPayload = true
-  public payloadSubinventoryId = '2'
+  public payloadSubinventoryId = 'emergency'
   public backRoute = 'emergency'
   public titleNew = 'Registro de emergencia'
   public subtitleNew = 'Agrega los detalles de emergencia médica.'
@@ -126,6 +129,9 @@ export class VisitsFormPageV2Component implements OnInit {
 
   public selectedDoctor: Doctor | null = null
   public selectedPatient: ShortPatient | null = null
+  public get patientAge(): number | null {
+    return ageInYears(this.selectedPatient?.birthDate)
+  }
   public selectedBed: BedRecord | null = null
 
   public searchDocResults: Doctor[] = []
@@ -140,6 +146,9 @@ export class VisitsFormPageV2Component implements OnInit {
   public isBedLoading: boolean = false
   public isSaving: boolean = false
 
+  private readonly doctorFocus = new Subject<string>()
+  private doctorFocused = false
+  public doctorSearchError = ''
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
   public showBedDropdown: boolean = false
@@ -188,43 +197,32 @@ export class VisitsFormPageV2Component implements OnInit {
       }
     })
 
-    this.doctorSearchControl.valueChanges.pipe(
-      debounceTime( 250 ),
-      distinctUntilChanged(),
-      filter((term): term is string => term !== null),
-      tap(( term ) => {
-        const cleanTerm = term.trim() || ''
+    doctorSuggestions(merge(
+      this.doctorSearchControl.valueChanges.pipe(tap(() => {
+        this.selectedDoctor = null
         this.visitForm.get('doctor')?.setValue('')
-        if ( cleanTerm.length < 2 ) {
-          this.searchDocResults = []
-          this.showDocDropdown = false
-          this.isDocLoading = false
-          return
-        }
-        this.isDocLoading = true
-      }),
-      switchMap(( term: string ) => term.trim().length < 2
-        ? of([])
-        : this.visitsService.searchDoctors( term.trim() )),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: ( results ) => {
+      })),
+      this.doctorFocus,
+    ), (term) => this.visitsService.searchDoctors(term))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ results, loading, error }) => {
         this.searchDocResults = results
-        this.isDocLoading = false
-      },
-      error: () => {
-        this.isDocLoading = false
-      }
-    })
+        this.isDocLoading = loading
+        this.doctorSearchError = error
+        this.showDocDropdown = this.doctorFocused
+      })
 
     this.patientSearchControl.valueChanges.pipe(
+      tap(() => {
+        this.selectedPatient = null
+        this.visitForm.get('patient')?.setValue('')
+      }),
       debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
         this.patientSearchError = ''
-        this.visitForm.get('patient')?.setValue('')
         if ( cleanTerm.length < 2 ) {
           this.searchPatResults = []
           this.showPatDropdown = false
@@ -455,6 +453,7 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public selectDoctor( doctor: Doctor ) {
+    this.doctorFocused = false
     this.selectedDoctor = doctor
     this.doctorSearchControl.setValue( doctor.name, { emitEvent: false })
     this.visitForm.get('doctor')?.setValue( doctor.id )
@@ -468,8 +467,17 @@ export class VisitsFormPageV2Component implements OnInit {
     this.showPatDropdown = false
   }
 
+  public handleDocFocus() {
+    this.doctorFocused = true
+    this.showDocDropdown = true
+    this.doctorFocus.next(this.doctorSearchControl.value ?? '')
+  }
+
   public handleDocBlur() {
-    setTimeout(() => this.showDocDropdown = false, 200)
+    this.doctorFocused = false
+    setTimeout(() => {
+      if (!this.doctorFocused) this.showDocDropdown = false
+    }, 200)
   }
 
   public handlePatBlur() {
@@ -491,6 +499,9 @@ export class VisitsFormPageV2Component implements OnInit {
       return
     }
     const visit = this.visitForm.value as FormVisitWithStock
+    if (visit.expediente) visit.expediente = {
+      ...visit.expediente, module: clinicalDatesForApi(visit.expediente.module),
+    }
 
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )
@@ -564,6 +575,7 @@ export class VisitsFormPageV2Component implements OnInit {
         next: () => {
           const visit = this.selectedVisit()
           if ( !visit ) return
+          this.selectedPatient = { id: visit.patientId, name: visit.patientName, birthDate: visit.patientBirthDate }
 
           this.visitForm.patchValue({
             patient: visit.patientId,
@@ -589,7 +601,14 @@ export class VisitsFormPageV2Component implements OnInit {
           })
 
           if (visit.expediente) {
-            this.visitForm.get('expediente')?.patchValue(visit.expediente)
+            this.visitForm.get('expediente')?.patchValue({
+              ...visit.expediente,
+              module: { ...visit.expediente.module,
+                surgeryStart: clinicalDateTimeInput(visit.expediente.module.surgeryStart),
+                surgeryEnd: clinicalDateTimeInput(visit.expediente.module.surgeryEnd),
+                dischargeDate: visit.expediente.module.dischargeDate?.slice(0, 10) ?? '',
+              },
+            })
           }
           this.syncBedFromForm()
 
@@ -689,22 +708,10 @@ export class VisitsFormPageV2Component implements OnInit {
     } 
   }
 
-  public handleChange(event: any) {
-    const { target } = event
-    const value = target.value
-    const stockItems = this.listOfStockItems() ?? []
+  public addInventoryItem(item: Stock) {
+    if (this.selectedStockItems.some((selected) => selected.id === item.id)) return
+    this.selectedStockItems = [...this.selectedStockItems, { ...item, currentQuantity: 1 }]
     this.stockItemsArray.markAsTouched()
-    if (this.selectedStockItems.length === 0){
-      const existingItem = stockItems.find((item: any) => item.id === value);
-      if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
-    } 
-    else {
-      const existingItem = this.selectedStockItems.find((item: any) => item.id === value);
-      if (!existingItem) {
-        const matched = stockItems.find((item: any) => item.id === value)
-        if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
-      }
-    }
     this.loadDataOfStockArray()
   }
 

@@ -38,13 +38,13 @@
     <div class="section-body">
       <div class="form-group search-group">
         <label class="required">Paciente</label>
-        <div class="search-box">
+        <div class="search-box" appAutocompleteKeyboard (autocompleteLeave)="onPatientBlur()">
           <input
             type="text"
             [value]="patientQuery"
             (input)="onPatientInput($any($event.target).value)"
             (focus)="onPatientFocus()"
-            (blur)="onPatientBlur()"
+
             placeholder="Buscar por nombre o identificación"
             autocomplete="off"
             [disabled]="isReadOnly"
@@ -65,7 +65,7 @@
                 class="search-item"
                 type="button"
                 *ngFor="let p of patientResults; trackBy: trackById"
-                (mousedown)="selectPatient(p)"
+                (mousedown)="$event.preventDefault()" (click)="selectPatient(p)" data-autocomplete-option tabindex="-1" role="option"
               >
                 <span>{{ p.name }}</span>
                 <small>{{ p.idNumber || 'Sin identificación' }}</small>
@@ -92,13 +92,13 @@
     <div class="section-body">
       <div class="form-group search-group">
         <label class="required">Doctor</label>
-        <div class="search-box">
+        <div class="search-box" appAutocompleteKeyboard (autocompleteLeave)="onDoctorBlur()">
           <input
             type="text"
             [value]="doctorQuery"
             (input)="onDoctorInput($any($event.target).value)"
             (focus)="onDoctorFocus()"
-            (blur)="onDoctorBlur()"
+
             placeholder="Buscar por nombre"
             autocomplete="off"
             [disabled]="isReadOnly"
@@ -119,7 +119,7 @@
                 class="search-item"
                 type="button"
                 *ngFor="let d of doctorResults; trackBy: trackById"
-                (mousedown)="selectDoctor(d)"
+                (mousedown)="$event.preventDefault()" (click)="selectDoctor(d)" data-autocomplete-option tabindex="-1" role="option"
               >
                 <span>{{ d.name }}</span>
                 <small>{{ d.specialty || 'Sin especialidad' }}</small>

@@ -41,6 +41,13 @@ export class VisitsReportPageComponent implements OnInit {
     return formatIncomingData(this.visit.lastVisitDate)
   }
 
+  public get allergySummary(): string {
+    const profile = this.visit?.clinicalProfileSnapshot?.data
+    if (!profile) return this.visit?.expediente?.standard?.allergies || '-'
+    return profile.allergyStatus === 'none_known' ? 'Sin alergias conocidas'
+      : profile.allergyStatus === 'unknown' ? 'Información aún no recabada' : profile.allergies
+  }
+
   public printReport(): void {
     window.print()
   }

@@ -1,4 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import type { ClinicalProfileResponse } from '../../components/clinical-profile/clinical-profile.component'
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { formatApiError } from '../../../shared/utils/api-error'
 import { environment } from '../../../../environments/environment';
@@ -17,6 +18,10 @@ interface Delimiters {
   providedIn: 'root'
 })
 export class VisitsService {
+  public getClinicalProfile(patientId: string): Observable<ClinicalProfileResponse> {
+    return this.http.get<{ data: ClinicalProfileResponse }>(`${this.baseUrl}/app/patients/${patientId}/clinical-profile`).pipe(
+      map(response => response.data), catchError(error => throwError(() => formatApiError(error))))
+  }
   private static readonly PATIENT_CACHE_TTL_MS = 5 * 60 * 1000
   private readonly baseUrl: string = environment.baseUrl
   private http = inject( HttpClient )

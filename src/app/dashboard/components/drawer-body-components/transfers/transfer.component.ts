@@ -8,7 +8,7 @@ import { AuthService } from '../../../../auth/services/auth.service';
 import { Permission } from '../../../../auth/permissions/permissions';
 
 type SubinventoryOption = {
-  id: number
+  id: string
   label: string
   permission: Permission
 }
@@ -31,9 +31,9 @@ export class TransferComponent implements OnInit {
 
   public itemQuantity: number[] = []
   private readonly allSubinventories: SubinventoryOption[] = [
-    { id: 2, label: 'Emergencia', permission: 'visits.emergency.read' },
-    { id: 3, label: 'Quirofano', permission: 'visits.operating_room.read' },
-    { id: 4, label: 'Hospitalización', permission: 'visits.hospitalization.read' }
+    { id: 'emergency', label: 'Emergencia', permission: 'visits.emergency.read' },
+    { id: 'operating_room', label: 'Quirofano', permission: 'visits.operating_room.read' },
+    { id: 'hospitalization', label: 'Hospitalización', permission: 'visits.hospitalization.read' }
   ]
   public availableSubinventories = computed(() => this.allSubinventories.filter(
     (subinventory) => this.authService.hasPermission(subinventory.permission)
@@ -79,8 +79,8 @@ export class TransferComponent implements OnInit {
     
     const itemId = this.selectedItemId()
     const { subinv, qty } = this.invoiceForm.value
-    const origin = 1
-    const destination = Number(subinv)
+    const origin = 'main'
+    const destination = String(subinv)
 
     if (!this.availableSubinventories().some((option) => option.id === destination)) {
       Swal.fire('Error', 'No tiene permiso para transferir inventario a esta bodega.', 'error')

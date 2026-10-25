@@ -1,9 +1,12 @@
+import { ageInYears } from '../../../shared/utils/age-in-years';
+import { ClinicalProfileReview } from '../../components/clinical-profile/clinical-profile.component'
+import { doctorSuggestions } from '../../helpers/visits-form/doctor-autocomplete'
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, debounceTime, distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
@@ -28,6 +31,9 @@ const CONSULTA_SUBINVENTORY_ID = '1'
   styleUrl: './visits-form-page.component.css'
 })
 export class VisitsFormPageComponent implements OnInit {
+  public profileReview: ClinicalProfileReview | null = null
+  public profileSaveBlocked = false
+  public showReferral = false
   public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
   @ViewChild('consentManager') consentManager?: ConsentManagerComponent
@@ -88,11 +94,14 @@ export class VisitsFormPageComponent implements OnInit {
     stockItems    : this.fb.array([])
   })
 
-  public doctorSearchControl = new FormControl(this.caller !== 'nv' ? String(this.selectedVisit()?.docName) : '')
+  public doctorSearchControl = new FormControl('')
   public patientSearchControl = new FormControl(this.caller !== 'nv' ? String(this.selectedVisit()?.patientName) : '')
 
   public selectedDoctor: Doctor | null = null
   public selectedPatient: ShortPatient | null = null
+  public get patientAge(): number | null {
+    return ageInYears(this.selectedPatient?.birthDate)
+  }
 
   public searchDocResults: Doctor[] = []
   public searchPatResults: ShortPatient[] = []
@@ -101,6 +110,9 @@ export class VisitsFormPageComponent implements OnInit {
   public isPatLoading: boolean = false
   public patientSearchError = ''
 
+  private readonly doctorFocus = new Subject<string>()
+  private doctorFocused = false
+  public doctorSearchError = ''
   public showDocDropdown: boolean = false
   public showPatDropdown: boolean = false
 
@@ -114,43 +126,34 @@ export class VisitsFormPageComponent implements OnInit {
         })
     }
 
-    this.doctorSearchControl.valueChanges.pipe(
-      debounceTime( 250 ),
-      distinctUntilChanged(),
-      filter((term): term is string => term !== null),
-      tap(( term ) => {
-        const cleanTerm = term.trim() || ''
+    doctorSuggestions(merge(
+      this.doctorSearchControl.valueChanges.pipe(tap(() => {
+        this.selectedDoctor = null
         this.visitForm.get('doctor')?.setValue('')
-        if ( cleanTerm.length < 2 ) {
-          this.searchDocResults = []
-          this.showDocDropdown = false
-          this.isDocLoading = false
-          return
-        }
-        this.isDocLoading = true
-      }),
-      switchMap(( term: string ) => term.trim().length < 2
-        ? of([])
-        : this.visitsService.searchDoctors( term.trim() )),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: ( results ) => {
+      })),
+      this.doctorFocus,
+    ), (term) => this.visitsService.searchDoctors(term))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ results, loading, error }) => {
         this.searchDocResults = results
-        this.isDocLoading = false
-      },
-      error: () => {
-        this.isDocLoading = false
-      }
-    })
+        this.isDocLoading = loading
+        this.doctorSearchError = error
+        this.showDocDropdown = this.doctorFocused
+      })
 
     this.patientSearchControl.valueChanges.pipe(
+      tap(() => {
+        this.selectedPatient = null
+        this.profileReview = null
+        this.profileSaveBlocked = false
+        this.visitForm.get('patient')?.setValue('')
+      }),
       debounceTime( 250 ),
       distinctUntilChanged(),
       filter((term): term is string => term !== null),
       tap(( term ) => {
         const cleanTerm = term.trim() || ''
         this.patientSearchError = ''
-        this.visitForm.get('patient')?.setValue('')
         if ( cleanTerm.length < 2 ) {
           this.searchPatResults = []
           this.showPatDropdown = false
@@ -223,6 +226,7 @@ export class VisitsFormPageComponent implements OnInit {
     }
 
   public selectDoctor( doctor: Doctor ) {
+    this.doctorFocused = false
     this.selectedDoctor = doctor
     this.doctorSearchControl.setValue( doctor.name, { emitEvent: false })
     this.visitForm.get('doctor')?.setValue( doctor.id )
@@ -230,14 +234,25 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public selectPatient( patient: ShortPatient ) {
+    this.profileReview = null
+    this.profileSaveBlocked = false
     this.selectedPatient = patient
     this.patientSearchControl.setValue( patient.name, { emitEvent: false })
     this.visitForm.get('patient')?.setValue( patient.id )
     this.showPatDropdown = false
   }
 
+  public handleDocFocus() {
+    this.doctorFocused = true
+    this.showDocDropdown = true
+    this.doctorFocus.next(this.doctorSearchControl.value ?? '')
+  }
+
   public handleDocBlur() {
-    setTimeout(() => this.showDocDropdown = false, 200)
+    this.doctorFocused = false
+    setTimeout(() => {
+      if (!this.doctorFocused) this.showDocDropdown = false
+    }, 200)
   }
 
   public handlePatBlur() {
@@ -269,22 +284,10 @@ export class VisitsFormPageComponent implements OnInit {
     }
   }
 
-  public handleChange(event: any) {
-    const { target } = event
-    const value = target.value
-    const stockItems = this.listOfStockItems() ?? []
+  public addInventoryItem(item: Stock) {
+    if (this.selectedStockItems.some((selected) => selected.id === item.id)) return
+    this.selectedStockItems = [...this.selectedStockItems, { ...item, currentQuantity: 1 }]
     this.stockItemsArray.markAsTouched()
-    if (this.selectedStockItems.length === 0){
-      const existingItem = stockItems.find((item: any) => item.id === value);
-      if( existingItem ) this.selectedStockItems.push({...existingItem, currentQuantity: 1});
-    }
-    else {
-      const existingItem = this.selectedStockItems.find((item: any) => item.id === value);
-      if (!existingItem) {
-        const matched = stockItems.find((item: any) => item.id === value)
-        if ( matched ) this.selectedStockItems.push({...matched, currentQuantity: 1})
-      }
-    }
     this.loadDataOfStockArray()
   }
 
@@ -308,11 +311,14 @@ export class VisitsFormPageComponent implements OnInit {
 
   public onHandleSubmit() {
     if (this.isSaving) return
+    if (this.caller === 'nv' && this.profileSaveBlocked) return
     if (this.visitForm.invalid) {
       this.visitForm.markAllAsTouched()
       return
     }
     const visit = this.visitForm.value as FormVisitWithStock
+    if (this.caller === 'nv' && this.profileReview) visit.clinicalProfileReview = this.profileReview
+    if (!this.canManageInventory()) delete visit.stockItems
     this.caller === 'nv'
     ? this.handleCreateVisit( visit )
     : this.handleEditVisit( visit )
@@ -372,6 +378,7 @@ export class VisitsFormPageComponent implements OnInit {
         next: () => {
           const visit = this.selectedVisit()
           if ( !visit ) return
+          this.selectedPatient = { id: visit.patientId, name: visit.patientName, birthDate: visit.patientBirthDate }
 
           this.visitForm.patchValue({
             ageAccordingToWeight: visit.ageBasedOnWeight,
@@ -399,6 +406,7 @@ export class VisitsFormPageComponent implements OnInit {
           if (visit.expediente) {
             this.visitForm.get('expediente')?.patchValue(visit.expediente)
           }
+          this.showReferral = !!visit.expediente?.module?.referrals
 
           this.initializeAutocompleteValues()
 

@@ -5,7 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "test:doctor-autocomplete": "node --test tests/doctor-autocomplete.test.cjs",
+    "test:clinical-profile": "node --test tests/clinical-profile.test.mjs",
+    "test:inventory-picker": "node --test tests/inventory-picker.test.mjs",
+    "watch": "ng build --watch --configuration development",
+    "test:patient-clinical-fields": "node --test tests/patient-clinical-fields.test.mjs"
   },
   "private": true,
   "dependencies": {
