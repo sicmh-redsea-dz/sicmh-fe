@@ -1,3 +1,5 @@
+import { FormDraftService } from '../../../shared/services/form-draft.service';
+import { FormDraft } from '../../../shared/services/form-draft';
 import { ageInYears } from '../../../shared/utils/age-in-years';
 import { AbstractControl, FormBuilder, ValidatorFn, Validators } from '@angular/forms';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
@@ -16,6 +18,17 @@ const optionalEmail: ValidatorFn = control => Validators.email({ value: typeof c
   styleUrl: './patient-form-page.component.css'
 })
 export class PatientFormPageComponent implements OnInit {
+  public isSaving = false
+  public draft?: FormDraft
+  private draftService = inject(FormDraftService)
+  private saveCheckpoint?: string
+  private startDraft() {
+    this.draft?.dispose()
+    this.draft = this.draftService.open({ scope: `patient:${this.patientId ?? 'new'}`,
+      changes: this.patientForm.valueChanges, snapshot: () => this.patientForm.getRawValue(),
+      restore: data => { this.patientForm.patchValue(data); this.updateIdentificationValidators() }, destroyRef: this.destroyRef })
+  }
+
   public title = 'Registro de Pacientes'
   public actionButtonText = 'Guardar'
   public isEditMode = false
@@ -83,14 +96,18 @@ export class PatientFormPageComponent implements OnInit {
       .subscribe((patient) => {
         if (!patient) return
         this.patchForm(patient)
+        this.startDraft()
       })
   }
 
   public onHandleSubmit() {
+    if (this.isSaving) return
     if (this.patientForm.invalid) {
       this.patientForm.markAllAsTouched()
       return
     }
+    this.isSaving = true
+    this.saveCheckpoint = this.draft?.checkpoint()
     const patient: FormPatient = this.patientForm.getRawValue()
     this.isEditMode
       ? this.handleEditPatient(patient, this.patientId)
@@ -104,6 +121,7 @@ export class PatientFormPageComponent implements OnInit {
   }
 
   private setEditMode(id: string) {
+    this.draft?.dispose()
     this.isEditMode = true
     this.patientId = id.trim() ? id : null
     this.title = 'Editar Paciente'
@@ -115,7 +133,9 @@ export class PatientFormPageComponent implements OnInit {
     this.patientId = null
     this.title = 'Registro de Pacientes'
     this.actionButtonText = 'Guardar'
+    this.draft?.dispose()
     this.patientForm.reset()
+    this.startDraft()
   }
 
   private patchForm(patient: Patient) {
@@ -141,11 +161,15 @@ export class PatientFormPageComponent implements OnInit {
   }
 
   private handleEditPatient( patient: FormPatient, patientId: string | null ) {
+    const submittedDraft = this.draft
+    const checkpoint = this.saveCheckpoint
     if (patientId === null) return
     this.patientService.editPatient(patient, patientId)
       .subscribe({
         next: (editedUser) => {
+          this.isSaving = false
           if( editedUser ) {
+            submittedDraft?.committed(checkpoint)
             const { patient } = editedUser.data
             Swal.fire('Success', `${patient.name} ${patient.lastName} has been edited!`, 'success')
               .then(() => {
@@ -154,16 +178,21 @@ export class PatientFormPageComponent implements OnInit {
           }
         },
         error: ( error ) => {
+          this.isSaving = false
           Swal.fire('Error', error, 'error')
         },
       })
   }
 
   private handleCreatePatient( patient: FormPatient ) {
+    const submittedDraft = this.draft
     this.patientService.savePatient(patient)
       .subscribe({
         next: (addedUser) => {
+          this.isSaving = false
           if( addedUser ) {
+            submittedDraft?.committed()
+            submittedDraft?.dispose()
             const { patient } = addedUser?.data
             Swal.fire('Success', `${patient.name} ${patient.lastName} has been added!`, 'success')
               .then(() => {
@@ -172,6 +201,7 @@ export class PatientFormPageComponent implements OnInit {
           }
         },
         error: (message) => {
+          this.isSaving = false
           Swal.fire('Error', message, 'error')
         },
       })

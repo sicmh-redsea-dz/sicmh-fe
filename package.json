@@ -11,7 +11,8 @@
     "test:clinical-profile": "node --test tests/clinical-profile.test.mjs",
     "test:inventory-picker": "node --test tests/inventory-picker.test.mjs",
     "watch": "ng build --watch --configuration development",
-    "test:patient-clinical-fields": "node --test tests/patient-clinical-fields.test.mjs"
+    "test:patient-clinical-fields": "node --test tests/patient-clinical-fields.test.mjs",
+    "test:session-drafts": "node --test tests/form-draft.test.mjs tests/auth-session.test.mjs tests/session-activity.test.mjs tests/clinical-profile.test.mjs"
   },
   "private": true,
   "dependencies": {

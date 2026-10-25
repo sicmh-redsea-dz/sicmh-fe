@@ -602,3 +602,7 @@ select.ng-invalid.ng-dirty {
 .input-row > .date-group { flex: 0 1 10rem; min-width: 9rem; }
 .input-row > .age-group { flex: 0 0 6rem; }
 .age-group input { width: 100%; box-sizing: border-box; padding: .5rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--surface-muted); color: inherit; }
+
+.draft-status { margin: 0 0 16px; padding: 10px 14px; border: 1px solid #94a3b8; border-radius: 8px; }
+.draft-status p { margin: 0 0 4px; font-weight: 600; }
+.draft-status small { display: block; line-height: 1.4; }

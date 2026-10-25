@@ -90,3 +90,51 @@ test('unmodified profiles are optional and only invalid edits block saving', () 
     assert.equal(state.values.at(-1), null)
   } finally { state.dispose() }
 })
+
+
+test('clinical profile recovery retains incomplete edits and the original concurrency version', () => {
+  const pending = new Subject()
+  const state = setup({ getClinicalProfile: () => pending })
+  try {
+    const { component, values } = state
+    component.patientId = 'patient'
+    component.recoveryState = { patientId: 'patient', version: 2, modified: true,
+      data: { ...data(), allergyStatus: 'recorded', allergies: '', currentMeds: 'Unfinished medication' }, conflicts: {} }
+    component.ngOnChanges()
+    pending.next({ version: 3, data: data(), conflicts: {}, updatedAt: null })
+    assert.equal(component.form.controls.currentMeds.value, 'Unfinished medication')
+    assert.equal(component.version, 2, 'retain saved version so the server detects a concurrent update')
+    assert.equal(component.canReview, false)
+    assert.equal(values.at(-1), null)
+    assert.equal(component.draftState.data.allergyStatus, 'recorded')
+    component.form.controls.allergies.setValue('Recovered allergy')
+    assert.equal(values.at(-1).version, 2)
+  } finally { state.dispose() }
+})
+
+test('recovery from another patient never replaces the loaded clinical profile', () => {
+  const state = setup({ getClinicalProfile: () => of({ version: 1, data: { ...data(), currentMeds: 'Current patient' }, conflicts: {}, updatedAt: null }) })
+  try {
+    const { component } = state
+    component.patientId = 'patient-b'
+    component.recoveryState = { patientId: 'patient-a', version: 1, modified: true, data: { ...data(), currentMeds: 'Other patient' } }
+    component.ngOnChanges()
+    assert.equal(component.form.controls.currentMeds.value, 'Current patient')
+  } finally { state.dispose() }
+})
+
+
+test('explicitly reloading a recovered profile permits resolving a stale version', () => {
+  const state = setup({ getClinicalProfile: () => of({ version: 3, data: { ...data(), currentMeds: 'Server value' }, conflicts: {}, updatedAt: null }) })
+  try {
+    const { component } = state
+    component.patientId = 'patient'
+    component.recoveryState = { patientId: 'patient', version: 2, modified: true,
+      data: { ...data(), currentMeds: 'Recovered value' }, conflicts: {} }
+    component.ngOnChanges()
+    assert.equal(component.form.controls.currentMeds.value, 'Recovered value')
+    component.load()
+    assert.equal(component.version, 3)
+    assert.equal(component.form.controls.currentMeds.value, 'Server value')
+  } finally { state.dispose() }
+})

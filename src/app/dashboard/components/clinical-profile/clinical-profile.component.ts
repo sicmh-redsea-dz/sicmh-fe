@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms'
 import { Subscription } from 'rxjs'
 import { VisitsService } from '../../services/visits-service/visits.service'
@@ -65,12 +65,14 @@ export interface ClinicalProfileResponse extends ClinicalProfileReview {
 })
 export class ClinicalProfileComponent implements OnChanges, OnDestroy {
   @Input() patientId = ''
+  @Input() recoveryState: any = null
   @Output() reviewChange = new EventEmitter<ClinicalProfileReview | null>()
   @Output() saveBlocked = new EventEmitter<boolean>()
   private service = inject(VisitsService)
   private fb = inject(FormBuilder)
   private request?: Subscription
   private changes?: Subscription
+  private appliedRecovery: unknown
   public form = this.fb.nonNullable.group({ familyHst: '', backgroundHst: '', pathologicalHst: '', surgicalHst: '', allergies: '', currentMeds: '', allergyStatus: 'unknown' })
   public fields = [{ key: 'pathologicalHst', label: 'Antecedentes patológicos' }, { key: 'familyHst', label: 'Antecedentes familiares' },
     { key: 'surgicalHst', label: 'Antecedentes quirúrgicos' }, { key: 'backgroundHst', label: 'Hábitos' }, { key: 'currentMeds', label: 'Medicamentos habituales' }] as const
@@ -90,7 +92,25 @@ export class ClinicalProfileComponent implements OnChanges, OnDestroy {
     this.emitReview()
     this.saveBlocked.emit(!this.canReview)
   }) }
-  ngOnChanges() { this.load() }
+  get draftState() {
+    return this.loaded ? { patientId: this.patientId, data: this.form.getRawValue(), version: this.version,
+      modified: this.modified, reviewed: this.reviewed, conflicts: this.conflicts } : null
+  }
+  ngOnChanges(changes?: SimpleChanges) {
+    if (!changes || changes['patientId']) this.load()
+    else if (changes['recoveryState'] && this.loaded) this.applyRecovery()
+  }
+  private applyRecovery() {
+    const state = this.recoveryState
+    if (state === this.appliedRecovery || (!state?.modified && !state?.reviewed)
+      || state.patientId !== this.patientId || !state.data || !Number.isSafeInteger(state.version)) return
+    this.appliedRecovery = state
+    this.form.reset(state.data, { emitEvent: false })
+    // Preserve the saved version so a newer server profile cannot be silently overwritten.
+    this.version = state.version; this.conflicts = state.conflicts ?? {}
+    this.modified = !!state.modified; this.editing = !!state.modified; this.expanded = true
+    this.reviewed = this.canReview; this.emitReview(); this.saveBlocked.emit(!this.canReview)
+  }
   ngOnDestroy() { this.request?.unsubscribe(); this.changes?.unsubscribe() }
   load() {
     this.request?.unsubscribe()
@@ -103,6 +123,7 @@ export class ClinicalProfileComponent implements OnChanges, OnDestroy {
         this.form.reset(profile.data, { emitEvent: false })
         this.version = profile.version; this.conflicts = profile.conflicts; this.updatedAt = profile.updatedAt
         this.editing = profile.version === 0; this.loaded = true; this.loading = false
+        this.applyRecovery()
       }, error: error => { this.error = String(error); this.loading = false },
     })
   }

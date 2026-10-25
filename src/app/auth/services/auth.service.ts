@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core'
 import { environment } from '../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { catchError, map, Observable, of } from 'rxjs'
+import { Router } from '@angular/router'
 import { User, AuthStatus } from '../interfaces'
 import { Permission, getPermissionsForRoles } from '../permissions/permissions'
 
@@ -12,6 +13,7 @@ export class AuthService {
 
   private readonly baseUrl: string = environment.baseUrl
   private http = inject(HttpClient)
+  private router = inject(Router)
 
   private _currentUser = signal<User | null>(null)
   private _authStatus = signal<AuthStatus>(AuthStatus.checking)
@@ -28,10 +30,6 @@ export class AuthService {
   })
   public mustChangePassword = computed(() => this._mustChangePassword())
 
-  constructor() {
-    this.checkAuthStatus().subscribe()
-  }
-
   private setAuthentication(user: User, token: string, codigoEmpresa: string): boolean {
     this._currentUser.set(user)
     this._authStatus.set(AuthStatus.authenticated)
@@ -41,6 +39,7 @@ export class AuthService {
   }
 
   private clearAuthState(): void {
+    window.dispatchEvent(new Event('session-ending'))
     localStorage.removeItem('token')
     localStorage.removeItem('codigoEmpresa')
     this._currentUser.set(null)
@@ -99,10 +98,12 @@ export class AuthService {
     return this.http.get<{ user: User }>(url, { headers })
       .pipe(
         map(({ user }) => {
+          if (localStorage.getItem('token') !== token) return this.authStatus() === AuthStatus.authenticated
           this.setAuthentication(user, token, codigoEmpresa)
           return true
         }),
         catchError(() => {
+          if (localStorage.getItem('token') !== token) return of(this.authStatus() === AuthStatus.authenticated)
           this.clearAuthState()
           return of(false)
         })
@@ -110,7 +111,43 @@ export class AuthService {
   }
 
   logout() {
+    sessionStorage.removeItem('sessionReturn')
     this.clearAuthState()
+  }
+
+  expireSession(): void {
+    const user = this.currentUser()
+    if (user && this.router.url.startsWith('/dashboard/')) {
+      sessionStorage.setItem('sessionReturn', JSON.stringify({ url: this.router.url,
+        userId: user._id, tenant: localStorage.getItem('codigoEmpresa') }))
+    }
+    this.clearAuthState()
+    void this.router.navigateByUrl('/auth/login', { replaceUrl: true })
+  }
+
+  resumeUrl(): string {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('sessionReturn') || 'null')
+      if (saved?.userId === this.currentUser()?._id && saved?.tenant === localStorage.getItem('codigoEmpresa')
+        && typeof saved.url === 'string' && saved.url.startsWith('/dashboard/')) return saved.url
+    } catch { /* An invalid recovery link must never prevent login. */ }
+    return '/dashboard'
+  }
+
+  renewSession(): Observable<boolean> {
+    const token = localStorage.getItem('token')
+    if (!token) return of(false)
+    return this.http.post<{ user: User; token: string }>(`${this.baseUrl}/auth/renew-session`, {}).pipe(
+      map(response => {
+        // Ignore late responses from a session that has since logged out or changed.
+        if (localStorage.getItem('token') !== token) return false
+        return this.setAuthentication(response.user, response.token, localStorage.getItem('codigoEmpresa') || '')
+      }),
+      catchError(error => {
+        if (error.status === 401 && localStorage.getItem('token') === token) this.expireSession()
+        return of(false)
+      }),
+    )
   }
 
   public hasPermission(required: Permission | Permission[]): boolean {

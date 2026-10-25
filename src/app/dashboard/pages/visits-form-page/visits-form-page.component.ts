@@ -1,12 +1,14 @@
+import { FormDraftService } from '../../../shared/services/form-draft.service';
+import { FormDraft } from '../../../shared/services/form-draft';
 import { ageInYears } from '../../../shared/utils/age-in-years';
-import { ClinicalProfileReview } from '../../components/clinical-profile/clinical-profile.component'
+import { ClinicalProfileComponent, ClinicalProfileReview } from '../../components/clinical-profile/clinical-profile.component'
 import { doctorSuggestions } from '../../helpers/visits-form/doctor-autocomplete'
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { Doctor, FormVisit } from '../../interface/visits-response.interface';
 import { VisitsService } from '../../services/visits-service/visits.service';
 import { formatIncomingData, formatNewDate } from '../../../shared/utils/date-formatters';
@@ -31,12 +33,44 @@ const CONSULTA_SUBINVENTORY_ID = '1'
   styleUrl: './visits-form-page.component.css'
 })
 export class VisitsFormPageComponent implements OnInit {
+  @ViewChild(ClinicalProfileComponent) clinicalProfile?: ClinicalProfileComponent
+  public recoveredProfile: any = null
+  public onProfileReview(value: ClinicalProfileReview | null) {
+    this.profileReview = value
+    this.draft?.changed()
+  }
   public profileReview: ClinicalProfileReview | null = null
   public profileSaveBlocked = false
   public showReferral = false
   public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
   @ViewChild('consentManager') consentManager?: ConsentManagerComponent
+
+  public draft?: FormDraft
+  private draftService = inject(FormDraftService)
+  private saveCheckpoint?: string
+  private visitRequest?: Subscription
+  private startDraft(id: string | null = null) {
+    this.draft?.dispose()
+    this.draft = this.draftService.open({
+      scope: `visit:${'visits'}:${id ?? 'new'}`,
+      changes: this.visitForm.valueChanges,
+      snapshot: () => ({ form: this.visitForm.getRawValue(), selectedPatient: this.selectedPatient,
+        selectedDoctor: this.selectedDoctor, doctorSearch: this.doctorSearchControl.value,
+        patientSearch: this.patientSearchControl.value, selectedStockItems: this.selectedStockItems, clinicalProfile: this.clinicalProfile?.draftState ?? this.recoveredProfile }),
+      restore: data => {
+        if (!data?.form) return
+        this.visitForm.patchValue(data.form, { emitEvent: false })
+        this.selectedPatient = data.selectedPatient ?? null; this.selectedDoctor = data.selectedDoctor ?? null
+        this.doctorSearchControl.setValue(data.doctorSearch || '', { emitEvent: false })
+        this.patientSearchControl.setValue(data.patientSearch || '', { emitEvent: false })
+        this.selectedStockItems = data.selectedStockItems ?? []
+        this.loadDataOfStockArray()
+        this.recoveredProfile = data.clinicalProfile ?? null
+        this.showReferral = !!data.form.expediente?.module?.referrals
+      }, destroyRef: this.destroyRef,
+    })
+  }
 
   public title = ''
   public subtitle = ''
@@ -181,6 +215,8 @@ export class VisitsFormPageComponent implements OnInit {
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe( params => {
+        this.visitRequest?.unsubscribe()
+        this.draft?.dispose(); this.draft = undefined
         const id = params.get('id')
         if ( !id ) return
         this.handleSelectedVisit( id )
@@ -203,6 +239,7 @@ export class VisitsFormPageComponent implements OnInit {
           this.selectedStockItems = []
           this.stockItemsArray.clear()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
+          this.startDraft()
         } else {
           this.caller = 'ev'
           this.title = 'Editar consulta externa'
@@ -316,6 +353,7 @@ export class VisitsFormPageComponent implements OnInit {
       this.visitForm.markAllAsTouched()
       return
     }
+    this.saveCheckpoint = this.draft?.checkpoint()
     const visit = this.visitForm.value as FormVisitWithStock
     if (this.caller === 'nv' && this.profileReview) visit.clinicalProfileReview = this.profileReview
     if (!this.canManageInventory()) delete visit.stockItems
@@ -325,6 +363,7 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisitWithStock) {
+    const submittedDraft = this.draft
     this.isSaving = true
     this.visitsService.createVisit( visit, 'visits' )
       .subscribe({
@@ -334,6 +373,8 @@ export class VisitsFormPageComponent implements OnInit {
             Swal.fire('Error', 'La visita se guardó sin devolver un identificador válido.', 'error')
             return
           }
+          submittedDraft?.committed()
+          submittedDraft?.dispose()
           this.uploadPendingAttachments(visit.patient, visitId, () => {
             this.finalizePendingConsents(visitId, () => {
               Swal.fire('Success', 'New visit added!', 'success')
@@ -373,11 +414,13 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleSelectedVisit( id: string ) {
-    this.visitsService.getVisit( id )
+    this.visitRequest?.unsubscribe()
+    this.visitRequest = this.visitsService.getVisit( id )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           const visit = this.selectedVisit()
-          if ( !visit ) return
+          if ( !visit || this.route.snapshot.paramMap.get('id') !== id ) return
           this.selectedPatient = { id: visit.patientId, name: visit.patientName, birthDate: visit.patientBirthDate }
 
           this.visitForm.patchValue({
@@ -429,6 +472,7 @@ export class VisitsFormPageComponent implements OnInit {
               this.loadDataOfStockArray()
             }
           }
+          this.startDraft(id)
         },
         error: ( err ) => {
           Swal.fire('Error', err, 'error')
@@ -437,6 +481,8 @@ export class VisitsFormPageComponent implements OnInit {
   }
 
   public handleEditVisit( visit: FormVisitWithStock ) {
+    const submittedDraft = this.draft
+    const checkpoint = this.saveCheckpoint
     visit.date = (visit.date || formatNewDate(new Date())).split('T')[0]
     const payload = { ...visit, origin: 'visits' }
     this.isSaving = true
@@ -445,6 +491,7 @@ export class VisitsFormPageComponent implements OnInit {
         next: ( visit ) => {
           if( visit ) {
             this.isSaving = false
+            submittedDraft?.committed(checkpoint)
             Swal.fire('Success', 'New visit edited!', 'success')
           } else {
             this.isSaving = false

@@ -10,8 +10,7 @@
         <img *ngIf="!logoFailed" [src]="prescription.logoUrl" alt="Logo de la clínica" (error)="logoFailed = true">
       </div>
       <div class="doctor-heading">
-        <div class="clinic-name">{{ prescription.clinicName }}</div>
-        <h1>Dr(a). {{ prescription.doctorName }}</h1>
+        <h1>{{ prescription.doctorTitle }} {{ prescription.doctorName }}</h1>
         <p>{{ prescription.doctorSpecialty || prescription.doctorPosition || 'Medicina general' }}</p>
       </div>
       <address>
@@ -37,7 +36,7 @@
           <img class="signature" *ngIf="prescription.signatureUrl && !signatureFailed" [src]="prescription.signatureUrl" alt="Firma digital" (error)="signatureFailed = true">
         </div>
         <div class="signature-line"></div>
-        <strong>Dr(a). {{ prescription.doctorName }}</strong>
+        <strong>{{ prescription.doctorTitle }} {{ prescription.doctorName }}</strong>
         <span>{{ prescription.doctorSpecialty || prescription.doctorPosition }}</span>
       </div>
     </section>

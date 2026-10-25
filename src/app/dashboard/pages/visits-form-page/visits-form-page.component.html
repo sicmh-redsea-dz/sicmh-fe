@@ -11,6 +11,11 @@
     <p class="subtle-text" *ngIf="caller !== 'nv' ">{{idTag}}</p>
   </div>
 
+  <div *ngIf="draft" class="draft-status" role="status" aria-live="polite">
+    <p>{{ draft.status }}</p>
+    <small>El borrador se recupera en esta pestaña durante 24 horas. Usa Guardar para confirmar. Los archivos y consentimientos pendientes deben adjuntarse nuevamente si recargas.</small>
+  </div>
+
   <form class="medical-form" 
         autocomplete="off"
         [formGroup]="visitForm"
@@ -85,8 +90,9 @@
 
     <app-clinical-profile *ngIf="caller === 'nv'"
       [patientId]="visitForm.get('patient')?.value || ''"
-      (reviewChange)="profileReview = $event"
-      (saveBlocked)="profileSaveBlocked = $event"></app-clinical-profile>
+      [recoveryState]="recoveredProfile"
+      (reviewChange)="onProfileReview($event)"
+      (saveBlocked)="profileSaveBlocked = $event; draft?.changed()"></app-clinical-profile>
 
     <p *ngIf="caller !== 'nv' && selectedVisit()?.clinicalProfileSnapshot as snapshot">
       Ficha clínica revisada el {{ snapshot.reviewedAt | date:'dd/MM/yyyy HH:mm' }}.

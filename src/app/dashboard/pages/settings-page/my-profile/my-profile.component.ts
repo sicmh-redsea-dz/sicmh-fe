@@ -27,6 +27,7 @@ export class MyProfileComponent implements OnInit {
   public profileForm = this.fb.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
+    gender: ['unspecified'],
     phone: [''],
     address: [''],
     identification: [''],
@@ -67,6 +68,7 @@ export class MyProfileComponent implements OnInit {
       name: this.profileForm.get('name')?.value || '',
       email: this.profileForm.get('email')?.value || '',
       profile: {
+        gender: this.profileForm.get('gender')?.value || 'unspecified',
         phone: this.profileForm.get('phone')?.value || '',
         address: this.profileForm.get('address')?.value || '',
         identification: this.profileForm.get('identification')?.value || '',
@@ -180,6 +182,7 @@ export class MyProfileComponent implements OnInit {
           this.profileForm.patchValue({
             name: user.name,
             email: user.email,
+            gender: user.profile?.gender || 'unspecified',
             phone: user.profile?.phone || '',
             address: user.profile?.address || '',
             identification: user.profile?.identification || '',

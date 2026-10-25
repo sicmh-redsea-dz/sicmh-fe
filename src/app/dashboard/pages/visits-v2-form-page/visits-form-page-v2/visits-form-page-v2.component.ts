@@ -1,9 +1,11 @@
 import { clinicalDateTimeInput, clinicalDatesForApi } from '../../../helpers/visits-form/clinical-dates';
+import { FormDraftService } from '../../../../shared/services/form-draft.service';
+import { FormDraft } from '../../../../shared/services/form-draft';
 import { ageInYears } from '../../../../shared/utils/age-in-years';
 import { doctorSuggestions } from '../../../helpers/visits-form/doctor-autocomplete'
 import { Component, computed, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, merge, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { VisitsService } from '../../../services/visits-service/visits.service';
 import { BedsService } from '../../../services/beds-service/beds.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -40,6 +42,31 @@ export class VisitsFormPageV2Component implements OnInit {
   public trackById = trackById
   @ViewChild('attachmentList') attachmentList?: AttachmentListComponent
   @ViewChild('consentManager') consentManager?: ConsentManagerComponent
+
+  public draft?: FormDraft
+  private draftService = inject(FormDraftService)
+  private saveCheckpoint?: string
+  private visitRequest?: Subscription
+  private startDraft(id: string | null = null) {
+    this.draft?.dispose()
+    this.draft = this.draftService.open({
+      scope: `visit:${this.origin}:${id ?? 'new'}`,
+      changes: this.visitForm.valueChanges,
+      snapshot: () => ({ form: this.visitForm.getRawValue(), selectedPatient: this.selectedPatient,
+        selectedDoctor: this.selectedDoctor, doctorSearch: this.doctorSearchControl.value,
+        patientSearch: this.patientSearchControl.value, selectedStockItems: this.selectedStockItems, bedSearch: this.bedSearchControl.value }),
+      restore: data => {
+        if (!data?.form) return
+        this.visitForm.patchValue(data.form, { emitEvent: false })
+        this.selectedPatient = data.selectedPatient ?? null; this.selectedDoctor = data.selectedDoctor ?? null
+        this.doctorSearchControl.setValue(data.doctorSearch || '', { emitEvent: false })
+        this.patientSearchControl.setValue(data.patientSearch || '', { emitEvent: false })
+        this.selectedStockItems = data.selectedStockItems ?? []
+        this.loadDataOfStockArray()
+        this.bedSearchControl.setValue(data.bedSearch || '', { emitEvent: false }); this.syncBedFromForm()
+      }, destroyRef: this.destroyRef,
+    })
+  }
 
   public title = ''
   public subtitle = ''
@@ -154,7 +181,6 @@ export class VisitsFormPageV2Component implements OnInit {
   public showBedDropdown: boolean = false
 
   private bedModule: BedModule | null = null
-  private shouldRestoreDraft = false
 
   ngOnInit(): void {
     this.route.data
@@ -258,16 +284,11 @@ export class VisitsFormPageV2Component implements OnInit {
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe( params => {
+        this.visitRequest?.unsubscribe()
+        this.draft?.dispose(); this.draft = undefined
         const id = params.get('id')
         if ( !id ) return
         this.handleSelectedVisit( id )
-      })
-
-    this.route.queryParamMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        this.shouldRestoreDraft = params.get('draft') === '1'
-        this.restoreDraftIfNeeded()
       })
 
     this.route.url
@@ -288,13 +309,13 @@ export class VisitsFormPageV2Component implements OnInit {
           this.selectedStockItems = []
           this.stockItemsArray.clear()
           this.visitForm.get('date')?.setValue(formatNewDate(new Date()))
+          this.startDraft()
         } else if (firstSegment) {
           this.caller = 'ev'
           this.title = this.titleEdit
           this.subtitle = this.subtitleEdit
           this.actionButtonText = 'Actualizar'
         }
-        this.restoreDraftIfNeeded()
       })
   }
 
@@ -498,6 +519,7 @@ export class VisitsFormPageV2Component implements OnInit {
       this.visitForm.markAllAsTouched()
       return
     }
+    this.saveCheckpoint = this.draft?.checkpoint()
     const visit = this.visitForm.value as FormVisitWithStock
     if (visit.expediente) visit.expediente = {
       ...visit.expediente, module: clinicalDatesForApi(visit.expediente.module),
@@ -509,6 +531,7 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleCreateVisit(visit: FormVisitWithStock) {
+    const submittedDraft = this.draft
     const payload: FormVisitWithStock = this.includeSubinventoryInPayload
       ? {
         ...visit,
@@ -528,11 +551,12 @@ export class VisitsFormPageV2Component implements OnInit {
             Swal.fire('Error', 'La visita se guardó sin devolver un identificador válido.', 'error')
             return
           }
+          submittedDraft?.committed()
+          submittedDraft?.dispose()
           this.uploadPendingAttachments(payload.patient, visitId, () => {
             this.finalizePendingConsents(visitId, () => {
               Swal.fire('Success', 'New visit added!', 'success')
                 .then(() => {
-                  this.clearDraft()
                   this.router.navigateByUrl(`/dashboard/${this.backRoute}/edit-visit/${visitId}`)
                 })
             })
@@ -570,11 +594,13 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleSelectedVisit( id: string ) {
-    this.visitsService.getVisit(id)
+    this.visitRequest?.unsubscribe()
+    this.visitRequest = this.visitsService.getVisit(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           const visit = this.selectedVisit()
-          if ( !visit ) return
+          if ( !visit || this.route.snapshot.paramMap.get('id') !== id ) return
           this.selectedPatient = { id: visit.patientId, name: visit.patientName, birthDate: visit.patientBirthDate }
 
           this.visitForm.patchValue({
@@ -631,6 +657,7 @@ export class VisitsFormPageV2Component implements OnInit {
             })
             this.loadDataOfStockArray()
           }
+          this.startDraft(id)
 
         },
         error: ( err ) => {
@@ -640,6 +667,8 @@ export class VisitsFormPageV2Component implements OnInit {
   }
 
   public handleEditVisit( visit: FormVisitWithStock ) {
+    const submittedDraft = this.draft
+    const checkpoint = this.saveCheckpoint
     visit.date = (visit.date || formatNewDate(new Date())).split('T')[0]
     const payload: FormVisitWithStock = this.includeSubinventoryInPayload
       ? {
@@ -657,7 +686,7 @@ export class VisitsFormPageV2Component implements OnInit {
         next: ( visit ) => {
           if( visit ) {
             this.isSaving = false
-            this.clearDraft()
+            submittedDraft?.committed(checkpoint)
             Swal.fire('Success', 'New visit edited!', 'success')
           } else {
             this.isSaving = false
@@ -733,61 +762,7 @@ export class VisitsFormPageV2Component implements OnInit {
     })
   }
 
-  private getDraftKey() {
-    return `visitDraft:${this.origin}:${this.caller || 'nv'}`
-  }
+  private saveDraft() { this.draft?.flush() }
 
-  private saveDraft() {
-    const payload = {
-      form: this.visitForm.getRawValue(),
-      selectedDoctor: this.selectedDoctor,
-      selectedPatient: this.selectedPatient,
-      doctorSearch: this.doctorSearchControl.value,
-      patientSearch: this.patientSearchControl.value,
-      selectedStockItems: this.selectedStockItems,
-      bedSearch: this.bedSearchControl.value,
-      selectedBedCode: this.selectedBed?.code ?? ''
-    }
-    sessionStorage.setItem(this.getDraftKey(), JSON.stringify(payload))
-  }
-
-  private restoreDraftIfNeeded() {
-    if (!this.shouldRestoreDraft) return
-    if (!this.caller) return
-    const raw = sessionStorage.getItem(this.getDraftKey())
-    if (!raw) return
-    try {
-      const payload = JSON.parse(raw)
-      if (payload?.form) {
-        this.visitForm.patchValue(payload.form)
-      }
-      this.selectedDoctor = payload?.selectedDoctor ?? null
-      this.selectedPatient = payload?.selectedPatient ?? null
-      if (payload?.doctorSearch) {
-        this.doctorSearchControl.setValue(payload.doctorSearch, { emitEvent: false })
-      }
-      if (payload?.patientSearch) {
-        this.patientSearchControl.setValue(payload.patientSearch, { emitEvent: false })
-      }
-      this.selectedStockItems = payload?.selectedStockItems ?? []
-      this.loadDataOfStockArray()
-      if (payload?.bedSearch) {
-        this.bedSearchControl.setValue(payload.bedSearch, { emitEvent: false })
-      }
-      if (payload?.selectedBedCode) {
-        const match = this.allBeds.find((bed) => bed.code === payload.selectedBedCode)
-        if (match) {
-          this.selectBed(match)
-        }
-      }
-    } catch (err) {
-      console.warn('No se pudo restaurar el borrador', err)
-    }
-  }
-
-  private clearDraft() {
-    sessionStorage.removeItem(this.getDraftKey())
-    this.shouldRestoreDraft = false
-  }
 
 }

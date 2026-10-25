@@ -121,6 +121,7 @@ export interface PrescriptionContext {
     doctorId: string
     doctorUserId: string | null
     doctorName: string
+    doctorTitle: string
     doctorSpecialty: string | null
     doctorPosition: string | null
     doctorPhone: string | null

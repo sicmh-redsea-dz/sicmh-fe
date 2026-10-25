@@ -1,12 +1,10 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core'
-import { Router } from '@angular/router'
 import { catchError, switchMap, throwError } from 'rxjs'
 import { AuthService } from '../../auth/services/auth.service'
 import { environment } from '../../../environments/environment'
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const router      = inject(Router)
   const authService = inject(AuthService)
 
   const token = localStorage.getItem('token')
@@ -19,8 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       const isAuthEndpoint = req.url.includes('/auth/')
 
       if (error.status === 401 && !isAuthEndpoint) {
-        authService.logout()
-        void router.navigateByUrl('/auth/login', { replaceUrl: true })
+        if (localStorage.getItem('token') === token) authService.expireSession()
         return throwError(() => error)
       }
 

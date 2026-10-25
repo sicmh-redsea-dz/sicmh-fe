@@ -10,6 +10,11 @@
     </div>
   </div>
 
+  <div *ngIf="draft" class="draft-status" role="status" aria-live="polite">
+    <p>{{ draft.status }}</p>
+    <small>El borrador se recupera en esta pestaña durante 24 horas. Usa Guardar para confirmar. Los archivos y consentimientos pendientes deben adjuntarse nuevamente si recargas.</small>
+  </div>
+
   <form class="patient-form"
         autocomplete="off"
         [formGroup]="patientForm"
@@ -194,7 +199,7 @@
 
     <button 
       class="submit-btn"
-      [disabled]="patientForm.invalid"
+      [disabled]="patientForm.invalid || isSaving"
       type="submit"
     >
       {{actionButtonText}}

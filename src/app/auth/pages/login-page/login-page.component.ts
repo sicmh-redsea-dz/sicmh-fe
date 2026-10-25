@@ -30,7 +30,7 @@ export class LoginPageComponent {
 
     this.authService.login(email, password, codigoEmpresa)
       .subscribe({
-        next: () => this.router.navigateByUrl('/dashboard'),
+        next: () => this.router.navigateByUrl(this.authService.resumeUrl()),
         error: (err) => Swal.fire('Error', this.getErrorMessage(err), 'error')
       })
   }

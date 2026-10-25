@@ -255,3 +255,7 @@ textarea.ng-dirty.ng-invalid {
 .birth-age-row > .form-group { flex: 1; min-width: 0; }
 .birth-age-row > .age-display label { white-space: nowrap; }
 .birth-age-row input { box-sizing: border-box; height: 3.25rem; }
+
+.draft-status { margin: 0 0 16px; padding: 10px 14px; border: 1px solid #94a3b8; border-radius: 8px; }
+.draft-status p { margin: 0 0 4px; font-weight: 600; }
+.draft-status small { display: block; line-height: 1.4; }

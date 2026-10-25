@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject } from '@angular/core';
+import { SessionActivityService } from './auth/services/session-activity.service';
 import { AuthService } from './auth/services/auth.service';
 import { Router } from '@angular/router';
 import { AuthStatus } from './auth/interfaces';
@@ -9,9 +10,15 @@ import { ThemeService } from './shared/services/theme.service';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
+  public sessionActivity = inject(SessionActivityService);
   private authService = inject( AuthService );
   private router = inject( Router );
   private themeService = inject( ThemeService );
+
+  constructor() {
+    // Start after the auth provider exists, so its interceptor can safely resolve it.
+    this.authService.checkAuthStatus().subscribe();
+  }
 
   public finishedAuthCheck = computed<boolean>(() => {
     if( this.authService.authStatus() === AuthStatus.checking ) return false
@@ -36,7 +43,7 @@ export class AppComponent {
           break;
         }
         if (currentUrl.startsWith('/auth') && !currentUrl.startsWith('/auth/reset-password')) {
-          this.router.navigateByUrl('/dashboard');
+          this.router.navigateByUrl(this.authService.resumeUrl());
         }
         break;
       case AuthStatus.notAuthenticated:

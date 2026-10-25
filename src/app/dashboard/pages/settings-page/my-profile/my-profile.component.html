@@ -36,6 +36,14 @@
             <label>Teléfono</label>
             <input type="text" formControlName="phone" placeholder="+504 9999-9999">
           </div>
+          <div class="form-group">
+            <label for="profile-gender">Género</label>
+            <select id="profile-gender" formControlName="gender">
+              <option value="unspecified">Sin especificar</option>
+              <option value="female">Femenino (Dra.)</option>
+              <option value="male">Masculino (Dr.)</option>
+            </select>
+          </div>
           <div class="form-group form-group-wide">
             <label>Dirección profesional</label>
             <input type="text" formControlName="address" placeholder="Dirección que aparecerá en las recetas">

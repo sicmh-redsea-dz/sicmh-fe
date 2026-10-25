@@ -9,6 +9,7 @@ export interface User {
   _id:      string;
   permissions?: Permission[];
   profile?: {
+    gender?: 'male' | 'female' | 'unspecified';
     phone?: string;
     identification?: string;
     department?: string;

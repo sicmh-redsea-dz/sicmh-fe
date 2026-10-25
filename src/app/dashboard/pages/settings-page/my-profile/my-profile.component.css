@@ -217,7 +217,7 @@
   color: var(--text-muted);
 }
 
-.form-group input {
+.form-group input, .form-group select {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.6rem 0.8rem;
@@ -227,7 +227,7 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-group input:focus {
+.form-group input:focus, .form-group select:focus {
   outline: none;
   border-color: rgba(20, 184, 166, 0.6);
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
