@@ -71,6 +71,19 @@
               "sourceMap": false,
               "extractLicenses": true
             },
+            "staging": {
+              "outputPath": "dist/medit-staging",
+              "index": {
+                "input": "src/index.staging.html",
+                "output": "index.html"
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,

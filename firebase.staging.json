@@ -1,0 +1,9 @@
+{
+  "hosting": {
+    "site": "sicmh-441423",
+    "public": "dist/medit-staging",
+    "ignore": ["firebase*.json", "**/.*", "**/node_modules/**"],
+    "headers": [{"source": "**", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]}],
+    "rewrites": [{"source": "**", "destination": "/index.html"}]
+  }
+}
