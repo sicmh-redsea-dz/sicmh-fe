@@ -1,3 +1,4 @@
+import { formatApiError } from '../../../shared/utils/api-error';
 import { FormDraftService } from '../../../shared/services/form-draft.service';
 import { FormDraft } from '../../../shared/services/form-draft';
 import { ageInYears } from '../../../shared/utils/age-in-years';
@@ -160,6 +161,26 @@ export class PatientFormPageComponent implements OnInit {
     })
   }
 
+  private showSaveError(error: any) {
+    const duplicate = error?.error?.code === 'PATIENT_IDENTIFICATION_EXISTS'
+    if (duplicate) {
+      this.patientForm.controls.id.setErrors({ ...this.patientForm.controls.id.errors, duplicate: true })
+      this.patientForm.controls.id.markAsTouched()
+    }
+    const validation = error?.status === 400 || error?.status === 422
+    const message = duplicate || validation ? formatApiError(error)
+      : error?.status === 0 ? 'No se pudo conectar con el servidor. Revisa tu conexión e intenta nuevamente.'
+      : 'No se pudo guardar el paciente. Tus datos permanecen en el formulario. Intenta nuevamente en unos momentos.'
+    void Swal.fire({
+      icon: duplicate || validation ? 'warning' : 'error',
+      title: duplicate ? 'Identificación ya registrada' : validation ? 'Revisa los datos del paciente' : 'No se pudo guardar el paciente',
+      text: message,
+      confirmButtonText: 'Revisar formulario',
+    }).then(() => {
+      if (duplicate) document.querySelector<HTMLInputElement>('[formControlName="id"]')?.focus()
+    })
+  }
+
   private handleEditPatient( patient: FormPatient, patientId: string | null ) {
     const submittedDraft = this.draft
     const checkpoint = this.saveCheckpoint
@@ -179,7 +200,7 @@ export class PatientFormPageComponent implements OnInit {
         },
         error: ( error ) => {
           this.isSaving = false
-          Swal.fire('Error', error, 'error')
+          this.showSaveError(error)
         },
       })
   }
@@ -202,7 +223,7 @@ export class PatientFormPageComponent implements OnInit {
         },
         error: (message) => {
           this.isSaving = false
-          Swal.fire('Error', message, 'error')
+          this.showSaveError(message)
         },
       })
   }

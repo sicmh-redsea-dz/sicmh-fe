@@ -39,10 +39,12 @@
                   formControlName="id"
                   [attr.maxlength]="identificationMaxLength"
                   [attr.inputmode]="patientForm.controls.identificationType.value === 'pasaporte' ? 'text' : 'numeric'"
-                  aria-describedby="identification-hint"
+                  aria-describedby="identification-hint identification-error"
+                  [attr.aria-invalid]="patientForm.controls.id.invalid && patientForm.controls.id.touched"
                   placeholder="Número o código alfanumérico">
           <small id="identification-hint">{{ identificationHint }}</small>
-           <div class="error-message" *ngIf="patientForm.get('id')?.invalid && (patientForm.get('id')?.touched || patientForm.get('id')?.dirty)">
+           <div id="identification-error" role="alert" class="error-message" *ngIf="patientForm.get('id')?.invalid && (patientForm.get('id')?.touched || patientForm.get('id')?.dirty)">
+            <small *ngIf="patientForm.controls.id.errors?.['duplicate']">Esta identificación ya está registrada. Verifica el número o busca al paciente en el listado.</small>
             <small *ngIf="patientForm.get('id')?.errors?.['required']">Este campo es obligatorio.</small>
             <small *ngIf="patientForm.get('id')?.errors?.['pattern']">{{ identificationHint }}</small>
           </div>

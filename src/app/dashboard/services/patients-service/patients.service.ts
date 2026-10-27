@@ -60,7 +60,7 @@ export class PatientsService {
     const body = {...patient}
     return this.http.post<AddedUser>( url, body, {} )
       .pipe(
-        catchError(( err ) => throwError(() => formatApiError(err)))
+        catchError(( err ) => throwError(() => err))
       )
   }
 
@@ -70,7 +70,7 @@ export class PatientsService {
     return this.http.patch<AddedUser>(url, body, {})
       .pipe(
         catchError(( err ) => {
-          return throwError(() => formatApiError(err))
+          return throwError(() => err)
         })
       )
   }
