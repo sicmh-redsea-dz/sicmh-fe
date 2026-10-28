@@ -116,22 +116,14 @@ export class AuthService {
   }
 
   expireSession(): void {
-    const user = this.currentUser()
-    if (user && this.router.url.startsWith('/dashboard/')) {
-      sessionStorage.setItem('sessionReturn', JSON.stringify({ url: this.router.url,
-        userId: user._id, tenant: localStorage.getItem('codigoEmpresa') }))
-    }
+    sessionStorage.removeItem('sessionReturn')
     this.clearAuthState()
     void this.router.navigateByUrl('/auth/login', { replaceUrl: true })
   }
 
   resumeUrl(): string {
-    try {
-      const saved = JSON.parse(sessionStorage.getItem('sessionReturn') || 'null')
-      if (saved?.userId === this.currentUser()?._id && saved?.tenant === localStorage.getItem('codigoEmpresa')
-        && typeof saved.url === 'string' && saved.url.startsWith('/dashboard/')) return saved.url
-    } catch { /* An invalid recovery link must never prevent login. */ }
-    return '/dashboard'
+    sessionStorage.removeItem('sessionReturn')
+    return '/dashboard/main'
   }
 
   renewSession(): Observable<boolean> {

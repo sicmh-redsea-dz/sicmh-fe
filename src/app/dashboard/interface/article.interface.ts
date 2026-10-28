@@ -4,5 +4,7 @@ export interface Article {
     prodName: string,
     prodQuantity: number,
     prodUnitPrice: number,
+    prodPurchasePrice?: number | string | null,
+    prodExpirationDate?: string | null,
     prodMinStock: number
 }

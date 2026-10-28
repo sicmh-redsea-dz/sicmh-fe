@@ -1,0 +1,324 @@
+.calendar {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+
+    grid-column: 4;
+    grid-row: 1 / span 2;
+}
+
+.calendar h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.125rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+:host ::ng-deep full-calendar {
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+:host ::ng-deep .fc {
+    border: none;
+    font-family: inherit;
+}
+
+:host ::ng-deep .fc-toolbar-title {
+    font-size: 1rem;
+}
+
+:host ::ng-deep .fc-daygrid-day-number {
+    font-size: .75rem;
+    font-weight: 500;
+}
+
+:host ::ng-deep .fc-daygrid-day-frame {
+    min-height: 28px !important;
+}
+
+:host ::ng-deep .cita-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 0 4px 3px;
+    overflow: hidden;
+}
+
+:host ::ng-deep .cita-day-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    line-height: 1;
+}
+
+.patients-table {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    grid-column: 1 / span 3;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.table-header h3 {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+
+.dash-table-container {
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+.dash-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+.dash-table-container thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-muted);
+    padding: 0.5rem;
+    font-size: 12px;
+    text-align: left;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+}
+  
+.dash-table-container td {
+    padding: 0.5rem;
+    font-size: 14px;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+  
+.dash-table-container tbody tr:nth-child(odd) {
+    background: #fbfcfe;
+}
+  
+.dash-table-container tbody tr:hover {
+    background: #f1f5ff;
+}
+
+/* ── Calendar header ─────────────────────────────────────── */
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.calendar-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 0.4rem;
+}
+
+.btn-new-cita {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    border: none;
+    background: var(--secondary-color, #14B8A6);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+    white-space: nowrap;
+}
+.btn-new-cita:hover { opacity: 0.85; }
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 0.25rem;
+}
+.modal-close:hover { color: var(--text-color); }
+
+.modal-form {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-group.full { flex: 1 1 100%; }
+
+.form-group label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--radius) / 2);
+    background: var(--surface);
+    color: var(--text-color);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: border-color .2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color, #14B8A6);
+}
+
+.form-group small {
+    font-size: 0.72rem;
+    color: #e53e3e;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 0.25rem;
+}
+
+.modal-actions .btn-danger { margin-right: auto; }
+
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    border: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.btn-primary  { background: var(--secondary-color, #14B8A6); color: #fff; }
+.btn-secondary{ background: var(--border-color); color: var(--text-color); }
+.btn-danger   { background: #fee2e2; color: #dc2626; }
+
+.btn-primary:hover, .btn-secondary:hover, .btn-danger:hover { opacity: 0.8; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+
+.page-heading { margin: 1.5rem 0; }
+.page-heading h1 { font-size: 1.5rem; margin-bottom: .4rem; }
+.page-heading p { color: var(--text-muted); }
+.dashboard { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); grid-template-rows: auto; overflow: visible; margin-top: 0; align-items: start; }
+.calendar { grid-column: 2; grid-row: 1; min-width: 0; }
+.patients-table { grid-column: 1; grid-row: 1; min-width: 0; }
+@media (max-width: 760px) { .dashboard { grid-template-columns: minmax(0, 1fr); } .calendar { grid-column: 1; grid-row: 2; } }
+@media (max-width: 600px) { .form-row { flex-direction: column; } .modal-actions { flex-wrap: wrap; } }
+
+.doctor-filter { display: flex; flex-direction: column; gap: .4rem; margin: .25rem 0 1rem; }
+.doctor-filter label { font-size: .8rem; font-weight: 600; color: var(--text-muted); }
+.doctor-filter select { width: 100%; min-width: 0; padding: .6rem .75rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--surface); color: var(--text-color); font: inherit; font-size: .85rem; }
+.doctor-filter select:focus-visible { outline: 2px solid var(--secondary-color); outline-offset: 2px; }

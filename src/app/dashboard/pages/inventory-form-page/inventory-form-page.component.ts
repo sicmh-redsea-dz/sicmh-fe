@@ -22,6 +22,8 @@ public title = ''
   private destroyRef = inject( DestroyRef )
   
   public articleForm: FormGroup = this.fb.group({
+    prodPurchasePrice: [null, [Validators.min(0), Validators.max(9999999999.99)]],
+    prodExpirationDate: [null],
     prodDesc      : ['', []],
     prodMinStock  : ['', []],
     prodName      : ['', [Validators.required]],
@@ -106,6 +108,8 @@ public title = ''
         next: ( item ) => {
           this.itemId = item.id
           this.articleForm.patchValue({
+            prodPurchasePrice: item.prodPurchasePrice ?? null,
+            prodExpirationDate: item.prodExpirationDate ?? null,
             prodDesc: item.prodDesc,
             prodMinStock: item.prodMinStock,
             prodName: item.prodName,

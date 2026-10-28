@@ -25,6 +25,13 @@ export const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['dashboard.view']
   },
   {
+    label: 'Citas',
+    icon: 'ph-bold ph-calendar-blank',
+    hasSubmenu: false,
+    routerLink: 'appointments',
+    requiredPermissions: ['schedule.read']
+  },
+  {
     label: 'Pacientes',
     icon: 'ph-bold ph-user-plus',
     hasSubmenu: false,

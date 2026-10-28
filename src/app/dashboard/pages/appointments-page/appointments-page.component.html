@@ -1,0 +1,174 @@
+<header class="page-heading"><h1>Citas</h1><p>Organiza la agenda y consulta las citas de cada d&#237;a.</p></header>
+<div class="dashboard">
+  <!-- ── Day appointments table ───────────────────────────── -->
+  <div class="patients-table">
+    <div class="table-header">
+      <h3>{{ selectedDate ? 'Citas del ' + selectedDate : 'Citas del día' }}</h3>
+    </div>
+    <div class="doctor-filter">
+      <label for="appointment-doctor-filter">Filtrar por doctor</label>
+      <select id="appointment-doctor-filter" [(ngModel)]="doctorFilter">
+        <option value="">Todos los doctores</option>
+        <option *ngFor="let doctor of doctorFilterOptions; trackBy: trackById" [value]="doctor.id">{{ doctor.nombre }}</option>
+        <option value="unassigned">Sin doctor asignado</option>
+      </select>
+    </div>
+    <div class="dash-table-container">
+      <table>
+        <thead>
+          <tr><th>Hora</th><th>Título</th><th>Doctor</th><th>Paciente</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of filteredCitas; trackBy: trackByCitaId" (click)="onCitaRowClick(c)" style="cursor:pointer">
+            <td>{{ fmtDt(c.Inicio) }}</td>
+            <td>{{ c.Titulo }}</td>
+            <td>{{ c.NombreDoctor || '—' }}</td>
+            <td>{{ c.NombrePaciente || '—' }}</td>
+            <td>{{ ESTADO_LABELS[c.Estado] }}</td>
+          </tr>
+          <tr *ngIf="!selectedDate">
+            <td colspan="5" style="text-align:center;color:var(--text-muted)">Selecciona un día en el calendario</td>
+          </tr>
+          <tr *ngIf="selectedDate && filteredCitas.length === 0">
+            <td colspan="5" style="text-align:center;color:var(--text-muted)">{{ doctorFilter ? 'Sin citas para este doctor en la fecha seleccionada' : 'Sin citas para este día' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="calendar">
+    <div class="calendar-header">
+      <span class="calendar-legend">
+        <span class="dot" style="background:#3B82F6"></span>Consulta
+        <span class="dot" style="background:#8B5CF6"></span>Cirugía
+        <span class="dot" style="background:#10B981"></span>Hospitalización
+        <span class="dot" style="background:#F59E0B"></span>Seguimiento
+        <span class="dot" style="background:#6B7280"></span>Otro
+      </span>
+      <button *ngIf="canEdit" class="btn-new-cita" (click)="openCreateModal()">
+        <i class="fa-solid fa-plus"></i> Nueva cita
+      </button>
+    </div>
+    <full-calendar #calendarRef [options]="calendarOptions"></full-calendar>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Appointment modal
+     ═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>{{ editingCita ? 'Editar cita' : 'Nueva cita' }}</h3>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+
+    <form [formGroup]="citaForm" (ngSubmit)="saveCita()" class="modal-form">
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Título *</label>
+          <input formControlName="titulo" placeholder="Ej. Consulta general" />
+          <small *ngIf="citaForm.get('titulo')?.touched && citaForm.get('titulo')?.invalid">Requerido</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select formControlName="tipo">
+            <option *ngFor="let t of tipoOptions; trackBy: trackBySelf" [value]="t">{{ TIPO_LABELS[t] }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select formControlName="estado">
+            <option *ngFor="let e of estadoOptions; trackBy: trackBySelf" [value]="e">{{ ESTADO_LABELS[e] }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Origen</label>
+          <select formControlName="source">
+            <option *ngIf="sources.length === 0" [ngValue]="null" disabled>Sin orígenes configurados</option>
+            <option *ngFor="let s of sources; trackBy: trackBySelf" [value]="s">{{ $any(SOURCE_LABELS)[s] || s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Inicio *</label>
+          <input type="datetime-local" formControlName="inicio" />
+          <small *ngIf="citaForm.get('inicio')?.touched && citaForm.get('inicio')?.invalid">Requerido</small>
+        </div>
+        <div class="form-group">
+          <label>Fin *</label>
+          <input type="datetime-local" formControlName="fin" />
+          <small *ngIf="citaForm.get('fin')?.touched && citaForm.get('fin')?.invalid">Requerido</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Doctor</label>
+          <select formControlName="personalId">
+            <option [ngValue]="null">— Sin asignar —</option>
+            <option *ngFor="let d of doctors; trackBy: trackById" [ngValue]="d.id">{{ d.nombre }} ({{ d.especialidad }})</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Identificación del paciente</label>
+          <input type="text" formControlName="pacienteIdentificacion" placeholder="Cédula / ID" maxlength="20" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Nombre del paciente</label>
+          <input type="text" formControlName="nombrePaciente" placeholder="Nombre completo (opcional)" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Recurso</label>
+          <select formControlName="recursoTipo">
+            <option [ngValue]="null">— Ninguno —</option>
+            <option value="quirofano">Quirófano</option>
+            <option value="cama">Cama / Hospitalización</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="citaForm.get('recursoTipo')?.value">
+          <label>ID del recurso</label>
+          <input formControlName="recursoId" placeholder="Ej. Q-01 o C-14" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion" rows="2" placeholder="Motivo de la cita…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Notas internas</label>
+          <textarea formControlName="notas" rows="2" placeholder="Instrucciones, preparación…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" *ngIf="editingCita" (click)="deleteCita()">
+          <i class="fa-solid fa-trash"></i> Eliminar
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isSaving">
+          {{ isSaving ? 'Guardando…' : (editingCita ? 'Guardar cambios' : 'Crear cita') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

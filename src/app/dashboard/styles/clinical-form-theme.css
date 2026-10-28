@@ -1,0 +1,58 @@
+/* Shared presentation for patient and care forms; existing field layouts stay local. */
+.container,
+.management-container,
+.patient-movements {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tag-color) 8%, var(--surface-muted)), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--tag-color) 12%, var(--border-color));
+  border-radius: 1.75rem;
+  box-shadow: var(--shadow-md);
+}
+.header-container,
+.management-container > .header,
+.patient-movements > .page-header {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(108, 139, 198, .25);
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, rgba(108, 139, 198, .18), rgba(31, 42, 68, .08));
+  box-shadow: var(--shadow-md);
+}
+.header-container { position: relative; padding-inline: 4rem; margin-bottom: 1.5rem; }
+.header-container .form-header { margin: 0; }
+.header-container .form-header h1 { color: var(--text-color); margin-bottom: .35rem; }
+.header-container .back-arrow { top: 50%; left: .75rem; }
+.header-container .subtle-text { top: .75rem; right: 1rem; transform: none; font-size: .7rem; }
+.patient-form,
+.medical-form,
+.management-container .list-panel,
+.management-container .detail-panel,
+.patient-movements .card {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, var(--tag-color));
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.patient-form,
+.medical-form { padding: 1.5rem; }
+:is(.patient-form, .medical-form, .management-container, .patient-movements) :is(input, textarea, select) {
+  background: var(--surface-muted);
+  color: var(--text-color);
+  border-radius: var(--radius-sm);
+}
+:is(.patient-form, .medical-form, .management-container, .patient-movements) :is(input, textarea, select):not(.ng-invalid.ng-touched) {
+  border-color: var(--border-color);
+}
+:is(.patient-form, .medical-form, .management-container, .patient-movements) :is(input, textarea, select):focus-visible {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+:is(.patient-form, .medical-form, .management-container, .patient-movements) label { color: var(--text-muted); }
+.medical-form .number-input { background: var(--surface-muted); border-color: var(--border-color); border-radius: var(--radius-sm); }
+.medical-form .button-group :is(button, select) { color: var(--text-color); background: var(--surface-muted); }
+.draft-status { background: var(--surface); border-color: var(--border-color); border-radius: var(--radius); }
+.fancy-divider { color: var(--text-color); }
+@media (max-width: 600px) {
+  .container, .management-container, .patient-movements { padding: 1rem; border-radius: 1.25rem; }
+  .header-container { padding: 1.25rem 2.75rem; }
+  .header-container .back-arrow { left: .25rem; padding-inline: .5rem; }
+  .patient-form, .medical-form { padding: 1rem; }
+}

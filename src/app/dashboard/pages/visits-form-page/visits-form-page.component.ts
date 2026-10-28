@@ -30,7 +30,7 @@ const CONSULTA_SUBINVENTORY_ID = '1'
 @Component({
   selector: 'app-visits-form-page',
   templateUrl: './visits-form-page.component.html',
-  styleUrl: './visits-form-page.component.css'
+  styleUrls: ['./visits-form-page.component.css', '../../styles/clinical-form-theme.css']
 })
 export class VisitsFormPageComponent implements OnInit {
   @ViewChild(ClinicalProfileComponent) clinicalProfile?: ClinicalProfileComponent

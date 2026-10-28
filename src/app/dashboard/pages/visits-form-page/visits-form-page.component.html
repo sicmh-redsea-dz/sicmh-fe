@@ -11,9 +11,9 @@
     <p class="subtle-text" *ngIf="caller !== 'nv' ">{{idTag}}</p>
   </div>
 
-  <div *ngIf="draft" class="draft-status" role="status" aria-live="polite">
-    <p>{{ draft.status }}</p>
-    <small>El borrador se recupera en esta pestaña durante 24 horas. Usa Guardar para confirmar. Los archivos y consentimientos pendientes deben adjuntarse nuevamente si recargas.</small>
+  <div *ngIf="draft?.hasPendingChanges" class="draft-status" role="status" aria-live="polite">
+    <p>{{ draft?.status }}</p>
+    <small>Borrador local por 24 h. Pulsa Guardar para confirmar. Si recargas, vuelve a adjuntar archivos y consentimientos.</small>
   </div>
 
   <form class="medical-form" 
@@ -24,7 +24,7 @@
 
     <div class="input-row">
       <div class="input-group date-group">
-        <label>Date</label>
+        <label>Fecha</label>
         <input type="date" 
               formControlName="date"/>
         <small class="error-text" *ngIf="visitForm.get('date')?.touched && visitForm.get('date')?.hasError('required')">
@@ -117,6 +117,16 @@
             </small>
           </div>
 
+          <div class="textarea-group">
+            <label>Exploración física</label>
+            <textarea
+              formControlName="physicalExam"
+              placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
+            <small class="error-text" *ngIf="visitForm.get('expediente.standard.physicalExam')?.touched && visitForm.get('expediente.standard.physicalExam')?.hasError('required')">
+              Este campo es obligatorio.
+            </small>
+          </div>
+
           <div class="textarea-group" *ngIf="caller !== 'nv' && visitForm.get('expediente.standard.currentIllness')?.value">
             <label>Padecimiento actual (registro anterior)</label>
             <textarea 
@@ -126,16 +136,6 @@
               Este campo es obligatorio.
             </small>
           </div>
-        </div>
-
-        <div class="textarea-full">
-          <label>Exploración física</label>
-          <textarea 
-            formControlName="physicalExam"
-            placeholder="Describe hallazgos relevantes de la exploración física."></textarea>
-          <small class="error-text" *ngIf="visitForm.get('expediente.standard.physicalExam')?.touched && visitForm.get('expediente.standard.physicalExam')?.hasError('required')">
-            Este campo es obligatorio.
-          </small>
         </div>
 
         <details *ngIf="caller !== 'nv'">
@@ -172,7 +172,6 @@
     </div>
 
     <div class="input-columns">
-      <!-- Columna izquierda (75%) -->
       <div class="left-column">
         <div class="number-input-group">
           <label>Presion</label>
@@ -266,41 +265,6 @@
         </div>
       </div>
 
-      <div class="divider-vertical"></div>
-      <!-- Columna derecha (25%) -->
-      <div class="right-column">
-        <div class="calculated-input-group">
-          <label>IMC</label>
-          <input class="calculated-input"
-                type="text" 
-                formControlName="BMI"
-                placeholder="Ej. 22.86"/>
-        </div>
-
-        <div class="calculated-input-group">
-          <label>% De Grasa</label>
-          <input class="calculated-input"
-                type="text" 
-                formControlName="fatPercentage"
-                placeholder="Ej. 25.8%"/>
-        </div>
-
-        <div class="calculated-input-group">
-          <label>Grasa Visceral</label>
-          <input class="calculated-input" 
-                type="text" 
-                formControlName="visceralFat"
-                placeholder="Ej. 1.07"/>
-        </div>
-
-        <div class="calculated-input-group">
-          <label>Edad Metabólica</label>
-          <input class="calculated-input" 
-                type="text" 
-                formControlName="ageAccordingToWeight"
-                placeholder="Ej. 32"/>
-        </div>
-      </div>
     </div>
 
     <details *ngIf="caller !== 'nv'">

@@ -16,7 +16,7 @@ const optionalEmail: ValidatorFn = control => Validators.email({ value: typeof c
 @Component({
   selector: 'app-patient-form-page',
   templateUrl: './patient-form-page.component.html',
-  styleUrl: './patient-form-page.component.css'
+  styleUrls: ['./patient-form-page.component.css', '../../styles/clinical-form-theme.css']
 })
 export class PatientFormPageComponent implements OnInit {
   public isSaving = false

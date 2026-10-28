@@ -31,7 +31,9 @@ export class InventoryPageComponent implements OnInit {
     'Nombre',
     'Descripción',
     'Cantidad',
-    'Precio Unitario'
+    'Precio Unitario',
+    'Precio de compra',
+    'Fecha de vencimiento'
   ]
   public searchTerm: string = ''
   public currentPage: number = 1

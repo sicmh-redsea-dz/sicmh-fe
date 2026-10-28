@@ -18,7 +18,7 @@ export class DashboardService {
           map(({ data }) => {
             let cardData = data.cardData
             let visitData = data.visitData
-            return { cardData, visitData }
+            return { cardData, visitData, dailyActivity: data.dailyActivity }
           }),
           catchError(( err ) => {
             return throwError(() => formatApiError(err))

@@ -15,7 +15,7 @@ import { trackById, trackByValue } from '../../../shared/utils/track-by';
 @Component({
   selector: 'app-or-rooms-management-page',
   templateUrl: './or-rooms-management-page.component.html',
-  styleUrl: './or-rooms-management-page.component.css'
+  styleUrls: ['./or-rooms-management-page.component.css', '../../styles/clinical-form-theme.css']
 })
 export class OrRoomsManagementPageComponent implements OnInit {
   public trackById = trackById

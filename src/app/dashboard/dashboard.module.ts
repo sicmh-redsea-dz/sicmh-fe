@@ -1,3 +1,5 @@
+import { DashboardLineChartComponent } from './components/dashboard-line-chart/dashboard-line-chart.component'
+import { AppointmentsPageComponent } from './pages/appointments-page/appointments-page.component'
 import { InventoryPickerComponent } from './components/inventory-picker/inventory-picker.component'
 import { ClinicalProfileComponent } from './components/clinical-profile/clinical-profile.component'
 import { NgModule } from '@angular/core';
@@ -43,6 +45,7 @@ import { ConsentManagerComponent } from './components/consents/consent-manager/c
     SidebarComponent,
     PatientsPageComponent,
     DashboardPageComponent,
+    AppointmentsPageComponent,
     PatientFormPageComponent,
     VisitsPageComponent,
     VisitsFormPageComponent,
@@ -69,6 +72,7 @@ import { ConsentManagerComponent } from './components/consents/consent-manager/c
     ConsentManagerComponent
   ],
   imports: [
+    DashboardLineChartComponent,
     ClinicalProfileComponent,
     CommonModule,
     DashboardRoutingModule,

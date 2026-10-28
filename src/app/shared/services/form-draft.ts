@@ -14,6 +14,7 @@ export interface DraftOptions {
 
 /** Recovery only: never submits a patient, encounter, inventory movement or consent. */
 export class FormDraft {
+  public hasPendingChanges = false
   public status = 'Sin cambios pendientes.'
   private baseline = ''
   private lastStored = ''
@@ -36,6 +37,7 @@ export class FormDraft {
         if (accepted) {
           this.options.restore(saved.data)
           this.lastStored = JSON.stringify(this.options.snapshot())
+          this.hasPendingChanges = this.lastStored !== this.baseline
           this.status = 'Borrador recuperado. Guarda el formulario para confirmar los datos.'
         } else this.options.storage.removeItem(this.options.key)
       } else if (raw) this.options.storage.removeItem(this.options.key)
@@ -54,6 +56,7 @@ export class FormDraft {
   changed() {
     if (!this.ready || this.disposed) return
     const value = JSON.stringify(this.options.snapshot())
+    this.hasPendingChanges = value !== this.baseline
     if (value === this.baseline) {
       this.cancelTimers()
       try { this.options.storage.removeItem(this.options.key) } catch { /* Status stays accurate below. */ }
@@ -73,6 +76,7 @@ export class FormDraft {
     try {
       const data = this.options.snapshot()
       const value = JSON.stringify(data)
+      this.hasPendingChanges = value !== this.baseline
       if (value === this.baseline || value === this.lastStored) return
       if (value.length > 500_000) throw new Error('Draft too large')
       const savedAt = this.now()
@@ -84,6 +88,7 @@ export class FormDraft {
   checkpoint() { return JSON.stringify(this.options.snapshot()) }
   committed(checkpoint = this.checkpoint()) {
     this.baseline = checkpoint; this.lastStored = ''; this.cancelTimers()
+    this.hasPendingChanges = false
     try { this.options.storage.removeItem(this.options.key) } catch { /* A later recovery still asks the user. */ }
     this.status = 'Datos guardados.'
     if (this.checkpoint() !== checkpoint) this.changed()

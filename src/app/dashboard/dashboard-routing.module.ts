@@ -1,3 +1,4 @@
+import { AppointmentsPageComponent } from './pages/appointments-page/appointments-page.component'
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout.component';
@@ -29,6 +30,12 @@ const routes: Routes = [
     component: DashboardLayoutComponent,
     children: [
       { 
+        path: 'appointments',
+        component: AppointmentsPageComponent,
+        canActivate: [permissionsGuard],
+        data: { permissions: ['schedule.read'] }
+      },
+      {
         path: 'main', 
         component: DashboardPageComponent,
         canActivate: [permissionsGuard],

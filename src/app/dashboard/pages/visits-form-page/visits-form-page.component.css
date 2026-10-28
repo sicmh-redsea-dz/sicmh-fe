@@ -3,7 +3,9 @@
   max-width: none;
   max-height: calc(100dvh - 48px);
   padding: 2rem;
-  background-color: var(--surface);
+  background-color: var(--surface-muted);
+  background-color: color-mix(in srgb, var(--surface-muted) 75%, var(--border-color));
+  border: 1px solid var(--border-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
   overflow-y: auto;
@@ -127,7 +129,7 @@ select {
 }
 
 .left-column {
-  width: 50%;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
@@ -590,3 +592,31 @@ select.ng-invalid.ng-touched {
 .draft-status { margin: 0 0 16px; padding: 10px 14px; border: 1px solid #94a3b8; border-radius: 8px; }
 .draft-status p { margin: 0 0 4px; font-weight: 600; }
 .draft-status small { display: block; line-height: 1.4; }
+
+.textarea-group { min-width: 0; }
+@media (max-width: 760px) { .textareas-row { flex-direction: column; } }
+
+/* A soft canvas separates the clinical form from its editable fields. */
+.medical-form input,
+.medical-form textarea,
+.medical-form select {
+  background-color: var(--surface);
+  color: var(--text-color);
+}
+.medical-form :is(input, textarea, select):not(.ng-invalid.ng-touched) {
+  border-color: var(--border-color);
+}
+.medical-form label { color: var(--text-muted); }
+.medical-form .number-input { background: var(--surface); border-color: var(--border-color); }
+.medical-form .button-group button,
+.medical-form .button-group select {
+  background: var(--surface-muted);
+  color: var(--text-color);
+}
+.medical-form :is(input, textarea, select):focus-visible {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+.medical-form input[readonly] { background: var(--surface-muted); }
+.draft-status { background: var(--surface); border-color: var(--border-color); }
+.fancy-divider { color: var(--text-color); }

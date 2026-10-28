@@ -39,6 +39,8 @@
                         <td>{{ item.prodDesc }}</td>
                         <td>{{ item.prodQuantity }}</td>
                         <td>{{ item.prodUnitPrice }}</td>
+                        <td>{{ item.prodPurchasePrice == null ? '?' : (item.prodPurchasePrice | number:'1.2-2') }}</td>
+                        <td>{{ item.prodExpirationDate ? (item.prodExpirationDate | date:'dd/MM/yyyy') : '?' }}</td>
                         <td 
                             class="opts-wrapper" 
                             (click)="$event.stopPropagation()" 

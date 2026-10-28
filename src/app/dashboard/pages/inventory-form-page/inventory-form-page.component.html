@@ -17,6 +17,19 @@
         [formGroup]="articleForm"
         (ngSubmit)="onHandleSubmit()">
     <div class="form-content">
+      <div class="form-column">
+        <div class="form-group">
+          <label for="purchase-price">Precio de compra por unidad (opcional)</label>
+          <input id="purchase-price" type="number" min="0" max="9999999999.99" step="0.01" formControlName="prodPurchasePrice">
+          <div class="error-message" *ngIf="articleForm.get('prodPurchasePrice')?.touched && articleForm.get('prodPurchasePrice')?.invalid">
+            <small>Ingresa un precio entre 0 y 9,999,999,999.99.</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="expiration-date">Fecha de vencimiento (opcional)</label>
+          <input id="expiration-date" type="date" min="1000-01-01" max="9999-12-31" formControlName="prodExpirationDate">
+        </div>
+      </div>
 
       <div class="form-column">
         <div class="form-group">

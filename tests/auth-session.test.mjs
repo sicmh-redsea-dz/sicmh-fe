@@ -27,7 +27,7 @@ const setup = () => {
   return { auth, http, router, dispose() { injector.destroy(); Object.assign(globalThis, original) } }
 }
 
-test('expiration flushes recovery listeners before credentials are cleared and returns the same user to the form', () => {
+test('expiration flushes recovery listeners before credentials are cleared and login always lands on the main dashboard', () => {
   const s = setup()
   try {
     let atFlush
@@ -36,11 +36,13 @@ test('expiration flushes recovery listeners before credentials are cleared and r
     assert.equal(atFlush, 'original')
     assert.equal(localStorage.getItem('token'), null)
     s.auth.setAuthentication({ _id: 'other', roles: [] }, 'other-token', 'TEST')
-    assert.equal(s.auth.resumeUrl(), '/dashboard')
+    assert.equal(s.auth.resumeUrl(), '/dashboard/main')
     s.auth.setAuthentication({ _id: 'u', roles: [] }, 'new-token', 'OTHER')
-    assert.equal(s.auth.resumeUrl(), '/dashboard')
+    assert.equal(s.auth.resumeUrl(), '/dashboard/main')
     s.auth.setAuthentication({ _id: 'u', roles: [] }, 'new-token', 'TEST')
-    assert.equal(s.auth.resumeUrl(), s.router.url)
+    sessionStorage.setItem('sessionReturn', JSON.stringify({ url: s.router.url, userId: 'u', tenant: 'TEST' }))
+    assert.equal(s.auth.resumeUrl(), '/dashboard/main')
+    assert.equal(sessionStorage.getItem('sessionReturn'), null)
   } finally { s.dispose() }
 })
 

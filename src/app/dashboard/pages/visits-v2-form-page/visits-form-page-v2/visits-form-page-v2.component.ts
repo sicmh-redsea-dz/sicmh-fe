@@ -36,7 +36,7 @@ type FormVisitWithStock = FormVisit & {
 @Component({
   selector: 'app-visits-form-page-v2',
   templateUrl: './visits-form-page-v2.component.html',
-  styleUrl: './visits-form-page-v2.component.css'
+  styleUrls: ['./visits-form-page-v2.component.css', '../../../styles/clinical-form-theme.css']
 })
 export class VisitsFormPageV2Component implements OnInit {
   public trackById = trackById

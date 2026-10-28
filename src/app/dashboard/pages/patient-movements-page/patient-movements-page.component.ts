@@ -11,7 +11,7 @@ import { trackByKey } from '../../../shared/utils/track-by'
 @Component({
   selector: 'app-patient-movements-page',
   templateUrl: './patient-movements-page.component.html',
-  styleUrl: './patient-movements-page.component.css'
+  styleUrls: ['./patient-movements-page.component.css', '../../styles/clinical-form-theme.css']
 })
 export class PatientMovementsPageComponent implements OnInit {
   private route = inject(ActivatedRoute)
